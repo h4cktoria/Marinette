@@ -13,12 +13,14 @@ Currently, I consider Marinette an MVP, yet it is already capable of doing some 
 This repository is the only place where you can get Marinette without any risks. Do NOT trust in-game websites!!!
 
 
+
+
 ## Table of contents
 
 1.  [Description](#description)
 2.  [How to install?](#installation-guide)
-    2.1.    [Unreliable, fast way](#unreliable-install)
-    2.2.    [Reliable, slow way](#reliable-install)
+    1.    [Unreliable, fast way](#unreliable-install)
+    2.    [Reliable, slow way](#reliable-install)
 3.  [How to contribute?](#contribution)
 4.  [Frequently Asked Questions](#faq)
 5.  [Similar projects](#similar-projects)
@@ -26,11 +28,15 @@ This repository is the only place where you can get Marinette without any risks.
 7.  [Thanks and Credits](#thanks-and-credits)
 
 
+
+
 ## Description <a name="description"></a>
 
 Marinette is a [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) without any fancy features like [Shell Expansions](https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html), [Shell Scripting](https://en.wikipedia.org/wiki/Shell_script), [Pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)) and so on. I have tried to make it as simple as I could, using few to no abstractions, allowing both the end users and myself to change it programmatically if needed. And I wouldn't say I've succeeded. =D
 
 If you are a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING TOOL! Hack by hand first, get a grip on the game mechanics, try to code something by yourself and have fun in general!
+
+
 
 
 ## How to install? <a name="installation-guide"></a>
@@ -44,6 +50,7 @@ Unreliable is unreliable because you are not:
 
 Reliable way frees yourself from these problems
 
+
 ### Unreliable, fast way <a name="unreliable-install"></a>
 
 1.  Copy [marinette_installer.src](scripts/marinette_installer.src) into the game directory. It will create the project structure at neccessary for successfull compilation
@@ -52,6 +59,7 @@ Reliable way frees yourself from these problems
     1.    Change the **Constants.identificator** to some 32 characters long string
     2.    Scroll down to **Theme** and change it as you want
 4.  Compile **marinette.src**. Launch marinette with `--password marinette` parameters. Congratulations!
+
 
 ### Reliable, (kinda?)slow way <a name="reliable-install"></a>
 
@@ -65,9 +73,13 @@ Reliable way frees yourself from these problems
 5.  Compile **marinette.src**. Launch marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
 
 
+
+
 ## How to contribute? <a name="contribution"></a>
 
 If you want to contibute, then look at the code first. Still want to contribute? Okie, great! Open pull request and wait for me to accept it!
+
+
 
 
 ## Frequently Asked Questions <a name="faq"></a>
@@ -76,25 +88,32 @@ Q: Why on earth would you call a computer program with a human name?
 
 A: Because everything made with love should be named as a human being
 
+
 Q: Why would you create yet another shell when there are already dozens of them?
 
 A: Because all shells lack something that I want and I have wanted something made by myself
+
 
 Q: When will you finally update?
 
 A: When I have time and will to do that =D
 
+
 Q: Why the code quality is so bad?
 
 A: I don't know. Maybe because I am insane and stupid? =D
+
 
 Q: Why you left every address unchanged on the screenshots?
 
 A: Because I reset every so often and target has been randomly generated with `raddr` command anyway
 
+
 Q: Will you do user manual?
 
 A: Maybe in the future
+
+
 
 
 ## Similar projects <a name="similar-projects"></a>
@@ -114,9 +133,13 @@ Another cute shell projects:
 If you want me to add your shell, then open an issue and I will add you as fast as I can! However, do keep in mind that I DON'T endorse proprietary projects as they are potentially malicious to the end user, and therefore won't add something like Viper/Omni/RedFox/etc
 
 
+
+
 ## License <a name="license"></a>
 
 This software is licensed under Zero-Clause BSD. See [here](LICENSE) for full details
+
+
 
 
 ## Thanks and Credits <a name="thanks-and-credits"></a>
