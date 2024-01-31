@@ -2,9 +2,9 @@
 
 Cute, simple and open source shell
 
-<img src="etc/marinette_launch.png" align="center" />
-<img src="etc/marinette_nesca.png" align="center" />
-<img src="etc/marinette_sm.png" align="center" />
+![Initialization](etc/marinette_launch.png)
+![Nesca command](etc/marinette_nesca.png)
+![Session Manager](etc/marinette_sm.png)
 
 Important note: this is **NOT A REAL HACKING TOOLKIT**! This has been made, works and will work only in the game called Grey Hack!
 
@@ -84,34 +84,34 @@ If you want to contibute, then look at the code first. Still want to contribute?
 
 ## Frequently Asked Questions <a name="faq"></a>
 
-Q: Why on earth would you call a computer program with a human name?
+**Q: Why on earth would you call a computer program with a human name?**
 
-A: Because everything made with love should be named as a human being
-
-
-Q: Why would you create yet another shell when there are already dozens of them?
-
-A: Because all shells lack something that I want and I have wanted something made by myself
+**A**: Because everything made with love should be named as a human being
 
 
-Q: When will you finally update?
+**Q: Why would you create yet another shell when there are already dozens of them?**
 
-A: When I have time and will to do that =D
-
-
-Q: Why the code quality is so bad?
-
-A: I don't know. Maybe because I am insane and stupid? =D
+**A**: Because all shells lack something that I want and I have wanted something made by myself
 
 
-Q: Why you left every address unchanged on the screenshots?
+**Q: When will you finally update?**
 
-A: Because I reset every so often and target has been randomly generated with `raddr` command anyway
+**A**: When I have time and will to do that =D
 
 
-Q: Will you do user manual?
+**Q: Why the code quality is so bad?**
 
-A: Maybe in the future
+**A**: I don't know. Maybe because I am insane and stupid? =D
+
+
+**Q: Why you left every address unchanged on the screenshots?**
+
+**A**: Because I reset every so often and target has been randomly generated with `raddr` command anyway
+
+
+**Q: Will you create user manual?**
+
+**A**: Maybe in the future
 
 
 
