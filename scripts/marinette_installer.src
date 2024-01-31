@@ -1,0 +1,48 @@
+get_shell.host_computer.create_folder("/home/guest/Sources", "Marinette")
+get_shell.host_computer.create_folder("/home/guest/Sources/Marinette", "src")
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+if file then file.delete
+get_shell.host_computer.touch("/home/guest/Sources/Marinette", "LICENSE")
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "Zero-Clause BSD" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "=============" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "Permission to use, copy, modify, and/or distribute this software for" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "any purpose with or without fee is hereby granted." + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE." + char(10))
+get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "marinette.src")
+get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "marilib.src")
+get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "portable.src")
+get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "commands.src")

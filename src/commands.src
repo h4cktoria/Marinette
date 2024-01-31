@@ -1,0 +1,1498 @@
+Helps["help"] = "Any - [cmd] - See available commands"
+Aliases["help"] = ["h", "?"]
+Commands["help"] = function(arguments)
+    commands = Helps.indexes
+    if arguments.len != 0 then commands = arguments
+
+    foundHelps = {}
+
+    for command in commands
+        if Commands.indexes.indexOf(command) == null then
+            for kv in Aliases
+                if kv.value.indexOf(command) != null then
+                    command = kv.key
+                    break
+                end if
+            end for
+            if Commands.indexes.indexOf(command) == null then
+                continue
+            end if
+        end if
+        if Aliases.indexes.indexOf(command) != null then 
+            aliases = Aliases[command]
+            commands = [command] + aliases
+        else
+            commands = [command]
+        end if
+        commands = commands.join(", ")
+        categories = "Undetermined"
+        args = "N/A"
+        description = "Undetermined"
+
+        if Helps.indexes.indexOf(command) != null then
+            help = Helps[command]
+            parts = help.split(" - ")
+
+            if parts.len == 1 then 
+                description = parts[0]
+            else if parts.len == 2 then
+                categories = parts[0]
+                description = parts[1]
+            else if parts.len == 3 then
+                categories = parts[0]
+                args = parts[1]
+                description = parts[2]
+            end if
+        end if
+        
+        help = {
+            "commands": commands,
+            "args": args,
+            "description": description,
+        }
+
+        if foundHelps.indexes.indexOf(categories) == null then foundHelps[categories] = []
+        foundHelps[categories].push(help)
+    end for
+
+    printCategories = function(categories)
+        print("<color="+Theme.miscPrimary+"><b><--"+categories+"-->")
+        for help in foundHelps[categories]
+            print("<color="+Theme.miscPrimary+">"+help.commands+"<color="+Theme.miscSecondary+"> - "+help.args+" - "+help.description)
+        end for
+    end function
+
+    if foundHelps.len > 0 then 
+        categories = removeDuplicates(foundHelps.indexes)
+        typePredicate = function(iItem, jItem)
+            priority = {
+                "Any": 0,
+                "Host": 1,
+                "Shell": 2,
+                "Computer": 3,
+                "File": 4,
+            }
+            return priority[iItem] > priority[jItem]
+        end function
+        mergeSort(categories, @typePredicate)
+
+        last = categories.pop
+        for category in categories
+            printCategories(category)
+            print(" ")
+        end for
+        printCategories(last)
+    else
+        Console.error("Could not find any help message :P")
+    end if
+end function
+
+
+Helps["license"] = "Any - See licensing details"
+Aliases["license"] = ["lic", "legal"]
+Commands["license"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+
+    license = [
+        "Zero-Clause BSD",
+        "=============",
+        "",
+        "Permission to use, copy, modify, and/or distribute this software for",
+        "any purpose with or without fee is hereby granted.",
+        "",
+        "THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL",
+        "WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES",
+        "OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE",
+        "FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY",
+        "DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN",
+        "AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT",
+        "OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.",
+    ]
+    print("<color="+Theme.miscPrimary+">Marinette is licensed under Zero-Clause BSD. See below for more details.")
+    print(" ")
+    for line in license
+        print("<color="+Theme.miscPrimary+">"+line)
+    end for
+    print(" ")
+    print("<color="+Theme.miscPrimary+">More info can be found here: <u>https://www.github.com/h4cktoria/marinette</u>")
+    print("<color="+Theme.miscPrimary+">P.S.: While you are free to change this license, I would be very happy if you still credit me ^_^ - Hacktoria")
+end function
+
+
+Helps["quit"] = "Any - Quit Marinette"
+Aliases["quit"] = ["q", "exit"]
+Commands["quit"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+
+    Console.log("Thank you for using Marinette! ~")
+    exit
+end function
+
+
+Helps["clear"] = "Any - Tidy up the console"
+Aliases["clear"] = ["cls", "tidy"]
+Commands["clear"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+
+    clear_screen
+end function
+
+
+Helps["sm"] = "Any - n/new | d/del (ids) | ld/load (id) | l/look - Session Manager"
+Commands["sm"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    
+    command = arguments.pull
+    if ["n", "new"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, -1)
+    if ["d", "del"].indexOf(command) != null and arguments.len == 0 then return Conditions.arguments(arguments, -1)
+    if ["ld", "load"].indexOf(command) != null and arguments.len != 1 then return Conditions.arguments(arguments, -1)
+    if ["l", "look"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, -1)
+
+    if ["n", "new"].indexOf(command) != null then
+        ISessions.add(Intrinsics)
+        Console.log("Added new session or updated existing one =)")
+    else if ["d", "del"].indexOf(command) != null then
+        i = 0; while i < arguments.len; i = i + 1
+            id = arguments[i-1]
+            if id isa string or not ISessions.delete(id) then
+                Console.error("Incorrect ID!")
+            else
+                Console.log("Deleted session with ID <i>"+id+"</i> successfully")
+                j = i-1; while j < arguments.len; j = j + 1
+                    arguments[j-1] = arguments[j-1] - 1
+                end while
+            end if
+        end while
+    else if ["ld", "load"].indexOf(command) != null then
+        id = arguments[0]
+        if id isa string or not ISessions.get(id) then return Console.error("Incorrect ID!")
+        session = ISessions.get(id)
+        globals.Intrinsics = session.Intrinsics
+        Console.log("Loaded session successfully")
+    else if ["l", "look"].indexOf(command) != null then
+        output = "ID Object PubAddr LocAddr Port User"
+        i = 1
+        while ISessions.get(i) != null
+            session = ISessions.get(i)
+            output = output+char(10)+(i)+" "+session.name
+            i = i + 1
+        end while
+        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+    else
+        return Console.error("Unknown second argument. Don't be so mysterious!")
+    end if
+end function
+
+
+Helps["hashcrack"] = "Any - (hashes) - Crack MD5 hashes"
+Aliases["hashcrack"] = ["hc"]
+Commands["hashcrack"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.crypto
+
+    crypto = Libs.crypto
+    for md5hash in arguments
+        name = md5hash
+        toCrack = md5hash
+        if md5hash.indexOf(":") != null then
+            parts = md5hash.split(":")
+            name = parts[0]
+            toCrack = parts[1]
+        end if
+        result = crypto.decipher(toCrack)
+        if not result then
+            Console.error("Could not crack <i>"+name)
+        else
+            Console.log("Cracked <i>"+name+"</i>: <i>"+result)
+        end if
+    end for
+end function
+
+
+Helps["raddr"] = "Any - [count] Generate random network addresses"
+Aliases["raddr"] = ["rip"]
+Commands["raddr"] = function(arguments)
+    Conditions.argumentsFewerThan(arguments, 2)
+    Conditions.network
+
+    count = arguments.pull
+    if count == null then count = 1
+    if not count isa number then return Console.error("Count can't be non-number value. *^*")
+    if count == 0 then return
+
+    Console.log("Generating random network addresses...")
+    i = 0; while i < count; i = i + 1
+        print("<color="+Theme.miscPrimary+">"+randomNetworkAddress+"</color>")
+    end while
+end function
+
+
+Helps["svcfind"] = "Any - (svc) [ver] - Online service finder"
+Aliases["svcfind"] = ["sf"]
+Commands["svcfind"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.argumentsFewerThan(arguments, 3)
+    Conditions.network
+
+    service = arguments[0]
+    serviceVersion = null
+    if arguments.len == 2 then serviceVersion = arguments[1]
+
+    Console.log("Starting the lookup...")
+    while true
+        ip = randomNetworkAddress
+        router = get_router(ip)
+        for port in router.used_ports
+            info = router.port_info(port)
+            if info.indexOf(service) != null then
+                if serviceVersion then
+                    if info.indexOf(serviceVersion) != null then
+                        return Console.log("Found <i>"+ip+":"+port.port_number+"</i> with <i>"+info+"</i> 0.0")
+                    end if
+                else
+                    return Console.log("Found <i>"+ip+":"+port.port_number+"</i> with <i>"+info+"</i> 0.0")
+                end if
+            end if
+            version = ""
+            if serviceVersion then version = " "+serviceVersion
+        end for
+        Console.error("No <i>"+service+version+"</i> on <i>"+ip+"</i>... X_X")
+    end while
+end function
+
+
+Helps["sysinf"] = "Host - Get system information"
+Aliases["sysinf"] = ["si"]
+Commands["sysinf"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.host
+
+    shell = get_shell
+    computer = shell.host_computer
+
+    print("<color="+Theme.miscPrimary+"><b><--Host-->")
+    if user_bank_number then bank = user_bank_number else bank = "Unavailable"
+    if user_mail_address then mail = user_mail_address else mail = "Unavailable"
+    print("<color="+Theme.miscPrimary+">User <color="+Theme.miscSecondary+">- "+active_user)
+    print("<color="+Theme.miscPrimary+">Hostname <color="+Theme.miscSecondary+">- "+computer.get_name)
+    print("<color="+Theme.miscPrimary+">Home <color="+Theme.miscSecondary+">- "+home_dir)
+    print("<color="+Theme.miscPrimary+">Bank <color="+Theme.miscSecondary+">- "+bank)
+    print("<color="+Theme.miscPrimary+">Mail <color="+Theme.miscSecondary+">- "+mail)
+    print("<color="+Theme.miscPrimary+">ProgramPath <color="+Theme.miscSecondary+">- "+program_path)
+    print("")
+
+    print("<color="+Theme.miscPrimary+"><b><--Network-->")
+    bssid = "Unavailable"
+    essid = "Unavailable"
+    kernel = "Unavailable"
+    localIp = "Unavailable"
+    publicIp = "Unavailable"
+    deviceIp = "Unavailable"
+    if computer.is_network_active then
+        router = get_router
+        bssid = router.bssid_name
+        essid = router.essid_name
+        kernel = router.kernel_version
+        localIp = router.local_ip
+        publicIp = router.public_ip
+        deviceIp = computer.local_ip
+    end if
+    print("<color="+Theme.miscPrimary+">Mac address <color="+Theme.miscSecondary+">- "+bssid)
+    print("<color="+Theme.miscPrimary+">Network name <color="+Theme.miscSecondary+">- "+essid)
+    print("<color="+Theme.miscPrimary+">Kernel version <color="+Theme.miscSecondary+">- "+kernel)
+    print("<color="+Theme.miscPrimary+">Local IP address <color="+Theme.miscSecondary+">- "+localIp)
+    print("<color="+Theme.miscPrimary+">Public IP address <color="+Theme.miscSecondary+">- "+publicIp)
+    print("<color="+Theme.miscPrimary+">Device IP address <color="+Theme.miscSecondary+">- "+deviceIp)
+    print(" ")
+
+    print("<color="+Theme.miscPrimary+"><b><--Libraries-->")
+    crypto = "Not loaded"
+    apt = "Not loaded"
+    metaxploit = "Not loaded"
+    blockchain = "Not loaded"
+    if Libs.indexes.indexOf("crypto") != null then crypto = "Loaded"
+    if Libs.indexes.indexOf("apt") != null then apt = "Loaded"
+    if Libs.indexes.indexOf("metaxploit") != null then metaxploit = "Loaded"
+    if Libs.indexes.indexOf("blockchain") != null then blockchain = "Loaded"
+    print("<color="+Theme.miscPrimary+">Crypto <color="+Theme.miscSecondary+">- "+crypto)
+    print("<color="+Theme.miscPrimary+">Apt <color="+Theme.miscSecondary+">- "+apt)
+    print("<color="+Theme.miscPrimary+">Metaxploit <color="+Theme.miscSecondary+">- "+metaxploit)
+    print("<color="+Theme.miscPrimary+">Blockchain <color="+Theme.miscSecondary+">- "+blockchain)
+    print(" ")
+
+    print("<color="+Theme.miscPrimary+"><b><--Miscellaneous-->")
+    print("<color="+Theme.miscPrimary+">Datetime <color="+Theme.miscSecondary+">- "+current_date)
+end function
+
+
+Helps["reload"] = "Host - Performs runtime loading and system checks"
+Aliases["reload"] = ["rl"]
+Commands["reload"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.host
+
+    performRuntimeLoading
+    performSystemChecks
+end function
+
+
+Helps["load"] = "Host - (ap/path) - Load library"
+Aliases["load"] = ["include"]
+Commands["load"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.host
+
+    loadOne = function(path)
+        library = null
+        fd = iterateToPath(Intrinsics.file, path)
+        if fd then library = include_lib(fd.path)
+        if not library then return Console.error("There is no library in there!")
+
+        type = typeof(library).lower
+        if type == "cryptolib" then
+            Libs.crypto = library
+            Console.log("We can now crack! \o/")
+        else if type == "aptclientlib" then
+            Libs.apt = library
+            Console.log("We can download packages now! \o/")
+        else if type == "metaxploitlib" then
+            Libs.metaxploit = library
+            Console.log("We can now do HaCkInG!!1! \o/")
+        else if type == "blockchainlib" then
+            Libs.blockchain = library
+            Console.log("We are now affiliated with cryptocurrencies! \o/")
+        else
+            Console.error("What is this library? Seems unfamiliar to me... ._.")
+        end if
+    end function
+
+    for path in arguments
+        loadOne(path)
+    end for
+end function
+
+
+Helps["userchange"] = "Host - (user) (pass) - Substitute current user"
+Aliases["userchange"] = ["uc"]
+Commands["userchange"] = function(arguments)
+    Conditions.arguments(arguments, 2)
+    Conditions.host
+
+    user = arguments[0]
+    pass = arguments[1]
+    
+    shell = get_shell(user, pass)
+    if not shell then
+        Console.error("Incorrect username or password! *^*")
+    else
+        Console.log("Looking for myself at filesystem...")
+        // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
+        fd = findMyself(Constants.identificator, "--identify-marinette --password "+Vars.password)
+        if not fd then return Console.error("Could not find Marinette. Where did you put me? D:<")
+
+        Intrinsics.shell = shell
+        Intrinsics.computer = Intrinsics.shell.host_computer
+        Intrinsics.file = Intrinsics.computer.File("/")
+        
+        shared = get_custom_object
+        shared.Vars = deepCopy(Vars)
+        shared.Intrinsics = deepCopy(Intrinsics)
+        shared.Libs = deepCopy(Libs)
+        shared.Sessions = deepCopy(Sessions)
+
+        shell.launch(fd.path, "--no-ascii-art --password "+Vars.password)
+        exit
+    end if
+end function
+
+
+Helps["netcrack"] = "Host - (iface) (id) - Crack into wifi networks"
+Commands["netcrack"] = function(arguments)
+    Conditions.arguments(arguments, 2)
+    Conditions.host
+    Conditions.crypto
+
+    crypto = Libs.crypto
+    iface = arguments[0]
+    id = arguments[1]
+
+    lines = Intrinsics.computer.network_devices.split(char(10))
+    i = 0; while i < lines.len; i = i + 1
+        parts = lines[i-1].split(" ")
+        lines[i-1] = parts[0]
+    end while
+    ifaces = lines
+    eth = ifaces.indexOf("eth")
+    if eth != null then ifaces.remove(eth)
+    if ifaces.indexOf(iface) == null then return Console.error("There is no such interface!")
+
+    networks = Intrinsics.computer.wifi_networks(iface)
+    if not networks then return Console.error("I couldn't get network list somehow!")
+    if id > networks.len then return Console.error("Incorrect ID! ()_))")
+    
+    Console.log("Finding the network by ID...")
+    powerPredicate = function(iItem, jItem)
+        iPwr = iItem.split(" ")[1].replace("%", "").to_int
+        jPwr = jItem.split(" ")[1].replace("%", "").to_int
+        return iPwr > jPwr
+    end function
+    mergeSort(networks, @powerPredicate)
+
+    network = networks[id-1].split(" ")
+    bssid = network[0]
+    pwr = network[1].replace("%", "").to_int
+    essid = network[2]
+    acks = ceil(300000 / pwr)
+
+    Console.log("Setting the monitor mode on a selected interface...")
+    result = crypto.airmon("start", iface)
+    if result isa string then
+        crypto.airmon("stop", iface)
+        return Console.error("Airmon failure: "+result)
+    end if
+
+    Console.log("Aireplaying on <i>"+essid+"</i> with "+acks+" ACKS...")
+    result = crypto.aireplay(bssid, essid, acks)
+    if result isa string then
+        crypto.airmon("stop", iface)
+        return Console.error("Aireplay failure: "+result)
+    end if
+
+    Console.log("Aircracking the handshake...")
+    password = crypto.aircrack(current_path+"/file.cap")
+
+    Console.log("Cleaning up...")
+    cap = get_shell.host_computer.File(current_path+"/file.cap")
+    if cap then cap.delete
+
+    Console.log("Setting the mode back on a selected interface...")
+    crypto.airmon("stop", iface)
+
+    if not password then
+        return Console.error("Could not crack password!")
+    else
+        return Console.log("Cracked the password for the network with ID <i>"+id+"</i>: <i>"+password)
+    end if
+end function
+
+
+Helps["meow"] = "Host - add (repos) | del (repos) | dl (pkgs) | l/look (repos) - Meow package manager"
+Aliases["meow"] = ["mpm"]
+Commands["meow"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 1)
+    Conditions.host
+    Conditions.network
+    Conditions.apt
+    
+    apt = Libs.apt
+    command = arguments.pull
+
+    isPackageExtension = function(package, extension)
+        parts = package.split("\.")
+        return parts.len >= 2 and not (parts[0] == "" and parts[1] == extension) and parts[-1] == extension
+    end function
+
+    if command == "add" then
+        for repo in arguments
+            parts = repo.split(":")
+            if not is_valid_ip(parts[0]) or parts.len > 2 or (parts.len == 2 and parts[1].to_int isa string) then
+                Console.error("Incorrect repository!")
+                continue
+            end if
+            address = parts[0]
+            port = 1542
+            if parts.len == 2 then port = parts[1].to_int
+            result = apt.add_repo(address, port)
+            if result and result isa string then 
+                Console.error("Apt failure: "+result)
+            else
+                Console.log("Added repository <i>"+address+":"+port+"</i> successfully!")
+            end if
+        end for
+    else if command == "del" then
+        for address in arguments
+            result = apt.del_repo(address)
+            if result and result isa string then 
+                Console.error("Apt failure: "+result)
+            else
+                Console.log("Deleted repository <i>"+address+"</i> successfully!")
+            end if
+        end for
+    else if command == "dl" then
+        apt.update
+        for package in arguments
+            if isPackageExtension(package, "exe") then
+                result = apt.install(package, "/usr/bin")
+            else if isPackageExtension(package, "src") then
+                result = apt.install(package, "/home/guest/Sources")
+            else if isPackageExtension(package, "txt") then
+                result = apt.install(package, "/home/guest/Downloads")
+            else
+                result = apt.install(package)
+            end if
+            if result and result isa string then
+                Console.error("Apt failure: "+result)
+            else
+                Console.log("Installed <i>"+package+"</i> successfully!")
+            end if
+        end for
+    else if ["l", "look"].indexOf(command) != null then
+        apt.update
+        for address in arguments
+            result = apt.show(address)
+            if result.indexOf(" repository not found") then 
+                Console.error("Apt failure: "+result)
+            else
+                Console.log("Looking at <i>"+address+"</i>...")
+                lines = result.split(char(10))
+                lines.pop
+                for line in lines
+                    print("<color="+Theme.miscPrimary+">"+line)
+                end for
+            end if
+        end for
+    else
+        return Console.error("Unknown second argument. Don't be so mysterious!")
+    end if
+end function
+
+
+Helps["nesca"] = "Host - [targets] - Network Scanner"
+Commands["nesca"] = function(arguments)
+    Conditions.host
+    Conditions.network
+
+    nescaOne = function(address)
+        router = getNetworkNode(address)
+        if not router then return Console.error("Incorrect address!")
+
+        domain = getDomainName(address)
+        Console.log("Map on <i>"+domain+" "+router.public_ip+" "+router.local_ip+"</i>...")
+        
+        output = "Addr Num Out Ins Svc Ver"
+        if router.public_ip != get_router.public_ip then output = output+char(10)+router.local_ip+" 0 Opened Opened rtr/swc "+router.kernel_version
+        for publicPort in router.used_ports
+            localAddr = publicPort.get_lan_ip
+            port = publicPort.port_number
+            pubState = "Closed"
+            locState = "Closed"
+            info = router.port_info(publicPort)
+            if not publicPort.is_closed then pubState = "Opened"
+            for localPort in getPublicPortsWithLocalStates(address)
+                if localPort.get_lan_ip != localAddr then continue
+                if localPort.port_number != port then continue
+                if not localPort.is_closed then
+                    locState = "Opened"
+                    break
+                end if
+            end for
+            output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
+        end for
+
+        for localPort in getLocalPorts(address)
+            localAddr = localPort.get_lan_ip
+            port = localPort.port_number
+            pubState = "Closed"
+            locState = "Closed"
+            info = router.port_info(localPort)
+            if not localPort.is_closed then locState = "Opened"
+            output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
+        end for
+
+        for localAddr in router.devices_lan_ip
+            node = null
+            isRouter = false
+            if router.public_ip == get_router.public_ip then
+                node = getNetworkNode(localAddr)
+                if node then isRouter = true
+            end if
+            if isRouter then
+                localAddr = node.local_ip
+                port = "0"
+                pubState = "Opened"
+                locState = "Opened"
+                info = "rtr/swc "+node.kernel_version
+                output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
+            end if
+        end for
+
+        for portlessAddr in getPortlessNodes(address)
+            output = output+char(10)+portlessAddr+" - - - computer -"
+        end for
+
+        lines = output.split(char(10))
+        addrPredicate = function(iItem, jItem)
+            iAddr = iItem.split(" ")[0]
+            jAddr = jItem.split(" ")[0]
+            return iAddr > jAddr
+        end function
+        compPredicate = function(iItem, jItem)
+            iSvc = iItem.split(" ")[4]
+            jSvc = jItem.split(" ")[4]
+            return iSvc != jSvc and jSvc == "computer"
+        end function
+        nodePredicate = function(iItem, jItem)
+            iSvc = iItem.split(" ")[4]
+            jSvc = jItem.split(" ")[4]
+            return iSvc != jSvc and jSvc == "rtr/swc"
+        end function
+        mergeSort(lines, @addrPredicate, 1)
+        mergeSort(lines, @compPredicate, 1)
+        mergeSort(lines, @nodePredicate, 1)
+
+        output = lines.join(char(10))
+        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+    end function
+
+    if arguments.len == 0 then
+        nescaOne(Intrinsics.publicAddress)
+    else
+        last = arguments.pop
+        for address in arguments
+            nescaOne(str(address))
+            print(" ")
+        end for
+        nescaOne(last)
+    end if
+end function
+
+// 
+// Thanks Ariavne for allowing me to use their nickname as a tool name :D
+Helps["ariadne"] = "Host - [ofargs] - Exploit the local system"
+Aliases["ariadne"] = ["aria"]
+Commands["ariadne"] = function(arguments)
+    Conditions.host
+    Conditions.metaxploit
+
+    fd = Intrinsics.file
+    metaxploit = Libs.metaxploit
+    
+    while fd.parent
+        fd = fd.parent
+    end while
+
+    Console.log("Searching for local libraries...")
+    metalibs = []
+    files = [] + fd.get_folders + fd.get_files
+    while files.len > 0
+        fd = files.pull
+        if fd.is_folder then 
+            files = fd.get_folders + fd.get_files + files
+            continue
+        end if
+
+        if not fd.is_binary then continue
+        metalib = metaxploit.load(fd.path)
+        if not metalib then continue
+        isAlreadyFound = false
+        for foundLib in metalibs
+            if foundLib.lib_name == metalib.lib_name and foundLib.version == metalib.version then
+                isAlreadyFound = true
+                break
+            end if
+        end for
+        if not isAlreadyFound then metalibs.push(metalib)
+    end while
+    
+    Console.log("Scanning the local libraries ("+metalibs.len+")...")
+    exploits = []
+    for metalib in metalibs
+        memory = metaxploit.scan(metalib)
+        for address in memory
+            vulners = scanMemoryAddress(metaxploit, metalib, address)
+            exploits.push({"metalib": metalib, "address": address, "vulners": vulners})
+        end for
+    end for
+
+    if exploits.len == 0 then return Console.error("No exploits have been found in scanned libraries!")
+    
+    Console.log("Exploiting the vulnerabilities...")
+    results = []
+    for exploit in exploits
+        for vulner in exploit.vulners
+            ofArgs = [null]
+            if arguments.len > 0 then ofArgs = ofArgs + arguments
+            ofArgs = removeDuplicates(ofArgs)
+            for ofArg in ofArgs
+                if ofArg == null then
+                    result = exploit.metalib.overflow(exploit.address, vulner.value)
+                else
+                    result = exploit.metalib.overflow(exploit.address, vulner.value, ofArg)
+                end if
+                if result == null then continue
+                object = result
+                result = {
+                    "publicAddr": Intrinsics.publicAddress,
+                    "localAddr": Intrinsics.localAddress,
+                    "metalib": exploit.metalib,
+                    "address": exploit.address,
+                    "vulner": vulner,
+                    "ofArg": null,
+                    "object": object,
+                }
+                if ofArg != null then result.ofArg = ofArg
+                results.push(result)
+            end for
+        end for
+    end for
+
+    if results.len == 0 then return Console.error("No vulnerabilites have been found in exploitable libraries!")
+
+    Console.log("Adding new sessions...")
+    for result in results
+        object = result.object
+        type = typeof(object)
+
+        if object isa string then print("TODO String result: "+object)
+        if object isa string or object isa number then continue
+
+        intrinsics = deepCopy(Intrinsics)
+        intrinsics.shell = null
+        intrinsics.computer = null
+        intrinsics.file = null
+        intrinsics.publicAddress = result.publicAddr
+        intrinsics.localAddress = result.localAddr
+        intrinsics.isConnectionRemote = true
+
+        if type == "shell" then
+            intrinsics.shell = object
+            intrinsics.computer = intrinsics.shell.host_computer
+            intrinsics.file = intrinsics.computer.File("/")
+        else if type == "computer" then
+            intrinsics.computer = object
+            intrinsics.file = intrinsics.computer.File("/")
+        else if type == "file" then
+            fd = object
+            while fd.parent
+                fd = fd.parent
+            end while
+            intrinsics.file = fd
+        end if
+
+        ISessions.add(intrinsics)
+    end for
+
+    Console.log("Gathering exploitation results...")
+    outputs = {}
+    for result in results
+        library = result.metalib.lib_name
+        version = result.metalib.version
+        address = result.address
+        vulner = result.vulner.value
+        ofArg = ""
+        object = result.object
+        type = typeof(object)
+        if result.ofArg then ofArg = result.ofArg
+
+        key = [library,version,ofArg].join(" ")
+        if outputs.indexes.indexOf(key) == null then
+            outputs[key] = [address,vulner,type].join(" ")
+        else
+            outputs[key] = outputs[key]+char(10)+[address,vulner,type].join(" ")
+        end if
+    end for
+
+    if outputs.len == 0 then return Console.error("No exploits have resulted in something worth looking!")
+
+    Console.log("Exploitation results:")
+    counter = 0
+    for kv in outputs
+        Console.log("Vulnerabilities in <i>"+kv.key+"</i>...")
+        output = "Addr Vulner Type"+char(10)+kv.value
+
+        lines = output.split(char(10))
+        typePredicate = function(iItem, jItem)
+            priority = {
+                "shell": 0,
+                "computer": 1,
+                "file": 2, 
+                "string": 3,
+                "number": 4,
+            }
+            iType = iItem.split(" ")[2]
+            jType = jItem.split(" ")[2]
+            return priority[iType] > priority[jType]
+        end function
+        mergeSort(lines, @typePredicate, 1)
+        
+        output = lines.join(char(10))
+        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+
+        counter = counter + 1
+        if counter != outputs.len then print(" ")
+    end for
+
+    Console.log("The process is done! Check session manager :)")
+end function
+
+
+Helps["nemesis"] = "Host - (pubAddr) a/all/(locAddr) a/all/(port) [ofargs] - Exploit the remote system"
+Aliases["nemesis"] = ["nsis", "ns"]
+Commands["nemesis"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 2)
+    Conditions.host
+    Conditions.network
+    Conditions.metaxploit
+
+    metaxploit = Libs.metaxploit
+
+    addr = arguments.pull
+    argLocAddr = arguments.pull
+    argPort = arguments.pull
+    ofArgs = [null]
+
+    router = getNetworkNode(addr)
+    if not router then return Console.error("Incorrect address!")
+    addr = router.public_ip
+    if router.public_ip == get_router.public_ip then addr = router.local_ip
+
+    ofArgs = ofArgs + arguments + router.devices_lan_ip
+
+    targets = []
+    if router.public_ip == get_router.public_ip then
+        for port in getPublicPortsWithLocalStates(addr) + getLocalPorts(addr)
+            target = {
+                "publicAddr": router.public_ip,
+                "localAddr": port.get_lan_ip,
+                "ip": port.get_lan_ip,
+                "port": port.port_number,
+            }
+            targets.push(target)
+        end for
+        for localAddr in router.devices_lan_ip
+            node = null
+            isRouter = false
+            if router.public_ip == get_router.public_ip then
+                node = getNetworkNode(localAddr)
+                if node then isRouter = true
+            end if
+            if isRouter then
+                ofArgs = ofArgs + node.devices_lan_ip
+                target = {
+                    "publicAddr": node.public_ip,
+                    "localAddr": localAddr,
+                    "ip": localAddr,
+                    "port": 0,
+                }
+                targets.push(target)
+            end if
+        end for
+    else
+        for port in router.used_ports
+            target = {
+                "publicAddr": router.public_ip,
+                "localAddr": port.get_lan_ip,
+                "ip": router.public_ip,
+                "port": port.port_number,
+            }
+            targets.push(target)
+        end for
+        target = {
+            "publicAddr": router.public_ip,
+            "localAddr": router.local_ip,
+            "ip": router.public_ip,
+            "port": 0,
+        }
+        targets.push(target)
+    end if
+    targets = removeDuplicates(targets)
+    ofArgs = removeDuplicates(ofArgs)
+
+    libraries = []
+    for target in targets
+        netSession = metaxploit.net_use(target.ip, target.port)
+        if not netSession then continue
+        metalib = netSession.dump_lib
+        library = {
+            "publicAddr": target.publicAddr,
+            "localAddr": target.localAddr,
+            "port": target.port,
+            "metalib": metalib,
+        }
+        libraries.push(library)
+    end for
+
+    i = 0; while i < libraries.len; i = i + 1
+        library = libraries[i-1]
+        if ["a", "all"].indexOf(argLocAddr) == null and library.localAddr != argLocAddr then
+            libraries.remove(i-1)
+            i = i - 1
+        else if ["a", "all"].indexOf(argPort) == null and library.port != argPort then
+            libraries.remove(i-1)
+            i = i - 1
+        end if
+    end while
+
+    Console.log("Scanning the remote libraries ("+libraries.len+")...")
+    exploits = []
+    for library in libraries
+        memory = metaxploit.scan(library.metalib)
+        for address in memory
+            vulners = scanMemoryAddress(metaxploit, library.metalib, address)
+            exploit = {
+                "publicAddr": library.publicAddr,
+                "localAddr": library.localAddr,
+                "port": library.port,
+                "metalib": library.metalib,
+                "address": address,
+                "vulners": vulners,
+            }
+            exploits.push(exploit)
+        end for
+    end for
+
+    if exploits.len == 0 then return Console.error("No exploits have been found in scanned libraries!")
+    
+    Console.log("Exploiting the vulnerabilities...")
+    results = []
+    for exploit in exploits
+        for vulner in exploit.vulners
+            ofArgs = [null]
+            if arguments.len > 0 then ofArgs = ofArgs + arguments
+            ofArgs = removeDuplicates(ofArgs)
+            for ofArg in ofArgs
+                if ofArg == null then
+                    result = exploit.metalib.overflow(exploit.address, vulner.value)
+                else
+                    result = exploit.metalib.overflow(exploit.address, vulner.value, str(ofArg))
+                end if
+                if result == null then continue
+                object = result
+                result = {
+                    "publicAddr": exploit.publicAddr,
+                    "localAddr": exploit.localAddr,
+                    "port": exploit.port,
+                    "metalib": exploit.metalib,
+                    "address": exploit.address,
+                    "vulner": vulner,
+                    "ofArg": null,
+                    "object": object,
+                }
+                if ofArg != null then result.ofArg = ofArg
+                results.push(result)
+            end for
+        end for
+    end for
+
+    if results.len == 0 then return Console.error("No vulnerabilites have been found in exploitable libraries!")
+
+    Console.log("Adding new sessions...")
+    for result in results
+        object = result.object
+        type = typeof(object)
+
+        if object isa string then print("TODO String result: "+object)
+        if object isa string or object isa number then continue
+
+        intrinsics = deepCopy(Intrinsics)
+        intrinsics.shell = null
+        intrinsics.computer = null
+        intrinsics.file = null
+        intrinsics.publicAddress = result.publicAddr
+        intrinsics.localAddress = result.localAddr
+        intrinsics.port = result.port
+        intrinsics.isConnectionRemote = true
+
+        if type == "shell" then
+            intrinsics.shell = object
+            intrinsics.computer = intrinsics.shell.host_computer
+            intrinsics.file = intrinsics.computer.File("/")
+        else if type == "computer" then
+            intrinsics.computer = object
+            intrinsics.file = intrinsics.computer.File("/")
+        else if type == "file" then
+            fd = object
+            while fd.parent
+                fd = fd.parent
+            end while
+            intrinsics.file = fd
+        end if
+
+        if result.ofArg != null and is_valid_ip(result.ofArg) then intrinsics.localAddress = result.ofArg
+
+        ISessions.add(intrinsics)
+    end for
+
+    Console.log("Gathering exploitation results...")
+    outputs = {}
+    for result in results
+        library = result.metalib.lib_name
+        version = result.metalib.version
+        address = result.address
+        vulner = result.vulner.value
+        ofArg = ""
+        object = result.object
+        type = typeof(object)
+        if result.ofArg then ofArg = result.ofArg
+
+        key = [library,version,ofArg].join(" ")
+        if outputs.indexes.indexOf(key) == null then
+            outputs[key] = [address,vulner,type].join(" ")
+        else
+            outputs[key] = outputs[key]+char(10)+[address,vulner,type].join(" ")
+        end if
+    end for
+
+    if outputs.len == 0 then return Console.error("No exploits have resulted in something worth looking!")
+
+    Console.log("Exploitation results:")
+    counter = 0
+    for kv in outputs
+        Console.log("Vulnerabilities in <i>"+kv.key+"</i>...")
+        output = "Addr Vulner Type"+char(10)+kv.value
+
+        lines = output.split(char(10))
+        typePredicate = function(iItem, jItem)
+            priority = {
+                "shell": 0,
+                "computer": 1,
+                "file": 2, 
+                "string": 3,
+                "number": 4,
+            }
+            iType = iItem.split(" ")[2]
+            jType = jItem.split(" ")[2]
+            return priority[iType] > priority[jType]
+        end function
+        mergeSort(lines, @typePredicate, 1)
+        
+        output = lines.join(char(10))
+        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+
+        counter = counter + 1
+        if counter != outputs.len then print(" ")
+    end for
+
+    Console.log("The process is done! Check session manager :)")
+end function
+
+
+Helps["hostify"] = "Shell - Attempt to hostify the session"
+Aliases["hostify"] = ["deploy"]
+Commands["hostify"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.remote
+    Conditions.shell(["shell"])
+    Conditions.network
+
+    Console.log("Looking for permissive directories to upload into...")
+    fdPermissive = findPermissivePath(Intrinsics.file, "wx")
+    if not fdPermissive then return Console.error("No permissive directories to upload into... ,_,")
+    Console.log("Looking for myself at filesystem...")
+    // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
+    fdMarinette = findMyself(Constants.identificator, "--identify-marinette --password "+Vars.password)
+    if not fdMarinette then return Console.error("Could not find Marinette. Where did you put me? D:<")
+    
+    Console.log("Uploading everything neccessary...")
+    fdBin = get_shell.host_computer.File(fdMarinette.path)
+    if not fdBin.has_permission("r") then return Console.error("No read access on something important. Change permissions!")
+    result = get_shell.scp(fdMarinette.path, fdPermissive.path, Intrinsics.shell)
+    if result isa string then return Console.error("Scp failure: "+result)
+    if not result then return Console.error("Unknown error has occured. Why on earth?..")
+    Console.log("<i>"+fdMarinette.path+"</i> -> <i>"+fdPermissive.path)
+
+    marinettePath = fdPermissive.path+"/"+fdMarinette.name
+    Intrinsics.isConnectionRemote = false
+
+    shared = get_custom_object
+    shared.Vars = deepCopy(Vars)
+    shared.Intrinsics = deepCopy(Intrinsics)
+    shared.Libs = deepCopy(Libs)
+    shared.Sessions = deepCopy(Sessions)
+
+    Console.log("The session is successfully hostified! :D")
+
+    Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Vars.password)
+    exit
+end function
+
+
+Helps["svcon"] = "Shell - (addr) (port) (user) (pass) (svc) - Connect to remote service"
+Aliases["svcon"] = ["sc"]
+Commands["svcon"] = function(arguments)
+    Conditions.arguments(arguments, 5)
+    Conditions.shell(["shell"])
+    Conditions.network
+
+    addr = arguments[0]
+    port = arguments[1]
+    user = arguments[2]
+    pass = arguments[3]
+    svc = arguments[4]
+
+    result = Intrinsics.shell.connect_service(addr, port, user, pass, svc)
+    if not result then return Console.error("Connection failed! *x*")
+    if ["shell", "ftpshell"].indexOf(typeof(result)) == null then Console.error("I have never met that kind of shell before...")
+    
+    intrinsics = deepCopy(Intrinsics)
+    intrinsics.shell = result
+    intrinsics.computer = intrinsics.shell.host_computer
+    intrinsics.file = intrinsics.computer.File("/")
+    intrinsics.publicAddress = intrinsics.computer.public_ip
+    intrinsics.localAddress = intrinsics.computer.local_ip
+    intrinsics.port = port
+    intrinsics.isConnectionRemote = true
+    
+    ISessions.add(intrinsics)
+    Console.log("Added new session or updated existing one =)")
+    Console.log("See <i>sm</i> for more details.")
+end function
+
+
+Helps["console"] = "Shell - Start in-game console"
+Aliases["console"] = ["con", "terminal", "term"]
+Commands["console"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.shell(["shell"])
+
+    Console.log("Starting the in-game console...")
+    Intrinsics.shell.start_terminal
+end function
+
+
+Helps["netint"] = "Computer - See network interfaces"
+Aliases["netint"] = ["ni"]
+Commands["netint"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.computer
+
+    output = "Iface Chip MonMode"+char(10)+Intrinsics.computer.network_devices
+    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+end function
+
+
+Helps["netlook"] = "Computer - (iface) - See surrounding networks"
+Aliases["netlook"] = ["nl"]
+Commands["netlook"] = function(arguments)
+    Conditions.arguments(arguments, 1)
+    Conditions.computer
+
+    iface = arguments[0]
+
+    lines = Intrinsics.computer.network_devices.split(char(10))
+    i = 0; while i < lines.len; i = i + 1
+        parts = lines[i-1].split(" ")
+        lines[i-1] = parts[0]
+    end while
+    ifaces = lines
+    eth = ifaces.indexOf("eth")
+    if eth != null then ifaces.remove(eth)
+    if ifaces.indexOf(iface) == null then return Console.error("There is no such interface!")
+
+    networks = Intrinsics.computer.wifi_networks(iface)
+    if not networks then return Console.error("I couldn't get network list somehow!")
+    
+    powerPredicate = function(iItem, jItem)
+        iPwr = iItem.split(" ")[1].replace("%", "").to_int
+        jPwr = jItem.split(" ")[1].replace("%", "").to_int
+        return iPwr > jPwr
+    end function
+    mergeSort(networks, @powerPredicate)
+
+    output = "ID MacAddress Pwr Name"
+    i = 0; for network in networks; i = i + 1
+        output = output+char(10)+i+" "+network
+    end for
+    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+end function
+
+
+Helps["netcon"] = "Computer - (iface) (id) (pass) - Connect to wifi network"
+Commands["netcon"] = function(arguments)
+    Conditions.arguments(arguments, 3)
+    Conditions.computer
+
+    iface = arguments[0]
+    id = arguments[1]
+    password = arguments[2]
+
+    lines = Intrinsics.computer.network_devices.split(char(10))
+    i = 0; while i < lines.len; i = i + 1
+        parts = lines[i-1].split(" ")
+        lines[i-1] = parts[0]
+    end while
+    ifaces = lines
+    eth = ifaces.indexOf("eth")
+    if eth != null then ifaces.remove(eth)
+    if ifaces.indexOf(iface) == null then return Console.error("There is no such interface!")
+
+    networks = Intrinsics.computer.wifi_networks(iface)
+    if not networks then return Console.error("I couldn't get network list somehow!")
+    if id > networks.len then return Console.error("Incorrect ID! ()_))")
+    id = id - 1
+    
+    Console.log("Finding the network by ID...")
+    powerPredicate = function(iItem, jItem)
+        iPwr = iItem.split(" ")[1].replace("%", "").to_int
+        jPwr = jItem.split(" ")[1].replace("%", "").to_int
+        return iPwr > jPwr
+    end function
+    mergeSort(networks, @powerPredicate)
+
+    network = networks[id].split(" ")
+    bssid = network[0]
+    essid = network[2]
+
+    result = Intrinsics.computer.connect_wifi(iface, bssid, essid, password)
+    if result isa string then
+        Console.error("Connection failure: "+result)
+    else
+        Console.log("Connected to <i>"+essid+"</i> successfully!")
+    end if
+end function
+
+
+Helps["tasklist"] = "Computer - View running tasks"
+Aliases["tasklist"] = ["tl"]
+Commands["tasklist"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.computer
+
+    Console.log("All running tasks:")
+    lines = Intrinsics.computer.show_procs.split(char(10))
+    output = "User Pid Cpu Mem Task"+char(10)+lines[1:].join(char(10))
+    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+end function
+
+
+Helps["taskill"] = "Computer - (tasks) - Terminate tasks"
+Aliases["taskill"] = ["tk"]
+Commands["taskill"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.computer
+
+    for pid in removeDuplicates(arguments)
+        result = Intrinsics.computer.close_program(pid)
+        if result isa string then
+            Console.error("Close program error: "+result)
+        else if not result then
+            Console.error("Unknown error!")
+        else
+            Console.log("Killed task successfully!")
+        end if
+    end for
+end function
+
+
+Helps["textfile"] = "Computer - (aps/paths) - Create text files"
+Aliases["textfile"] = ["tf"]
+Commands["textfile"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.computer
+
+    textfileOne = function(path)
+        fd = Intrinsics.file
+        parts = path.split("/")
+        fileName = parts.pop
+        path = parts.join("/")
+        if path != "" then fd = iterateToPath(fd, path)
+        if not fd or not fd.is_folder then return Console.error("Path does not exist or is not a directory!")
+        result = Intrinsics.computer.touch(fd.path, fileName)
+        if result isa string then
+            Console.error("Touch error: "+result)
+        else if not result then
+            Console.error("Unknown error!")
+        else
+            Console.log("File have been created successfully!")
+        end if
+    end function
+
+    for path in arguments
+        textfileOne(path)
+    end for
+end function
+
+
+Helps["walk"] = "File - b/back (step) | i/into (ap/path) - Walk in FS"
+Aliases["walk"] = ["w"]
+Commands["walk"] = function(arguments)
+    Conditions.arguments(arguments, 2)
+
+    command = arguments[0]
+    s = arguments[1]
+    path = str(arguments[1])
+    fd = Intrinsics.file
+
+    if ["b", "back"].indexOf(command) != null then
+        if s isa string then return Console.error("Amount of steps is always a number... o_0")
+        i = 0; while i < s; i = i + 1
+            if fd.parent then fd = fd.parent
+        end while
+        Intrinsics.file = fd
+    else if ["i", "into"].indexOf(command) != null then
+        fd = iterateToPath(fd, path)
+        if not fd or not fd.is_folder then return Console.error("Directory has not been found... ,_,")
+        Intrinsics.file = fd
+    else
+        return Console.error("Unknown second argument. Don't be so mysterious!")
+    end if
+end function
+
+
+Helps["look"] = "File - [aps/paths] - Look at files"
+Aliases["look"] = ["l"]
+Commands["look"] = function(arguments)
+    lookOne = function(path)
+        fd = Intrinsics.file
+        fd = iterateToPath(fd, path)
+        if not fd or not fd.is_folder then return Console.error("Directory has not been found... ,_,")
+
+        Console.log("Files in <i>"+fd.path)
+        output = "Permissions Owner Group Size Type Name"
+        for f in [] + fd.get_folders + fd.get_files
+            if f.is_folder then 
+                type = "Folder"
+            else if f.is_binary then 
+                type = "Binary"
+            else
+                type = "Text"
+            end if
+            permissions = f.permissions
+            output = output+char(10)+[permissions[1:],f.owner,f.group,f.size,type,f.name].join(" ")
+        end for
+        
+        // All lines exchange sorted by
+        // * Name alphanumerically
+        // * By filetype
+        lines = output.split(char(10))
+        namePredicate = function(iItem, jItem)
+            iName = iItem.split(" ")[5]
+            jName = jItem.split(" ")[5]
+            return iName > jName
+        end function
+        ftPredicate = function(iItem, jItem)
+            priority = {
+                "Folder": 2,
+                "Binary": 1,
+                "Text": 0,
+            }
+            iType = iItem.split(" ")[4]
+            jType = jItem.split(" ")[4]
+            return priority[iType] < priority[jType]
+        end function
+        mergeSort(lines, @namePredicate, 1)
+        mergeSort(lines, @ftPredicate, 1)
+        output = lines.join(char(10))
+
+        output = formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary)
+        print(output)
+    end function
+    
+    if arguments.len == 0 then
+        lookOne(Intrinsics.file.path)
+    else
+        last = arguments.pop
+        for path in arguments
+            lookOne(path)
+            print(" ")
+        end for
+        lookOne(last)
+    end if
+end function
+
+
+Helps["read"] = "File - (aps/paths) - Read the inside of files"
+Aliases["read"] = ["r"]
+Commands["read"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+
+    readOne = function(path)
+        fd = Intrinsics.file
+        fd = iterateToPath(fd, path)
+        if not fd or fd.is_binary or fd.is_folder then return Console.error("There are no readable files in there!")
+        Console.log("Reading file <i>"+fd.path+"</i>...")
+        lines = fd.get_content.split(char(10))
+        for line in lines
+            line = line.replace("\n", "\\n")
+            print("<color="+Theme.miscSecondary+">"+line)
+        end for
+    end function
+
+    if arguments.len == 1 then
+        readOne(arguments[0])
+    else
+        last = arguments.pop
+        for path in arguments
+            readOne(path)
+            print(" ")
+        end for
+        readOne(last)
+    end if
+end function
+
+
+Helps["delete"] = "File - (aps/paths) - Delete files"
+Aliases["delete"] = ["del"]
+Commands["delete"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+
+    deleteOne = function(path)
+        fd = Intrinsics.file
+        fd = iterateToPath(fd, path)
+        if not fd then return Console.error("No such file or directory... 0-0")
+        result = fd.delete
+        if result != "" then return Console.error("Deletion failure: "+result)
+        Console.log("Deleted <i>"+fd.path+"</i> successfully...")
+    end function
+
+    for path in arguments
+        deleteOne(path)
+    end for
+end function
+
+
+Helps["copy"] = "File - (ap/path) (dest) - Copy files"
+Aliases["copy"] = ["cp"]
+Commands["copy"] = function(arguments)
+    Conditions.arguments(arguments, 2)
+    
+    fd = Intrinsics.file
+    path = arguments[0]
+    dest = arguments[1]
+
+    fdSource = iterateToPath(fd, path)
+    if not fd then return Console.error("Source path does not exist!")
+    fileName = fdSource.name
+
+    fdDest = iterateToPath(fd, dest)
+    if fdDest and not fdDest.is_folder then
+        fileName = fdDest.name
+        fdDest = fdDest.parent
+    end if
+    if not fdDest then
+        parts = dest.split("/")
+        fileName = parts.pop
+        fdDest = iterateToPath(fd, parts.join("/"))
+        if not fdDest and parts.len == 0 then fdDest = fd
+        if not fdDest then return Console.error("Destination directory does not exist!")
+    end if
+
+    result = fdSource.copy(fdDest.path, fileName)
+    if result isa string then
+        Console.error("Copy error: "+result)
+    else if not result then
+        Console.error("Unknown error!")
+    else
+        Console.log("Copied file successfully!")
+    end if
+end function
+
+
+Helps["tree"] = "File - File system tree"
+Commands["tree"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+
+    recursefd = function(fd, tab=2)
+        print((" "*(tab-2))+"<color="+Theme.miscPrimary+">"+fd.permissions+"</color> "+"<color="+Theme.miscSecondary+">"+fd.path)
+        for file in fd.get_files
+            print((" "*tab)+"<color="+Theme.miscPrimary+">"+file.permissions+"</color> "+"<color="+Theme.miscSecondary+">"+file.path)
+        end for
+        for folder in fd.get_folders
+            recursefd(folder, tab + 2)
+        end for
+    end function
+
+    Console.log("Showing file system tree...")
+    fd = iterateToPath(Intrinsics.file, "/")
+    recursefd(fd)
+end function

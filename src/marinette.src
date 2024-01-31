@@ -1,0 +1,104 @@
+import_code("/home/guest/Sources/Marinette/src/portable.src")
+import_code("/home/guest/Sources/Marinette/src/marilib.src")
+import_code("/home/guest/Sources/Marinette/src/commands.src")
+
+
+
+
+// 
+// Takes the password from params, iterates it with sha256 25 times and
+// compares with the hashed password in Constants
+performPasswordChecking = function
+    userPassword = getParamValue("--password")
+    if userPassword != null then
+        passwordHash = userPassword
+        i = 0; while i < 25; i = i + 1
+            passwordHash = sha256(passwordHash)
+        end while
+        correctHash = Constants.password
+        if passwordHash == correctHash then
+            Vars.password = userPassword
+            return
+        end if
+    end if
+    exit(Console.error("Incorrect password! :("))
+end function
+
+// 
+// Throws identificator with get_custom_object and exits
+// Needed so that we could find it among other executables on system
+throwIdentifyingSignal = function
+    shared = get_custom_object
+    shared.identificator = Constants.identificator
+    exit
+end function
+
+// 
+// Loads stuff that could be loaded only at runtime
+performRuntimeLoading = function
+    Console.log("Performing runtime loading...")
+    
+    shell = get_shell
+    computer = shell.host_computer
+    file = computer.File("/")
+    
+    Intrinsics.publicAddress = null
+    Intrinsics.localAddress = null
+    if computer.is_network_active then
+        Intrinsics.publicAddress = computer.public_ip
+        Intrinsics.localAddress = computer.local_ip
+    end if
+
+    // 
+    // Loads every library it can find on the system
+    // Loads the most recent versions if metaxploit has been found
+    globals.Libs = loadLibraries
+
+    shared = get_custom_object
+    if shared.indexes.indexOf("Vars") != null then globals.Vars = deepCopy(shared.Vars)
+    if shared.indexes.indexOf("Intrinsics") != null then globals.Intrinsics = deepCopy(shared.Intrinsics)
+    if shared.indexes.indexOf("Libs") != null then globals.Libs = deepCopy(shared.Libs)
+    if shared.indexes.indexOf("Sessions") != null then globals.Sessions = deepCopy(shared.Sessions)
+
+    // 
+    // If host session does not exist, simply creating it
+    // Else we just overwrite host session with current one
+    if Vars.hostSession == null then
+        Vars.hostSession = ISessions.createSession(Intrinsics)
+    else
+        ISessions.add(Vars.hostSession.Intrinsics)
+    end if
+    ISessions.add(Intrinsics)
+end function
+
+// 
+// Checks if full Marinette's functionality can be used
+performSystemChecks = function
+    Console.log("Performing system checks...")
+    
+    haveAllPassed = true
+    if not (Intrinsics.publicAddress and Intrinsics.localAddress) then haveAllPassed = false
+    if Libs.len < 4 then haveAllPassed = false
+
+    if not haveAllPassed then
+        Console.warning("Something is bad! @_@")
+        Console.warning("See <i>sysinf</i> for more details.")
+    else
+        Console.log("All checks have successfully been passed! ^_^")
+    end if
+end function
+
+
+
+
+main = function
+    if params.indexOf("--password") == null then exit(Console.error("Marinette is protected! You shall not pass! ~"))
+    performPasswordChecking
+
+    if params.indexOf("--identify-marinette") != null then throwIdentifyingSignal
+    if params.indexOf("--no-ascii-art") == null then Console.asciiArt
+    if params.indexOf("--no-runtime-loading") == null then performRuntimeLoading
+    if params.indexOf("--no-system-checks") == null then performSystemChecks
+
+    Console.cmdloop
+end function; main

@@ -1,0 +1,785 @@
+//////////////////////////////////////////////////////////// 
+// Functions for custom shells
+////////////////////////////////////////////////////////////
+
+// 
+// Iterates file object to some existant path
+// Does not support any kind of super cow powers (even "..")
+iterateToPath = function(fd, path)
+    if path == "" then return
+    
+    parts = path.split("/")
+
+    if path[0] == "/" then
+        while fd.parent
+            fd = fd.parent
+        end while
+        if path == "/" then return fd
+        parts.pull
+    end if
+
+    for part in parts
+        if part == "" then
+            if not fd.is_folder then return
+            parts.remove(parts.indexOf(""))
+            if parts.indexOf("") == null then return fd
+            return
+        end if
+
+        if not fd.is_folder then return
+        found = false
+        for file in [] + fd.get_folders + fd.get_files
+            if file.name == part then
+                fd = file
+                found = true
+                break
+            end if
+        end for
+        if not found then return
+    end for
+
+    return fd
+end function
+
+// 
+// Checks what access we have got on file object
+// Returns "undetermined" if the access if not root and there is no /home
+checkPermissions = function(fd)
+    while fd.parent
+        fd = fd.parent
+    end while
+
+    hasRootPermissions = true
+    for permission in "rwx"
+        if not fd.has_permission(permission) then 
+            hasRootPermissions = false
+            break
+        end if
+    end for
+    if hasRootPermissions then return "root"
+
+    for folder in fd.get_folders
+        if folder.name == "home" then
+            fd = folder
+            break
+        end if
+    end for
+    if fd.path != "/home" then return "undetermined"
+
+    for folder in fd.get_folders
+        if folder.name == "guest" then continue
+        hasUserPermissions = true
+        for permission in "rwx"
+            if not folder.has_permission(permission) then 
+                hasUserPermissions = false
+                break
+            end if
+        end for
+        if hasUserPermissions then return folder.name
+    end for
+
+    return "guest"
+end function
+
+// 
+// Finds the executed program by the identificator thrown with get_custom_object
+findMyself = function(identificator, args)
+    shell = get_shell
+    computer = shell.host_computer
+    file = computer.File("/")
+
+    fd = file
+    files = [] + fd.get_folders + fd.get_files
+    fdMyself = computer.File(program_path)
+    if fdMyself then files = [fdMyself] + files
+
+    while files.len > 0
+        fd = files.pull
+        if fd.is_folder then
+            files = fd.get_folders + fd.get_files + files
+            continue
+        end if
+
+        if fd.is_binary then
+            shared = get_custom_object
+            if not fd.has_permission("x") then continue
+            shell.launch(fd.path, args)
+            if shared.indexes.indexOf("identificator") != null then
+                if shared.identificator == identificator then return fd
+            end if
+        end if
+    end while
+end function
+
+// 
+// Iterates file object until we find the folder with the needed permissions
+findPermissivePath = function(fd, perms)
+    while fd.parent
+        fd = fd.parent
+    end while
+
+    files = [] + fd.get_folders
+    while files.len > 0
+        fd = files.pull
+        if fd.is_folder then files = fd.get_folders + files
+
+        hasPermission = true
+        for perm in perms
+            if not fd.has_permission(perm) then
+                hasPermission = false
+                break
+            end if
+        end for
+        if hasPermission then return fd
+    end while
+end function
+
+//
+// Source: https://www.greyrepo.xyz/posts/scan-class
+// Scans library and returs a list of vulnerabilities
+// Returns the following:
+// vulnerability = {
+//     "value": string,
+//     "requirements": [string],
+// }
+// vulnerabilities = [vulnerability]
+scanMemoryAddress = function(metaxploit, metalib, address)
+    scanResult = metaxploit.scan_address(metalib, address)
+    if not scanResult then return
+
+	vulnerabilities = []
+	while true
+		start = scanResult.indexOf("<b>")
+		if start == null then break
+		
+		end_ = scanResult.indexOf("</b>")
+		value = slice(scanResult, start+3, end_)
+		
+		scanResult = scanResult[end_+5:]
+		scanResult = scanResult[scanResult.indexOf(".")+1:]
+		
+		scanResultLines = scanResult.split(char(10))[1:]
+		if scanResultLines[0].indexOf("*") != null then
+			requirements = scanResultLines[:scanResultLines.indexOf("")]
+		else	
+			requirements = []
+		end if
+		
+		if requirements.len >= 1 then
+			scanResult = scanResult[scanResult.indexOf(requirements[-1])+requirements[-1].len+1:]
+		end if
+        
+		vulnerabilities.push({"value": value, "requirements": requirements})
+	end while
+	
+	return vulnerabilities
+end function
+
+// 
+// Loads all the libraries it can find on host
+// Returns the following:
+// libs = {
+//     "libName1": libObject,
+//     "libName2": libObject,
+//     ...
+// }
+loadLibraries = function(metaxploit=null)
+    libs = {}
+    versions = {}
+
+    fd = get_shell.host_computer.File("/")
+    files = [] + fd.get_folders + fd.get_files
+    while files.len > 0
+        fd = files.pull
+        if fd.is_folder then
+            files = fd.get_folders + fd.get_files + files
+            continue
+        end if
+
+        library = include_lib(fd.path)
+        if not library then continue
+
+        libName = typeof(library).lower
+        for removal in ["lib", "client"]
+            libName = libName.replace(removal, "")
+        end for
+        if not metaxploit and libName == "metaxploit" then return loadLibraries(library)
+
+        if metaxploit then
+            metalib = metaxploit.load(fd.path)
+            if versions.indexes.indexOf(libName) == null then
+                versions[libName] = metalib.version
+                comparing = [metalib.version, metalib.version]
+            else
+                comparing = [versions[libName], metalib.version]
+            end if
+            comparing.sort
+            comparing.reverse
+            libs[libName] = library
+            versions[libName] = comparing[0]
+        else
+            libs[libName] = library
+        end if
+    end while
+    return libs
+end function
+
+
+//////////////////////////////////////////////////////////// 
+// List functions
+////////////////////////////////////////////////////////////
+
+// 
+// Copies the first layer of a map or each element of a list
+shallowCopy = function(collection)
+    listCopy = function(list_)
+        copy = []
+        for i in list_
+            copy.push(@i)
+        end for
+        return copy
+    end function
+
+    mapCopy = function(map_)
+        copy = {}
+        for kv in map_
+            copy[@kv["key"]] = @kv["value"]
+        end for
+        return copy
+    end function
+
+    if collection isa list then return listCopy(collection)
+    if collection isa map then return mapCopy(collection)
+end function
+
+// 
+// Copies a list/map until the elements in it are recursively exhausted
+deepCopy = function(collection)
+    listCopy = function(list_)
+        copied = []
+        for i in list_
+            if @i isa map then
+                copied.push(mapCopy(@i))
+            else if @i isa list then
+                copied.push(listCopy(@i))
+            else
+                copied.push(@i)
+            end if
+        end for
+        return copied
+    end function
+
+    mapCopy = function(map_)
+        ghObject = ["shell", "computer", "file", "ftpshell"]
+        if ghObject.indexOf(typeof(map_)) != null then return map_
+        copied = {}
+        for kv in map_
+            if @kv["value"] isa map then
+                copied[@kv["key"]] = mapCopy(@kv["value"])
+            else if @kv["value"] isa list then
+                copied[@kv["key"]] = listCopy(@kv["value"])
+            else
+                copied[@kv["key"]] = @kv["value"]
+            end if
+        end for
+        return copied
+    end function
+
+    if collection isa list then return listCopy(collection)
+    if collection isa map then return mapCopy(collection)
+end function
+
+// 
+// Checks if the list is sorted
+isSorted = function(arr, predicate)
+    if not @predicate then
+        predicate = function(iItem, jItem)
+            return iItem < jItem
+        end function
+    end if
+
+    i = 0; while i < arr.len - 1; i = i + 1
+        if not predicate(arr[i-1], arr[i-1 + 1]) then return false
+    end while
+    return true
+end function
+
+// 
+// Removes duplicates in list
+removeDuplicates = function(arr)
+    nullIdentificator = "@NULL_IDENTIFICATOR"
+    set = {}
+    for i in arr
+        if i == null then
+            set.push(nullIdentificator)
+        else
+            set.push(i)
+        end if
+    end for
+    set = set.indexes
+    nullIdI = set.indexOf(nullIdentificator)
+    while nullIdI != null
+        set[nullIdI] = null
+        nullIdI = set.indexOf(nullIdentificator)
+    end while
+    set.sort
+    return set
+end function
+
+// 
+// Applies function to every item in a list and returns that list
+fmap = function(func, arr)
+    applied = []
+    for i in arr
+        applied.push(func(i))
+    end for
+    return applied
+end function
+
+cycleSort = function(arr, predicate, start, end_)
+	if start == null then start = 0
+    if end_ == null then end_ = arr.len - 1
+
+	cycleStart = 0; while cycleStart <= end_; cycleStart = cycleStart + 1
+		item = arr[cycleStart-1]
+
+		pos = cycleStart-1
+		i = cycleStart-1 + 1; while i <= end_; i = i + 1
+			if predicate(item, arr[i-1]) then pos = pos + 1
+		end while
+		if pos == cycleStart-1 then continue
+		while item == arr[pos]
+			pos = pos + 1
+		end while
+
+		temp = arr[pos]
+		arr[pos] = item
+		item = temp
+
+		while pos != cycleStart-1
+			pos = cycleStart-1
+			i = cycleStart-1 + 1; while i <= end_; i = i + 1
+				if predicate(item, arr[i-1]) then pos = pos + 1
+			end while
+			while item == arr[pos]
+				pos = pos + 1
+			end while
+
+			temp = arr[pos]
+			arr[pos] = item
+			item = temp
+		end while
+	end while
+end function
+
+insertionSort = function(arr, predicate, start, end_)
+	if start == null then start = 0
+    if end_ == null then end_ = arr.len - 1
+
+	i = start + 1
+	while i <= end_
+		j = i
+		while j > 0 and predicate(arr[j-1], arr[j])
+			temp = arr[j]
+			arr[j] = arr[j-1]
+			arr[j-1] = temp
+			j = j - 1
+		end while
+		i = i + 1
+	end while
+end function
+
+quickSort = function(arr, predicate, low, high)
+    if low == null then low = 0
+    if high == null then high = arr.len - 1
+
+    partition = function(arr, predicate, low, high)
+        pivot = arr[high]
+        i = low - 1
+    
+        j = low; while j < high; j = j + 1
+            if predicate(pivot, arr[j-1]) then
+                i = i + 1
+                temp = arr[i]
+                arr[i] = arr[j-1]
+                arr[j-1] = temp
+            end if
+        end while
+        
+        temp = arr[i + 1]
+        arr[i + 1] = arr[high]
+        arr[high] = temp
+    
+        return i + 1
+    end function
+
+    if low < high then
+        pi = partition(arr, @predicate, low, high)
+
+        quickSort(arr, @predicate, low, pi - 1)
+        quickSort(arr, @predicate, pi + 1, high)
+    end if
+end function
+
+selectionSort = function(arr, predicate, start, end_)
+	if start == null then start = 0
+    if end_ == null then end_ = arr.len - 1
+
+	i = 0; while i < end_; i = i + 1
+		jMin = i-1
+		j = i-1 + 1; while j <= end_; j = j + 1
+			if predicate(arr[j-1], arr[jMin]) then
+				jMin = j-1
+				continue
+			end if
+		end while
+
+		if jMin != i-1 then
+			temp = arr[i-1]
+			arr[i-1] = arr[jMin]
+			arr[jMin] = temp
+		end if
+	end while
+end function
+
+mergeSort = function(arr, predicate, start, end_)
+    if start == null then start = 0
+    if end_ == null then end_ = arr.len - 1
+
+    merge = function(arr, predicate, start, mid, end_)
+        left = arr[start:mid+1]
+        right = arr[mid+1:end_+1]
+        
+        i = 0
+        j = 0
+        k = start
+        
+        while i < len(left) and j < len(right)
+            if not predicate(left[i], right[j]) then
+                arr[k] = left[i]
+                i = i + 1
+            else
+                arr[k] = right[j]
+                j = j + 1
+            end if
+            k = k + 1
+        end while
+        
+        while i < len(left)
+            arr[k] = left[i]
+            i = i + 1
+            k = k + 1
+        end while
+        
+        while j < len(right)
+            arr[k] = right[j]
+            j = j + 1
+            k = k + 1
+        end while
+    end function
+
+    if start >= end_ then return arr
+
+    mid = (start + end_) / 2
+    
+    mergeSort(arr, @predicate, start, mid)
+    mergeSort(arr, @predicate, mid+1, end_)
+    
+    merge(arr, @predicate, start, mid, end_)
+end function
+
+
+//////////////////////////////////////////////////////////// 
+// Networking
+////////////////////////////////////////////////////////////
+
+// 
+// Returns router or switch of the address
+// Address can be anything(even the website address)
+getNetworkNode = function(address)
+    if not is_valid_ip(address) then address = nslookup(address)
+    if address == "Not found" then return
+    
+    if is_lan_ip(address) then
+        router = get_switch(address)
+        if not router then router = get_router(address)
+    else
+        router = get_router
+        if router.public_ip == address then return router
+        router = get_router(address)
+    end if
+    return router
+end function
+
+getPublicPortsWithLocalStates = function(address)
+    router = getNetworkNode(address)
+    if not router then return []
+
+    ports = []
+    for localAddress in router.devices_lan_ip
+        for localPort in router.device_ports(localAddress)
+            isPublicPort = false
+            for publicPort in router.used_ports
+                if publicPort.get_lan_ip != localPort.get_lan_ip then continue
+                if publicPort.port_number != localPort.port_number then continue
+                isPublicPort = true
+                break
+            end for
+            if isPublicPort then ports.push(localPort)
+        end for
+    end for
+    return ports
+end function
+
+getLocalPorts = function(address)
+    router = getNetworkNode(address)
+    if not router then return []
+
+    ports = []
+    for localAddress in router.devices_lan_ip
+        devicePorts = router.device_ports(localAddress)
+        if devicePorts isa string then return ports
+        for localPort in devicePorts
+            isPublicPort = false
+            for publicPort in router.used_ports
+                if publicPort.get_lan_ip != localPort.get_lan_ip then continue
+                if publicPort.port_number != localPort.port_number then continue
+                isPublicPort = true
+                break
+            end for
+            if not isPublicPort then ports.push(localPort)
+        end for
+    end for
+    return ports
+end function
+
+// 
+// Returns computers w/o ports
+getPortlessNodes = function(address)
+    router = getNetworkNode(address)
+    if not router then return []
+
+    nodes = []
+    for localAddress in router.devices_lan_ip
+        localPorts = router.device_ports(localAddress)
+        if localPorts.len == 0 then nodes.push(localAddress)
+    end for
+    return nodes
+end function
+
+// 
+// Generates random IP
+randomNetworkAddress = function
+    ip = "0.0.0.0"
+    if not get_shell.host_computer.is_network_active then return ip
+    min = 0
+    max = 255
+    while not get_router(ip) or is_lan_ip(ip) 
+        a = floor(rnd * (max - min + 1) + min)
+        b = floor(rnd * (max - min + 1) + min)
+        c = floor(rnd * (max - min + 1) + min)
+        d = floor(rnd * (max - min + 1) + min)
+        ip = [a, b, c, d].join(".")
+    end while
+    return ip
+end function
+
+//
+// nslookup, but reversed
+getDomainName = function(address)
+    router = getNetworkNode(address)
+    if not router then return
+    address = router.public_ip
+
+    info = whois(address)
+    if info.indexOf("Domain name: ") == null then return
+    parts = info.split(char(10))
+    domain = parts[0].split(": ")
+    return domain[1]
+end function
+
+
+// 
+// format_columns(), but with the first line being colored with headerColor,
+// and all the others with columnsColor
+formatColumnsColored = function(columns, headerColor, columnsColor)
+    columns = format_columns(columns)
+    lines = columns.split(char(10))
+    lines[0] = "<color="+headerColor+">"+lines[0]
+    i = 1; while i < lines.len; i = i + 1
+        lines[i-1] = "<color="+columnsColor+">"+lines[i-1]
+    end while
+    return lines.join(char(10))
+end function
+
+// 
+// Returns one value after the param in params
+getParamValue = function(param)
+    paramIndex = params.indexOf(param)
+    if paramIndex < (params.len - 1) then return params[paramIndex + 1]
+end function
+
+
+//////////////////////////////////////////////////////////// 
+// Encryption & Hashing
+////////////////////////////////////////////////////////////
+
+// 
+// Source: https://github.com/Finko42/GreyHack
+// Hashes the input with sha256
+sha256 = function(input)
+	
+	Blocks = [[0]]
+	i=0
+	e=0
+	while i < input.len
+		e=4
+		while e > 0 and input.hasIndex(i)
+			e=e-1
+			Blocks[-1][-1] = Blocks[-1][-1] + code(input[i])*256^e
+			i=i+1
+		end while
+		if e == 0 then
+			if Blocks[-1].len == 16 then Blocks = Blocks + [[0]] else Blocks[-1] = Blocks[-1] + [0]
+		end if
+	end while
+	
+	if e > 0 then
+		Blocks[-1][-1] = Blocks[-1][-1] + (2147483648/256^(4-e))
+	else
+		Blocks[-1][-1] = 2147483648
+	end if
+	
+	if Blocks[-1].len == 16 then Blocks = Blocks + [[0]]
+	while Blocks[-1].len != 15
+		Blocks[-1] = Blocks[-1] + [0]
+	end while
+	
+	Blocks[-1] = Blocks[-1] + [input.len*8]
+	
+	add = function(a, b)
+		return (a + b) % 4294967296
+	end function
+	
+	XOR = function(a, b)
+		return bitwise("^", floor(a/65536), floor(b/65536))*65536+bitwise("^", a%65536, b%65536)
+	end function
+	
+	AND = function(a, b)
+		return bitwise("&", floor(a/65536), floor(b/65536))*65536+bitwise("&", a%65536, b%65536)
+	end function
+	
+	OR = function(a, b)
+		return bitwise("|", floor(a/65536), floor(b/65536))*65536+bitwise("|", a%65536, b%65536)
+	end function
+	
+	NOT = function(n)
+		return 4294967295-n
+	end function
+	
+	Ch = function(x, y, z)
+		return OR(AND(x, y), AND(NOT(x), z))
+	end function
+	
+	Maj = function(x, y, z)
+		return OR(OR(AND(x, y), AND(x, z)), AND(y, z))
+	end function
+	
+	shr = function(n, shifts)
+		return floor(n/2^shifts)
+	end function
+	
+	rotr = function(n, rots)
+		rots = 2^rots
+		return (n % rots) * (4294967296/rots) + floor(n/rots)
+	end function
+	
+	sigma0 = function(n)
+		return XOR(XOR(rotr(n, 7), rotr(n, 18)), shr(n, 3))
+	end function
+	
+	sigma1 = function(n)
+		return XOR(XOR(rotr(n, 17), rotr(n, 19)), shr(n, 10))
+	end function
+	
+	SIGMA0 = function(n)
+		return XOR(XOR(rotr(n, 2), rotr(n, 13)), rotr(n, 22))
+	end function
+	
+	SIGMA1 = function(n)
+		return XOR(XOR(rotr(n, 6), rotr(n, 11)), rotr(n, 25))
+	end function
+	
+	K = []
+	K = K + [1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221]
+	K = K + [3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580]
+	K = K + [3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986]
+	K = K + [2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895]
+	K = K + [666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037]
+	K = K + [2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344]
+	K = K + [430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779]
+	K = K + [1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298]
+	
+	H = [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]
+	
+	for Block in Blocks
+		W = Block[0:]
+		
+		for i in range(16, 63)
+			W = W + [add(add(add(sigma1(W[i-2]), W[i-7]), sigma0(W[i-15])), W[i-16])]
+		end for
+		
+		a = H[0]
+		b = H[1]
+		c = H[2]
+		d = H[3]
+		e = H[4]
+		f = H[5]
+		g = H[6]
+		h = H[7]
+		
+		for i in range(0, 63)
+			T1 = add(add(add(add(SIGMA1(e), Ch(e, f, g)), h), K[i]), W[i])
+			T2 = add(SIGMA0(a), Maj(a, b, c))
+			h = g
+			g = f
+			f = e
+			e = add(d, T1)
+			d = c
+			c = b
+			b = a
+			a = add(T1, T2)
+		end for
+		H[0] = add(a, H[0])
+		H[1] = add(b, H[1])
+		H[2] = add(c, H[2])
+		H[3] = add(d, H[3])
+		H[4] = add(e, H[4])
+		H[5] = add(f, H[5])
+		H[6] = add(g, H[6])
+		H[7] = add(h, H[7])
+	end for
+	
+	hexTable = "0123456789abcdef"
+	hash = ""
+	for i in H.indexes
+		for j in range(7)
+			hash = hash + hexTable[floor(H[i]/16^j) % 16]
+		end for
+	end for
+	return hash
+end function
+
+
+//////////////////////////////////////////////////////////// 
+// Security
+////////////////////////////////////////////////////////////
+
+// 
+// Checks if any of the prohibited characters are in the string
+isInputValid = function(input, prohibited=["<", ">", "\", """"])
+    for char in prohibited
+        if input.indexOf(char) != null then return false
+    end for
+    return true
+end function
