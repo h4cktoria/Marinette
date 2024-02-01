@@ -127,7 +127,7 @@ Another cute shell projects:
 -   [Project Pollux](https://github.com/SidiaDevelopment/greyhack-console) by Sidia
 -   [Project p1an0Xshell](https://github.com/wh0wfg/greyscripts-p1an0) by Irtalhmu
 -   [Project Vexxed](https://github.com/WizeWizard42/GreyHack-Vexxed) by WizeWizard
--   [OpenViper](https://github.com/cantemizyurek/viper-3.0) by viris(maybe? not entirely sure)
+-   [OpenViper](https://github.com/cantemizyurek/viper-3.0) by SkidMall
 -   [MTX Franework](https://github.com/tuonux/mtx) by tuonux. Not a shell, just an interesting project that I've decided to include anyway
 
 If you want me to add your shell, then open an issue and I will add you as fast as I can! However, do keep in mind that I DON'T endorse proprietary projects as they are potentially malicious to the end user, and therefore won't add something like Viper/Omni/RedFox/etc
