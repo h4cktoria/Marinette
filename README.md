@@ -8,9 +8,9 @@ Cute, simple and open source shell
 
 Important note: this is **NOT A REAL HACKING TOOLKIT**! This has been made, works and will work only in the game called Grey Hack!
 
-Currently, I consider Marinette an MVP, yet it is already capable of doing some basic stuff
+Currently, I consider Marinette an MVP, yet it's already capable of doing some basic stuff
 
-This repository is the only place where you can get Marinette without any risks. Do NOT trust in-game websites!!!
+This repository is the only place where you can get Marinette without any risks. DON'T trust in-game websites!!!
 
 
 
@@ -32,9 +32,9 @@ This repository is the only place where you can get Marinette without any risks.
 
 ## Description <a name="description"></a>
 
-Marinette is a [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) without any fancy features like [Shell Expansions](https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html), [Shell Scripting](https://en.wikipedia.org/wiki/Shell_script), [Pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)) and so on. I have tried to make it as simple as I could, using few to no abstractions, allowing both the end users and myself to change it programmatically if needed. And I wouldn't say I've succeeded. =D
+Marinette is a [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) without any fancy features like [Shell Expansions](https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html), [Shell Scripting](https://en.wikipedia.org/wiki/Shell_script), [Pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)) and so on. I've tried to make it as simple as I could, using few to no abstractions, allowing both the end users and myself to change it programmatically if needed. And I wouldn't say I've succeeded. =D
 
-If you are a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING TOOL! Hack by hand first, get a grip on the game mechanics, try to code something by yourself and have fun in general!
+If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING TOOL! Hack by hand first, get a grip on the game mechanics, try to code something by yourself and have fun in general!
 
 
 
@@ -43,9 +43,9 @@ If you are a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING
 
 There are two ways to install Marinette: Unreliable and reliable
 
-Unreliable is unreliable because you are not:
+Unreliable is unreliable because you aren't:
 1.  Dynamically creating a script for making the in-game folder structure. I can easily forget to update it when doing yet another commit
-2.  Changing the password of the executable, since it is sha256() 25 times and can be changed only with a script
+2.  Changing the password of the executable, since it's iterated with sha256() 25 times and can be changed only with a script
 3.  Randomly generating the identificator which may result in identificator collision with another Marinette user
 
 Reliable way frees yourself from these problems
@@ -64,11 +64,11 @@ Reliable way frees yourself from these problems
 ### Reliable, (kinda?)slow way <a name="reliable-install"></a>
 
 1.  Download the repository to your computer
-2.  From the root of the project, launch **scripts/marinette_installer.py**. It will create **marinette_installer.src**
+2.  From the root of the project, launch **scripts/marinette_installer.py**. It'll create **marinette_installer.src**
 3.  Repeat steps 1-2 from [Unreliable way](#unreliable-install)
 4.  (Optionally) Change the stuff in **marilib.src**
-    1.    From the root of the project, launch **scripts/hash_password.py** with the desired password. You will get a hashed password you can set in **Constants.password**
-    2.    From the root of the project, launch **scripts/identifying_signal.py**. You will get random identificator you can set in **Constants.identificator**
+    1.    From the root of the project, launch **scripts/hash_password.py** with the desired password. You'll get a hashed password you can set in **Constants.password**
+    2.    From the root of the project, launch **scripts/identifying_signal.py**. You'll get random identificator you can set in **Constants.identificator**
     3.    Scroll down to **Theme** and change it as you want
 5.  Compile **marinette.src**. Launch marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
 
@@ -101,7 +101,7 @@ If you want to contibute, then look at the code first. Still want to contribute?
 
 **Q: Why the code quality is so bad?**
 
-**A**: I don't know. Maybe because I am insane and stupid? =D
+**A**: I don't know. Maybe because I'm insane and stupid? =D
 
 
 **Q: Why you left every address unchanged on the screenshots?**
@@ -130,7 +130,7 @@ Another cute shell projects:
 -   [OpenViper](https://github.com/cantemizyurek/viper-3.0) by SkidMall
 -   [MTX Franework](https://github.com/tuonux/mtx) by tuonux. Not a shell, just an interesting project that I've decided to include anyway
 
-If you want me to add your shell, then open an issue and I will add you as fast as I can! However, do keep in mind that I DON'T endorse proprietary projects as they are potentially malicious to the end user, and therefore won't add something like Viper/Omni/RedFox/etc
+If you want me to add your shell, then open an issue and I'll add you as fast as I can! However, do keep in mind that I DON'T endorse proprietary projects as they are potentially malicious to the end user, and therefore won't add something like Viper/Omni/RedFox/etc
 
 
 
@@ -148,9 +148,9 @@ Special thanks and credits goes to:
 
 -   [Kurouzu](https://steamcommunity.com/profiles/76561198135838638) - for [Grey Hack](https://store.steampowered.com/app/605230/Grey_Hack/)
 -   [Joe Strout](https://github.com/JoeStrout) - for [MiniScript](https://github.com/JoeStrout/miniscript)
--   [Clover](https://github.com/cloverrfoxx) - for [Lunar](https://github.com/cloverrfoxx/greyhack), from where I have taken and adapted a lot of design choices
+-   [Clover](https://github.com/cloverrfoxx) - for [Lunar](https://github.com/cloverrfoxx/greyhack), from where I've taken and adapted a lot of design choices
 -   [Roupi](https://www.greyrepo.xyz/users/roupi) - for [Scan class module](https://www.greyrepo.xyz/posts/scan-class)
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(`ariadne`)
 
-If I have somehow forgotten to mention you in here then accept my apologizes! Open an issue and I will add you as fast as I can!
+If I've somehow forgotten to mention you in here then accept my apologizes! Open an issue and I'll add you as fast as I can!
