@@ -191,7 +191,7 @@ Commands["hashcrack"] = function(arguments)
     Conditions.crypto
 
     crypto = Libs.crypto
-    for md5hash in arguments
+    for md5hash in fmap(@str, arguments)
         name = md5hash
         toCrack = md5hash
         if md5hash.indexOf(":") != null then
@@ -234,9 +234,9 @@ Commands["svcfind"] = function(arguments)
     Conditions.argumentsFewerThan(arguments, 3)
     Conditions.network
 
-    service = arguments[0]
+    service = str(arguments[0])
     serviceVersion = null
-    if arguments.len == 2 then serviceVersion = arguments[1]
+    if arguments.len == 2 then serviceVersion = str(arguments[1])
 
     Console.log("Starting the lookup...")
     while true
@@ -366,7 +366,7 @@ Commands["load"] = function(arguments)
         end if
     end function
 
-    for path in arguments
+    for path in fmap(@str, arguments)
         loadOne(path)
     end for
 end function
@@ -378,8 +378,8 @@ Commands["userchange"] = function(arguments)
     Conditions.arguments(arguments, 2)
     Conditions.host
 
-    user = arguments[0]
-    pass = arguments[1]
+    user = str(arguments[0])
+    pass = str(arguments[1])
     
     shell = get_shell(user, pass)
     if not shell then
@@ -413,7 +413,7 @@ Commands["netcrack"] = function(arguments)
     Conditions.crypto
 
     crypto = Libs.crypto
-    iface = arguments[0]
+    iface = str(arguments[0])
     id = arguments[1]
 
     lines = Intrinsics.computer.network_devices.split(char(10))
@@ -428,7 +428,7 @@ Commands["netcrack"] = function(arguments)
 
     networks = Intrinsics.computer.wifi_networks(iface)
     if not networks then return Console.error("I couldn't get network list somehow!")
-    if id > networks.len then return Console.error("Incorrect ID! ()_))")
+    if not id isa number or id > networks.len then return Console.error("Incorrect ID! ()_))")
     
     Console.log("Finding the network by ID...")
     powerPredicate = function(iItem, jItem)
@@ -485,7 +485,7 @@ Commands["meow"] = function(arguments)
     Conditions.apt
     
     apt = Libs.apt
-    command = arguments.pull
+    command = str(arguments.pull)
 
     isPackageExtension = function(package, extension)
         parts = package.split("\.")
@@ -493,7 +493,7 @@ Commands["meow"] = function(arguments)
     end function
 
     if command == "add" then
-        for repo in arguments
+        for repo in fmap(@str, arguments)
             parts = repo.split(":")
             if not is_valid_ip(parts[0]) or parts.len > 2 or (parts.len == 2 and parts[1].to_int isa string) then
                 Console.error("Incorrect repository!")
@@ -510,7 +510,7 @@ Commands["meow"] = function(arguments)
             end if
         end for
     else if command == "del" then
-        for address in arguments
+        for address in fmap(@str, arguments)
             result = apt.del_repo(address)
             if result and result isa string then 
                 Console.error("Apt failure: "+result)
@@ -520,7 +520,7 @@ Commands["meow"] = function(arguments)
         end for
     else if command == "dl" then
         apt.update
-        for package in arguments
+        for package in fmap(@str, arguments)
             if isPackageExtension(package, "exe") then
                 result = apt.install(package, "/usr/bin")
             else if isPackageExtension(package, "src") then
@@ -538,7 +538,7 @@ Commands["meow"] = function(arguments)
         end for
     else if ["l", "look"].indexOf(command) != null then
         apt.update
-        for address in arguments
+        for address in fmap(@str, arguments)
             result = apt.show(address)
             if result.indexOf(" repository not found") then 
                 Console.error("Apt failure: "+result)
@@ -647,6 +647,7 @@ Commands["nesca"] = function(arguments)
     if arguments.len == 0 then
         nescaOne(Intrinsics.publicAddress)
     else
+        arguments = fmap(@str, arguments)
         last = arguments.pop
         for address in arguments
             nescaOne(str(address))
@@ -711,7 +712,7 @@ Commands["ariadne"] = function(arguments)
     for exploit in exploits
         for vulner in exploit.vulners
             ofArgs = [null]
-            if arguments.len > 0 then ofArgs = ofArgs + arguments
+            if arguments.len > 0 then ofArgs = ofArgs + fmap(@str, arguments)
             ofArgs = removeDuplicates(ofArgs)
             for ofArg in ofArgs
                 if ofArg == null then
@@ -836,17 +837,20 @@ Commands["nemesis"] = function(arguments)
 
     metaxploit = Libs.metaxploit
 
-    addr = arguments.pull
-    argLocAddr = arguments.pull
+    addr = str(arguments.pull)
+    argLocAddr = str(arguments.pull)
     argPort = arguments.pull
     ofArgs = [null]
 
     router = getNetworkNode(addr)
-    if not router then return Console.error("Incorrect address!")
+    if not router then return Console.error("Incorrect address x.x")
     addr = router.public_ip
     if router.public_ip == get_router.public_ip then addr = router.local_ip
 
-    ofArgs = ofArgs + arguments + router.devices_lan_ip
+    if not is_valid_ip(argLocAddr) or not is_lan_ip(argLocAddr) then return Console.error("Incorrect local address x.x")
+    if not argPort isa number then return Console.error("Incorrect port number x.x")
+
+    ofArgs = ofArgs + fmap(@str, arguments) + router.devices_lan_ip
 
     targets = []
     if router.public_ip == get_router.public_ip then
@@ -1114,11 +1118,14 @@ Commands["svcon"] = function(arguments)
     Conditions.shell(["shell"])
     Conditions.network
 
-    addr = arguments[0]
+    addr = str(arguments[0])
     port = arguments[1]
-    user = arguments[2]
-    pass = arguments[3]
-    svc = arguments[4]
+    user = str(arguments[2])
+    pass = str(arguments[3])
+    svc = str(arguments[4])
+
+    if not is_valid_ip(addr) then return Console.error("Incorrect address x.x")
+    if not port isa number then return Console.error("Incorrect port number x.x")
 
     result = Intrinsics.shell.connect_service(addr, port, user, pass, svc)
     if not result then return Console.error("Connection failed! *x*")
@@ -1167,7 +1174,7 @@ Commands["netlook"] = function(arguments)
     Conditions.arguments(arguments, 1)
     Conditions.computer
 
-    iface = arguments[0]
+    iface = str(arguments[0])
 
     lines = Intrinsics.computer.network_devices.split(char(10))
     i = 0; while i < lines.len; i = i + 1
@@ -1202,9 +1209,9 @@ Commands["netcon"] = function(arguments)
     Conditions.arguments(arguments, 3)
     Conditions.computer
 
-    iface = arguments[0]
+    iface = str(arguments[0])
     id = arguments[1]
-    password = arguments[2]
+    password = str(arguments[2])
 
     lines = Intrinsics.computer.network_devices.split(char(10))
     i = 0; while i < lines.len; i = i + 1
@@ -1218,7 +1225,7 @@ Commands["netcon"] = function(arguments)
 
     networks = Intrinsics.computer.wifi_networks(iface)
     if not networks then return Console.error("I couldn't get network list somehow!")
-    if id > networks.len then return Console.error("Incorrect ID! ()_))")
+    if not id isa number or id > networks.len then return Console.error("Incorrect ID! ()_))")
     id = id - 1
     
     Console.log("Finding the network by ID...")
@@ -1297,7 +1304,7 @@ Commands["textfile"] = function(arguments)
         end if
     end function
 
-    for path in arguments
+    for path in fmap(@str, arguments)
         textfileOne(path)
     end for
 end function
@@ -1308,13 +1315,14 @@ Aliases["walk"] = ["w"]
 Commands["walk"] = function(arguments)
     Conditions.arguments(arguments, 2)
 
-    command = arguments[0]
+    command = str(arguments[0])
     s = arguments[1]
     path = str(arguments[1])
+
     fd = Intrinsics.file
 
     if ["b", "back"].indexOf(command) != null then
-        if s isa string then return Console.error("Amount of steps is always a number... o_0")
+        if not s isa number then return Console.error("Amount of steps is always a number... o_0")
         i = 0; while i < s; i = i + 1
             if fd.parent then fd = fd.parent
         end while
@@ -1381,6 +1389,7 @@ Commands["look"] = function(arguments)
     if arguments.len == 0 then
         lookOne(Intrinsics.file.path)
     else
+        arguments = fmap(@str, arguments)
         last = arguments.pop
         for path in arguments
             lookOne(path)
@@ -1409,8 +1418,9 @@ Commands["read"] = function(arguments)
     end function
 
     if arguments.len == 1 then
-        readOne(arguments[0])
+        readOne(str(arguments[0]))
     else
+        arguments = fmap(@str, arguments)
         last = arguments.pop
         for path in arguments
             readOne(path)
@@ -1435,7 +1445,7 @@ Commands["delete"] = function(arguments)
         Console.log("Deleted <i>"+fd.path+"</i> successfully...")
     end function
 
-    for path in arguments
+    for path in fmap(@str, arguments)
         deleteOne(path)
     end for
 end function
@@ -1447,8 +1457,8 @@ Commands["copy"] = function(arguments)
     Conditions.arguments(arguments, 2)
     
     fd = Intrinsics.file
-    path = arguments[0]
-    dest = arguments[1]
+    path = str(arguments[0])
+    dest = str(arguments[1])
 
     fdSource = iterateToPath(fd, path)
     if not fd then return Console.error("Source path does not exist!")
