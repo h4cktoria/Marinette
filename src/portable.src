@@ -254,6 +254,7 @@ end function
 
 // 
 // Copies a list/map until the elements in it are recursively exhausted
+// If a map has classID index, omits the recursive copying and just returns that map
 deepCopy = function(collection)
     listCopy = function(list_)
         copied = []
@@ -270,8 +271,7 @@ deepCopy = function(collection)
     end function
 
     mapCopy = function(map_)
-        ghObject = ["shell", "computer", "file", "ftpshell"]
-        if ghObject.indexOf(typeof(map_)) != null then return map_
+        if map_.indexes.indexOf("classID") != null then return map_
         copied = {}
         for kv in map_
             if @kv["value"] isa map then
