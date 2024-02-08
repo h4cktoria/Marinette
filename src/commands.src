@@ -261,6 +261,69 @@ Commands["svcfind"] = function(arguments)
 end function
 
 
+Helps["maildump"] = "Any - (addr) (port) - See users registered on SMTP service"
+Aliases["maildump"] = ["md"]
+Commands["maildump"] = function(arguments)
+    Conditions.arguments(arguments, 2)
+    Conditions.network
+    Conditions.crypto
+
+    crypto = Libs.crypto
+
+    addr = str(arguments[0])
+    port = arguments[1]
+
+    router = getNetworkNode(addr)
+    if not router then return Console.error("Incorrect address x.x")
+    addr = router.public_ip
+    if router.public_ip == get_router.public_ip then addr = router.local_ip
+
+    if not port isa number then return Console.error("Incorrect port x.x")
+
+    result = crypto.smtp_user_list(addr, port)
+    if not result then return Console.error("SMTP service is invulnerable ,_,")
+    if result isa string then return Console.error("Smtp user list error: "+result)
+
+    output = result.join(char(10))
+    output = output.replace("email not found", "-")
+    output = "User Email"+char(10)+output
+    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+end function
+
+
+Helps["whois"] = "Any - [addrs] - See information about target"
+Commands["whois"] = function(arguments)
+    Conditions.network
+
+    whoisOne = function(addr)
+        router = getNetworkNode(addr)
+        if not router then return Console.error("Incorrect address x.x")
+        addr = router.public_ip
+
+        output = whois(addr)
+        lines = output.split(char(10))
+        if lines.len == 1 then return Console.error("Whois error: "+output)
+        
+        Console.log("Whois on <i>"+addr+"</i>...")
+        for line in lines
+            print("<color="+Theme.miscSecondary+">"+line+"</color>")
+        end for
+    end function
+
+    if arguments.len == 0 then
+        whoisOne(get_router.public_ip)
+    else
+        arguments = fmap(@str, arguments)
+        last = arguments.pop
+        for path in arguments
+            whoisOne(path)
+            print(" ")
+        end for
+        whoisOne(last)
+    end if
+end function
+
+
 Helps["sysinf"] = "Host - Get system information"
 Aliases["sysinf"] = ["si"]
 Commands["sysinf"] = function(arguments)
@@ -847,9 +910,6 @@ Commands["nemesis"] = function(arguments)
     addr = router.public_ip
     if router.public_ip == get_router.public_ip then addr = router.local_ip
 
-    if not is_valid_ip(argLocAddr) or not is_lan_ip(argLocAddr) then return Console.error("Incorrect local address x.x")
-    if not argPort isa number then return Console.error("Incorrect port number x.x")
-
     ofArgs = ofArgs + fmap(@str, arguments) + router.devices_lan_ip
 
     targets = []
@@ -1409,8 +1469,10 @@ Commands["read"] = function(arguments)
         fd = Intrinsics.file
         fd = iterateToPath(fd, path)
         if not fd or fd.is_binary or fd.is_folder then return Console.error("There are no readable files in there!")
+        content = fd.get_content
+        if content == null then return Console.error("Could not get the contents of a file...")
         Console.log("Reading file <i>"+fd.path+"</i>...")
-        lines = fd.get_content.split(char(10))
+        lines = content.split(char(10))
         for line in lines
             line = line.replace("\n", "\\n")
             print("<color="+Theme.miscSecondary+">"+line)

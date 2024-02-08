@@ -517,7 +517,9 @@ getPublicPortsWithLocalStates = function(address)
 
     ports = []
     for localAddress in router.devices_lan_ip
-        for localPort in router.device_ports(localAddress)
+        devicePorts = router.device_ports(localAddress)
+        if devicePorts == null or devicePorts isa string then continue
+        for localPort in devicePorts
             isPublicPort = false
             for publicPort in router.used_ports
                 if publicPort.get_lan_ip != localPort.get_lan_ip then continue
@@ -538,7 +540,7 @@ getLocalPorts = function(address)
     ports = []
     for localAddress in router.devices_lan_ip
         devicePorts = router.device_ports(localAddress)
-        if devicePorts isa string then return ports
+        if devicePorts == null or devicePorts isa string then continue
         for localPort in devicePorts
             isPublicPort = false
             for publicPort in router.used_ports
@@ -562,7 +564,7 @@ getPortlessNodes = function(address)
     nodes = []
     for localAddress in router.devices_lan_ip
         localPorts = router.device_ports(localAddress)
-        if localPorts.len == 0 then nodes.push(localAddress)
+        if localPorts == null or localPorts isa string or localPorts.len == 0 then nodes.push(localAddress)
     end for
     return nodes
 end function
