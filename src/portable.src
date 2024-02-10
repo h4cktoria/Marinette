@@ -600,6 +600,42 @@ getDomainName = function(address)
     return domain[1]
 end function
 
+getAdministrativeContact = function(address)
+    router = getNetworkNode(address)
+    if not router then return
+    address = router.public_ip
+
+    info = whois(address)
+    if info.indexOf("Administrative contact: ") == null then return
+    parts = info.split(char(10))
+    domain = parts[0].split(": ")
+    return domain[1]
+end function
+
+getDomainEmailAddress = function(address)
+    router = getNetworkNode(address)
+    if not router then return
+    address = router.public_ip
+
+    info = whois(address)
+    if info.indexOf("Email address: ") == null then return
+    parts = info.split(char(10))
+    domain = parts[0].split(": ")
+    return domain[1]
+end function
+
+getDomainPhoneNumber = function(address)
+    router = getNetworkNode(address)
+    if not router then return
+    address = router.public_ip
+
+    info = whois(address)
+    if info.indexOf("Phone: ") == null then return
+    parts = info.split(char(10))
+    domain = parts[0].split(": ")
+    return domain[1]
+end function
+
 
 // 
 // format_columns(), but with the first line being colored with headerColor,

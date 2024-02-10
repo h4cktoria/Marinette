@@ -621,6 +621,7 @@ end function
 
 
 Helps["nesca"] = "Host - [targets] - Network Scanner"
+Aliases["nesca"] = ["netscan"]
 Commands["nesca"] = function(arguments)
     Conditions.host
     Conditions.network
@@ -633,7 +634,7 @@ Commands["nesca"] = function(arguments)
         Console.log("Map on <i>"+domain+" "+router.public_ip+" "+router.local_ip+"</i>...")
         
         output = "Addr Num Out Ins Svc Ver"
-        if router.public_ip != get_router.public_ip then output = output+char(10)+router.local_ip+" 0 Opened Opened rtr/swc "+router.kernel_version
+        if router.public_ip != get_router.public_ip then output = output+char(10)+router.local_ip+" 0 Opened Opened node "+router.kernel_version
         for publicPort in router.used_ports
             localAddr = publicPort.get_lan_ip
             port = publicPort.port_number
@@ -674,7 +675,7 @@ Commands["nesca"] = function(arguments)
                 port = "0"
                 pubState = "Opened"
                 locState = "Opened"
-                info = "rtr/swc "+node.kernel_version
+                info = "node "+node.kernel_version
                 output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
             end if
         end for
@@ -697,7 +698,7 @@ Commands["nesca"] = function(arguments)
         nodePredicate = function(iItem, jItem)
             iSvc = iItem.split(" ")[4]
             jSvc = jItem.split(" ")[4]
-            return iSvc != jSvc and jSvc == "rtr/swc"
+            return iSvc != jSvc and jSvc == "node"
         end function
         mergeSort(lines, @addrPredicate, 1)
         mergeSort(lines, @compPredicate, 1)
@@ -719,6 +720,7 @@ Commands["nesca"] = function(arguments)
         nescaOne(last)
     end if
 end function
+
 
 // 
 // Thanks Ariavne for allowing me to use their nickname as a tool name :D
