@@ -23,7 +23,7 @@ Constants = {
     // Identificator is a signal that lets Marinette find itself in path.
     // You might want to change that if you are PVPing against another player
     // with Marinette, or if you and another player are hacking the same server.
-    "identificator": "MUVNFRJCWETFBCAIPFIZERWJOMPKZYJC",
+    "identificator": "YHTPUNNAUJGJDSOJSKBZSJGOEYJCZLOB",
 }
 
 
@@ -37,7 +37,7 @@ Vars = {
 
 
 // 
-// Shell objects that are used in commands
+// Internal objects that are used in commands
 Intrinsics = {
     "shell": get_shell,
     "computer": get_shell.host_computer,

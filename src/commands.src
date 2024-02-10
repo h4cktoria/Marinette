@@ -1609,3 +1609,63 @@ Commands["tree"] = function(arguments)
     fd = iterateToPath(Intrinsics.file, "/")
     recursefd(fd)
 end function
+
+
+Helps["nosense"] = "File - Removes sensitive info"
+Commands["nosense"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+
+    sensitive = [
+        "/etc/passwd",
+        "/root/Config/Mail.txt",
+        "/root/Config/Bank.txt",
+    ]
+    userSensitive = [
+        "/home/{USER}/Config/Mail.txt",
+        "/home/{USER}/Config/Bank.txt",
+    ]
+
+    hasAnythingFailed = false
+    cleanup = function(path)
+        fd = iterateToPath(Intrinsics.file, path)
+        if not fd then return Console.log("<i>"+path+"</i>: not found...")
+        if fd.is_folder or fd.is_binary then return Console.log("<i>"+path+"</i>: not a text file...")
+        
+        lines = [
+            "<color="+Theme.miscPrimary+">   Cleaned up with <3 by Marinette!         </color>",
+            "<color="+Theme.miscSecondary+">   https://github.com/h4cktoria/Marinette   </color>",
+        ]
+        
+        result = fd.set_content(lines.join(char(10)))
+        if result isa string then
+            Console.error("<i>"+path+"</i>: set content error: "+result)
+            outer.hasAnythingFailed = true
+        else if not result then
+            Console.error("<i>"+path+"</i>: unknown error!")
+            outer.hasAnythingFailed = true
+        else
+            Console.log("<i>"+path+"</i>: overwritten...")
+        end if
+    end function
+
+    for path in sensitive
+        cleanup(path)
+    end for
+
+    fd = iterateToPath(Intrinsics.file, "/home")
+    if not fd.is_folder then return Console.warning("<i>/home</i>: not a folder...")
+    for folder in fd.get_folders
+        user = folder.name
+        for path in userSensitive
+            path = path.replace("{USER}", user)
+            cleanup(path)
+        end for
+    end for
+
+    if hasAnythingFailed then
+        Console.warning("Something went wrong! 0_0")
+        Console.warning("Perhaps, you should run me as root? (_()")
+    else
+        Console.log("Sensitive info cleanup is complete! <3")
+    end if
+end function
