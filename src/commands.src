@@ -1256,9 +1256,11 @@ Commands["netlook"] = function(arguments)
     end function
     mergeSort(networks, @powerPredicate)
 
-    output = "ID MacAddress Pwr Name"
+    output = "ID MacAddress Pwr Name Acks"
     i = 0; for network in networks; i = i + 1
-        output = output+char(10)+i+" "+network
+        pwr = network.split(" ")[1].replace("%", "").to_int
+        acks = ceil(300000 / pwr)
+        output = output+char(10)+i+" "+network+" "+acks
     end for
     print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 end function

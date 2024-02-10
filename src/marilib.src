@@ -160,6 +160,7 @@ Console.cmdloop = function
 
             if Commands.indexes.indexOf(command) == null then
                 Console.error("Sorry! No such command available! (=0_0=)")
+                Console.error("See <i>help</i> to get some!")
                 continue
             end if
         end if
