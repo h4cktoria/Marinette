@@ -132,6 +132,8 @@ Another cute shell projects:
 
 If you want me to add your shell, then open an issue and I'll add you as fast as I can! However, do keep in mind that I DON'T endorse proprietary projects as they are potentially malicious to the end user, and therefore won't add something like Viper/Omni/RedFox/etc
 
+Upd: 10.02.2024 - The sources of both Omni(v0.7.0) and Viper(v2.2.1) got leaked and I've managed to have a quick glance at both. Have to admit, I've found no malicious code for the end user, so they are probably safe to use as of now? Still be cautious as this can change in the future
+
 
 
 
@@ -151,6 +153,6 @@ Special thanks and credits goes to:
 -   [Clover](https://github.com/cloverrfoxx) - for [Lunar](https://github.com/cloverrfoxx/greyhack), from where I've taken and adapted a lot of design choices
 -   [Roupi](https://www.greyrepo.xyz/users/roupi) - for [Scan class module](https://www.greyrepo.xyz/posts/scan-class)
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
--   Ariavne - for allowing me to use their nickname as a command name(`ariadne`)
+-   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
 
 If I've somehow forgotten to mention you in here then accept my apologizes! Open an issue and I'll add you as fast as I can!
