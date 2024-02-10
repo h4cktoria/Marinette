@@ -302,12 +302,21 @@ Commands["whois"] = function(arguments)
 
         output = whois(addr)
         lines = output.split(char(10))
-        if lines.len == 1 then return Console.error("Whois error: "+output)
+
+        domain = getDomainName(addr)
+        admin = getAdministrativeContact(addr)
+        email = getDomainEmailAddress(addr)
+        phone = getDomainPhoneNumber(addr)
+        if not domain or not admin or not email or not phone then return Console.error("Whois lookup error!")
         
         Console.log("Whois on <i>"+addr+"</i>...")
-        for line in lines
-            print("<color="+Theme.miscSecondary+">"+line+"</color>")
-        end for
+        lines = [
+            "<color="+Theme.miscPrimary+">Domain > <color="+Theme.miscSecondary+">"+domain,
+            "<color="+Theme.miscPrimary+">Admin  > <color="+Theme.miscSecondary+">"+admin,
+            "<color="+Theme.miscPrimary+">Email  > <color="+Theme.miscSecondary+">"+email,
+            "<color="+Theme.miscPrimary+">Phone  > <color="+Theme.miscSecondary+">"+phone,
+        ]
+        print(lines.join(char(10)))
     end function
 
     if arguments.len == 0 then
@@ -627,14 +636,17 @@ Commands["nesca"] = function(arguments)
     Conditions.network
 
     nescaOne = function(address)
+        nodes = []
+
         router = getNetworkNode(address)
         if not router then return Console.error("Incorrect address!")
+        nodes.push(router)
 
         domain = getDomainName(address)
         Console.log("Map on <i>"+domain+" "+router.public_ip+" "+router.local_ip+"</i>...")
         
-        output = "Addr Num Out Ins Svc Ver"
-        if router.public_ip != get_router.public_ip then output = output+char(10)+router.local_ip+" 0 Opened Opened node "+router.kernel_version
+        output = "Num Out Ins Svc Ver Addr"
+        if router.public_ip != get_router.public_ip then output = output+char(10)+"0 Opened Opened node "+router.kernel_version+" "+router.local_ip
         for publicPort in router.used_ports
             localAddr = publicPort.get_lan_ip
             port = publicPort.port_number
@@ -650,7 +662,7 @@ Commands["nesca"] = function(arguments)
                     break
                 end if
             end for
-            output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
+            output = output+char(10)+[port,pubState,locState,info,localAddr].join(" ")
         end for
 
         for localPort in getLocalPorts(address)
@@ -660,50 +672,74 @@ Commands["nesca"] = function(arguments)
             locState = "Closed"
             info = router.port_info(localPort)
             if not localPort.is_closed then locState = "Opened"
-            output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
+            output = output+char(10)+[port,pubState,locState,info,localAddr].join(" ")
         end for
 
         for localAddr in router.devices_lan_ip
             node = null
-            isRouter = false
-            if router.public_ip == get_router.public_ip then
-                node = getNetworkNode(localAddr)
-                if node then isRouter = true
-            end if
-            if isRouter then
-                localAddr = node.local_ip
-                port = "0"
-                pubState = "Opened"
-                locState = "Opened"
-                info = "node "+node.kernel_version
-                output = output+char(10)+[localAddr,port,pubState,locState,info].join(" ")
-            end if
+            if router.public_ip == get_router.public_ip then node = getNetworkNode(localAddr)
+            if not node then continue
+            nodes.push(node)
+
+            localAddr = node.local_ip
+            port = "0"
+            pubState = "Opened"
+            locState = "Opened"
+            info = "node "+node.kernel_version
+            output = output+char(10)+[port,pubState,locState,info,localAddr].join(" ")
         end for
 
         for portlessAddr in getPortlessNodes(address)
-            output = output+char(10)+portlessAddr+" - - - computer -"
+            output = output+char(10)+"- - - comp - "+portlessAddr
         end for
 
         lines = output.split(char(10))
         addrPredicate = function(iItem, jItem)
-            iAddr = iItem.split(" ")[0]
-            jAddr = jItem.split(" ")[0]
+            iAddr = iItem.split(" ")[5]
+            jAddr = jItem.split(" ")[5]
             return iAddr > jAddr
         end function
         compPredicate = function(iItem, jItem)
-            iSvc = iItem.split(" ")[4]
-            jSvc = jItem.split(" ")[4]
-            return iSvc != jSvc and jSvc == "computer"
+            iSvc = iItem.split(" ")[3]
+            jSvc = jItem.split(" ")[3]
+            return iSvc != jSvc and jSvc == "comp"
         end function
         nodePredicate = function(iItem, jItem)
-            iSvc = iItem.split(" ")[4]
-            jSvc = jItem.split(" ")[4]
+            iSvc = iItem.split(" ")[3]
+            jSvc = jItem.split(" ")[3]
             return iSvc != jSvc and jSvc == "node"
         end function
         mergeSort(lines, @addrPredicate, 1)
         mergeSort(lines, @compPredicate, 1)
         mergeSort(lines, @nodePredicate, 1)
 
+        output = lines.join(char(10))
+        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
+
+        output = "Port Rule Source Dest Addr"
+        for node in nodes
+            for rule in node.firewall_rules
+                parts = rule.split(" ")
+                action = parts[0]
+                port = parts[1]
+                source = parts[2]
+                dest = parts[3]
+                addr = node.local_ip
+                output = output+char(10)+[port,action,source,dest,addr].join(" ")
+            end for
+        end for
+
+        if output == "Port Rule Source Dest Addr" then return
+        Console.log("Firewall on <i>"+domain+" "+router.public_ip+" "+router.local_ip+"</i>...")
+
+        lines = output.split(char(10))
+        addrPredicate = function(iItem, jItem)
+            iAddr = iItem.split(" ")[4]
+            jAddr = jItem.split(" ")[4]
+            return iAddr > jAddr
+        end function
+        mergeSort(lines, @addrPredicate, 1)
+        
         output = lines.join(char(10))
         print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
     end function
@@ -1555,6 +1591,7 @@ end function
 
 
 Helps["tree"] = "File - File system tree"
+Aliases["tree"] = ["fs"]
 Commands["tree"] = function(arguments)
     Conditions.arguments(arguments, 0)
 

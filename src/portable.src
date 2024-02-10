@@ -608,7 +608,7 @@ getAdministrativeContact = function(address)
     info = whois(address)
     if info.indexOf("Administrative contact: ") == null then return
     parts = info.split(char(10))
-    domain = parts[0].split(": ")
+    domain = parts[1].split(": ")
     return domain[1]
 end function
 
@@ -620,7 +620,7 @@ getDomainEmailAddress = function(address)
     info = whois(address)
     if info.indexOf("Email address: ") == null then return
     parts = info.split(char(10))
-    domain = parts[0].split(": ")
+    domain = parts[2].split(": ")
     return domain[1]
 end function
 
@@ -632,7 +632,7 @@ getDomainPhoneNumber = function(address)
     info = whois(address)
     if info.indexOf("Phone: ") == null then return
     parts = info.split(char(10))
-    domain = parts[0].split(": ")
+    domain = parts[3].split(": ")
     return domain[1]
 end function
 
