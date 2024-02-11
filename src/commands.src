@@ -1712,3 +1712,20 @@ Commands["nosense"] = function(arguments)
         Console.log("Sensitive info cleanup is complete! <3")
     end if
 end function
+
+
+Helps["ste"] = "File - (ap/path) - Simple text editor"
+Commands["ste"] = function(arguments)
+    Conditions.arguments(arguments, 1)
+
+    path = str(arguments[0])
+    fd = iterateToPath(Intrinsics.file, path)
+    if not fd then return Console.error("File not found!")
+    if fd.is_binary or fd.is_folder then return Console.error("Not a text file!")
+    
+    for perm in "rw"
+        if not fd.has_permission(perm) then return Console.error("No neccessary permissions!")
+    end for
+
+    simpleTextEditor(fd)
+end function

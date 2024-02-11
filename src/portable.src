@@ -224,6 +224,143 @@ loadLibraries = function(metaxploit=null)
     return libs
 end function
 
+// 
+// Source: https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack
+// Simple text editor adapted to work on remote connections
+// Has no "Save and quit" command
+// Crashes the program with no rw permissions on file
+simpleTextEditor = function(fd)
+    // 
+    // Renamed it just in case
+    STEcmds = {}
+
+    STEcmds["h"] = {"name": "h", "desc": "Displays this message."}
+    STEcmds["h"]["run"] = function()
+        output = "Commands:" + ""+char(10)+"" 
+        for command in STEcmds
+            commandData = command.value
+            output = output + " " + commandData.name + " " + commandData.desc + ""+char(10)+""
+        end for
+        output = output + "Press any key to continue..."
+        return user_input(output, false, true)
+    end function
+
+    STEcmds["i"] = {"name":"i", "desc":"Insert a line before a number."}
+    STEcmds["i"]["run"] = function()
+        input = user_input("[Number] [NewText]"+char(10)+"> ")
+        input = input.split(" ")
+        lineNumber = input[0].to_int
+        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
+        input.pull
+        subStr = input.join(" ")
+        if lineNumber >= lines.len then
+            outer.lines.push(subStr)
+            outer.text = lines.join(char(10))
+            return outer.text
+        end if
+        if lineNumber == 0 then
+            outer.lines.reverse
+            outer.lines.push(subStr)
+            outer.lines.reverse
+            outer.text = lines.join(char(10))
+            return outer.text
+        end if
+        upLines = lines[:lineNumber - 1]
+        downLines = lines[lineNumber - 1:]
+        lines = upLines + [subStr] + downLines
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["m"] = {"name":"m", "desc":"Modify a line."}
+    STEcmds["m"]["run"] = function()
+        input = user_input("[Number] [NewText]"+char(10)+"> ")
+        input = input.split(" ")
+        lineNumber = input[0].to_int
+        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
+        input.pull
+        subStr = input.join(" ")
+        if lineNumber > lines.len then
+            outer.lines.push(subStr)
+            outer.text = lines.join(char(10))
+            return outer.text
+        end if
+        if lineNumber <= 0 then return user_input("Invalid line number.", false ,true)
+        lines[lineNumber - 1] = subStr
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["c"] = {"name":"c", "desc":"Clear a line."}
+    STEcmds["c"]["run"] = function()
+        input = user_input("[Number]"+char(10)+"> ")
+        lineNumber = input.to_int
+        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
+        if lineNumber > lines.len then return user_input("Invalid line number.", false ,true)
+        if lineNumber <= 0 then return user_input("Invalid line number.", false ,true)
+        outer.lines[lineNumber - 1] = ""
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["r"] = {"name":"r", "desc":"Remove a line."}
+    STEcmds["r"]["run"] = function()
+        input = user_input("[Number]"+char(10)+"> ")
+        lineNumber = input.to_int
+        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
+        if lineNumber > lines.len then return user_input("Invalid line number.", false ,true)
+        if lineNumber == 0 then return user_input("Invalid line number.", false ,true)
+        if lineNumber == lines.len and lines.len == 1 then return user_input("Cannot remove the only line.", false ,true)
+        upLines = outer.lines[:lineNumber - 1]
+        downLines = outer.lines[lineNumber:]
+        outer.lines = upLines + downLines
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["s"] = {"name":"s", "desc":"Save changes."}
+    STEcmds["s"]["run"] = function()
+        if writeFile then return user_input("Changes saved.", false, true) else return user_input("Failed to save.", false ,true)
+    end function
+
+    STEcmds["q"] = {"name":"q", "desc":"Quit without saving."}
+
+    writeFile = function()
+        if outer.file.set_content(outer.text) != 1 then return null else return true
+    end function
+
+    execute = function(input = "")
+        if not STEcmds.hasIndex(input) then return user_input("Error: Command not found! Press h for a list of STEcmds."+char(10)+"Press any key to continue", false, true)
+        command = STEcmds[input]
+        command.run
+    end function
+
+    main = function()
+        // 
+        // globals() changed to outer() to avoid messing up with global namespace
+        // Removed dependency on the computer because why would you ever want it xd
+        fileName = fd.name
+        outer.file = fd
+        outer.text = fd.get_content
+
+        while true
+            clear_screen
+            outer.lines = outer.text.split(char(10))
+            if not lines then lines = [""]
+            for i in range(0, lines.len - 1)
+                print("<color=orange> " + (i + 1) + "<color=white>:</color> " + lines[i])
+            end for
+            input = user_input("<color=yellow> " + fileName + "></color> ", false, true)
+            
+            // 
+            // Needed hack so that it won't exit the entire program
+            if input == "q" then return
+            
+            execute(input.lower)
+        end while
+    end function; main
+end function
+
 
 //////////////////////////////////////////////////////////// 
 // List functions
