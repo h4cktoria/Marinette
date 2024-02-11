@@ -1410,6 +1410,49 @@ Commands["textfile"] = function(arguments)
 end function
 
 
+Helps["unlog"] = "Computer - Corrupt /var/system.log file"
+Commands["unlog"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    Conditions.computer
+
+    result = Intrinsics.computer.touch("/var", "corrupted.log")
+    if result isa string then
+        return Console.error("Could not create a log file: touch error: "+result)
+    else if not result then
+        return Console.error("Could not create a log file: unknown error!")
+    else
+        Console.log("Created log file to be corrupted at <i>/var/corrupted.log</i>...")
+    end if
+
+    corruptedLog = iterateToPath(Intrinsics.file, "/var/corrupted.log")
+    if not corruptedLog then return Console.error("Could not locate <i>/var/corrupted.log</i> after it's creation!")
+
+    lines = [
+        "<color="+Theme.miscPrimary+">   Cleaned up with <3 by Marinette!         </color>",
+        "<color="+Theme.miscSecondary+">   https://github.com/h4cktoria/Marinette   </color>",
+    ]
+    result = corruptedLog.set_content(lines.join(char(10)))
+    if result isa string then
+        return Console.error("Could not write to log file: set content error: "+result)
+    else if not result then
+        return Console.error("Could not write to log file: unknown error!")
+    else
+        Console.log("Written to log file at <i>/var/corrupted.log</i>...")
+    end if
+
+    result = corruptedLog.move("/var", "system.log")
+    if result isa string then
+        return Console.error("Could not substitute /var/system.log: move error: "+result)
+    else if not result then
+        return Console.error("Could not substitute /var/system.log: unknown error!")
+    else
+        Console.log("Substituted <i>/var/system.log</i>...")
+    end if
+
+    Console.log("Corrupted <i>/var/system.log</i> successfully! \(*o*)/")
+end function
+
+
 Helps["walk"] = "File - b/back (step) | i/into (ap/path) - Walk in FS"
 Aliases["walk"] = ["w"]
 Commands["walk"] = function(arguments)

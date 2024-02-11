@@ -57,7 +57,7 @@ Reliable way frees yourself from these problems
 2.  Copy-Paste every source file from [src](src) into the in-game **/home/guest/Sources/Marinette/src**
 3.  (Optionally) Change the stuff in **marilib.src**
     1.    Change the **Constants.identificator** to some 32 characters long string
-    2.    Scroll down to **Theme** and change it as you want
+    2.    Scroll down to **Theme** and change it as you want(you may want to have a look at [themes](themes))
 4.  Compile **marinette.src**. Launch marinette with `--password marinette` parameters. Congratulations!
 
 
@@ -69,7 +69,7 @@ Reliable way frees yourself from these problems
 4.  (Optionally) Change the stuff in **marilib.src**
     1.    From the root of the project, launch **scripts/hash_password.py** with the desired password. You'll get a hashed password you can set in **Constants.password**
     2.    From the root of the project, launch **scripts/identifying_signal.py**. You'll get random identificator you can set in **Constants.identificator**
-    3.    Scroll down to **Theme** and change it as you want
+    3.    Scroll down to **Theme** and change it as you want(you may want to have a look at [themes](themes))
 5.  Compile **marinette.src**. Launch marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
 
 
