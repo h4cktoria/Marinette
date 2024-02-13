@@ -227,9 +227,7 @@ end function
 // 
 // Source: https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack
 // Simple text editor adapted to work on remote connections
-// Has no "Save and quit" command
-// Crashes the program with no rw permissions on file
-simpleTextEditor = function(fd)
+simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yellow")
     // 
     // Renamed it just in case
     STEcmds = {}
@@ -247,7 +245,7 @@ simpleTextEditor = function(fd)
 
     STEcmds["i"] = {"name":"i", "desc":"Insert a line before a number."}
     STEcmds["i"]["run"] = function()
-        input = user_input("[Number] [NewText]"+char(10)+"> ")
+        input = user_input("[Number] [NewText]"+char(10)+">")
         input = input.split(" ")
         lineNumber = input[0].to_int
         if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
@@ -274,7 +272,7 @@ simpleTextEditor = function(fd)
 
     STEcmds["m"] = {"name":"m", "desc":"Modify a line."}
     STEcmds["m"]["run"] = function()
-        input = user_input("[Number] [NewText]"+char(10)+"> ")
+        input = user_input("[Number] [NewText]"+char(10)+">")
         input = input.split(" ")
         lineNumber = input[0].to_int
         if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
@@ -293,7 +291,7 @@ simpleTextEditor = function(fd)
 
     STEcmds["c"] = {"name":"c", "desc":"Clear a line."}
     STEcmds["c"]["run"] = function()
-        input = user_input("[Number]"+char(10)+"> ")
+        input = user_input("[Number]"+char(10)+">")
         lineNumber = input.to_int
         if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
         if lineNumber > lines.len then return user_input("Invalid line number.", false ,true)
@@ -305,7 +303,7 @@ simpleTextEditor = function(fd)
 
     STEcmds["r"] = {"name":"r", "desc":"Remove a line."}
     STEcmds["r"]["run"] = function()
-        input = user_input("[Number]"+char(10)+"> ")
+        input = user_input("[Number]"+char(10)+">")
         lineNumber = input.to_int
         if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
         if lineNumber > lines.len then return user_input("Invalid line number.", false ,true)
@@ -318,12 +316,24 @@ simpleTextEditor = function(fd)
         return outer.text
     end function
 
+    STEcmds["x"] = {"name":"x", "desc":"Save and exit."}
+    STEcmds["x"]["run"] = function()
+        // 
+        // Changed to print
+        if writeFile then print("Changes saved. Exiting.") else return user_input("Failed to save.", false ,true)
+    end function
+
     STEcmds["s"] = {"name":"s", "desc":"Save changes."}
     STEcmds["s"]["run"] = function()
         if writeFile then return user_input("Changes saved.", false, true) else return user_input("Failed to save.", false ,true)
     end function
 
-    STEcmds["q"] = {"name":"q", "desc":"Quit without saving."}
+    STEcmds["q"] = {"name":"q", "desc":"Exit without save."}
+    STEcmds["q"]["run"] = function()
+        // 
+        // Changed to print
+        print("Changes not saved. Exiting.")
+    end function
 
     writeFile = function()
         if outer.file.set_content(outer.text) != 1 then return null else return true
@@ -336,6 +346,15 @@ simpleTextEditor = function(fd)
     end function
 
     main = function()
+        if fd.is_folder or fd.is_binary then return print("Not a text file. Exiting.")
+
+        // 
+        // Checking if we're able to read/write the file
+        content = fd.get_content
+        if content == null then return print("Insufficient read/write permissions. Exiting.")
+        result = fd.set_content(content)
+        if result != true then return print("Insufficient read/write permissions. Exiting.")
+
         // 
         // globals() changed to outer() to avoid messing up with global namespace
         // Removed dependency on the computer because why would you ever want it xd
@@ -348,16 +367,16 @@ simpleTextEditor = function(fd)
             outer.lines = outer.text.split(char(10))
             if not lines then lines = [""]
             for i in range(0, lines.len - 1)
-                print("<color=orange> " + (i + 1) + "<color=white>:</color> " + lines[i])
+                print("<color="+clLine+">" + (i + 1) + "<color="+clDelim+">:</color> " + lines[i])
             end for
-            input = user_input("<color=yellow> " + fileName + "></color> ", false, true)
-            
+            input = user_input("<color="+clInput+">" + fileName + "></color> ", false, true)
+            execute(input.lower)
+
             // 
             // Needed hack so that it won't exit the entire program
-            if input == "q" then return
-            
-            execute(input.lower)
+            if "xq".indexOf(input) != null then return
         end while
+
     end function; main
 end function
 

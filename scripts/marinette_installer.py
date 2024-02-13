@@ -45,7 +45,10 @@ if __name__ == "__main__":
         script_file.write(create_file("/home/guest/Sources/Marinette/LICENSE"))
 
         with open("LICENSE", "r") as license_file:
-            for line in map(lambda line: line.replace("\n", ""), license_file.readlines()):
+            lines = license_file.readlines()
+            lines = map(lambda line: line.replace("\n", ""), lines)
+            lines = map(lambda line: line.replace("\"", "\"\""), lines)
+            for line in lines:
                 script_file.write(append("/home/guest/Sources/Marinette/LICENSE", line))
 
         for src in Path("src").iterdir():

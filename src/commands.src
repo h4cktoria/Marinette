@@ -101,7 +101,7 @@ Commands["license"] = function(arguments)
         "Permission to use, copy, modify, and/or distribute this software for any",
         "purpose with or without fee is hereby granted.",
         "",
-        "THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH",
+        "THE SOFTWARE IS PROVIDED ""AS IS"" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH",
         "REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY",
         "AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,",
         "INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM",
@@ -1722,12 +1722,9 @@ Commands["ste"] = function(arguments)
 
     path = str(arguments[0])
     fd = iterateToPath(Intrinsics.file, path)
+
     if not fd then return Console.error("File not found!")
     if fd.is_binary or fd.is_folder then return Console.error("Not a text file!")
-    
-    for perm in "rw"
-        if not fd.has_permission(perm) then return Console.error("No neccessary permissions!")
-    end for
 
-    simpleTextEditor(fd)
+    simpleTextEditor(fd, Theme.miscPrimary, Theme.miscSecondary, Theme.inputMessage)
 end function
