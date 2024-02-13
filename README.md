@@ -139,7 +139,9 @@ Upd: 10.02.2024 - The sources of both Omni(v0.7.0) and Viper(v2.2.1) got leaked 
 
 ## License <a name="license"></a>
 
-This software is licensed under Zero-Clause BSD. See [here](LICENSE) for full details
+This software is licensed under BSD Zero Clause License. See [here](LICENSE) for full details
+
+[Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack) is licensed under MIT License. See [here](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack/blob/main/LICENSE) for full details
 
 
 

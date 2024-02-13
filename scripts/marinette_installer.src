@@ -5,43 +5,46 @@ if file then file.delete
 get_shell.host_computer.touch("/home/guest/Sources/Marinette", "LICENSE")
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "Zero-Clause BSD" + char(10))
-file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
-old = file.get_content
-file.set_content(old + "=============" + char(10))
+file.set_content(old + "BSD Zero Clause License" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
 file.set_content(old + "" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "Permission to use, copy, modify, and/or distribute this software for" + char(10))
-file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
-old = file.get_content
-file.set_content(old + "any purpose with or without fee is hereby granted." + char(10))
+file.set_content(old + "Copyright (c) 2024 h4cktoria" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
 file.set_content(old + "" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL" + char(10))
+file.set_content(old + "Permission to use, copy, modify, and/or distribute this software for any" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES" + char(10))
+file.set_content(old + "purpose with or without fee is hereby granted." + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE" + char(10))
+file.set_content(old + "" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY" + char(10))
+file.set_content(old + "THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN" + char(10))
+file.set_content(old + "REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY" + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT" + char(10))
+file.set_content(old + "AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT," + char(10))
 file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
 old = file.get_content
-file.set_content(old + "OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE." + char(10))
+file.set_content(old + "INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR" + char(10))
+file = get_shell.host_computer.File("/home/guest/Sources/Marinette/LICENSE")
+old = file.get_content
+file.set_content(old + "PERFORMANCE OF THIS SOFTWARE." + char(10))
 get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "marinette.src")
 get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "marilib.src")
 get_shell.host_computer.touch("/home/guest/Sources/Marinette/src", "portable.src")
