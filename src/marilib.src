@@ -26,7 +26,7 @@ Constants = {
     // Identificator is a signal that lets Marinette find itself in path.
     // You might want to change that if you are PVPing against another player
     // with Marinette, or if you and another player are hacking the same server.
-    "identificator": "EBRZHOSPEUCGDVYSYIASCQJQUQVUZPOS",
+    "identificator": "JFAZENTPNNAOQUQNDAOYVTSMIIBHMPMQ",
 }
 
 

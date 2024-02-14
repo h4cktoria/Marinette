@@ -423,39 +423,46 @@ Commands["reload"] = function(arguments)
 end function
 
 
-Helps["load"] = "Host - (ap/path) - Load library"
-Aliases["load"] = ["include"]
-Commands["load"] = function(arguments)
+Helps["inspect"] = "Host - (aps/paths) - See libraries information"
+Commands["inspect"] = function(arguments)
     Conditions.argumentsMoreThan(arguments, 0)
     Conditions.host
+    Conditions.metaxploit
 
-    loadOne = function(path)
-        library = null
+    metaxploit = Libs.metaxploit
+
+    inspectOne = function(path)
         fd = iterateToPath(Intrinsics.file, path)
-        if fd then library = include_lib(fd.path)
-        if not library then return Console.error("There is no library in there!")
 
-        type = typeof(library).lower
-        if type == "cryptolib" then
-            Libs.crypto = library
-            Console.log("We can now crack! \o/")
-        else if type == "aptclientlib" then
-            Libs.apt = library
-            Console.log("We can download packages now! \o/")
-        else if type == "metaxploitlib" then
-            Libs.metaxploit = library
-            Console.log("We can now do HaCkInG!!1! \o/")
-        else if type == "blockchainlib" then
-            Libs.blockchain = library
-            Console.log("We are now affiliated with cryptocurrencies! \o/")
+        metalib = null
+        if fd then metalib = metaxploit.load(fd.path)
+        if not metalib then return Console.error("There is no library in there")
+
+        object = null
+        if fd then object = include_lib(fd.path)
+
+        if not object then
+            objectType = "library"
         else
-            Console.error("What is this library? Seems unfamiliar to me... ._.")
+            objectType = typeof(object).lower
+            for removal in ["lib", "client"]
+                objectType = objectType.replace(removal, "")
+            end for
         end if
+
+        Console.log("Library at <i>"+fd.path+"</i>")
+        print("<color="+Theme.miscPrimary+">Type    > <color="+Theme.miscSecondary+">"+objectType)
+        print("<color="+Theme.miscPrimary+">Library > <color="+Theme.miscSecondary+">"+metalib.lib_name)
+        print("<color="+Theme.miscPrimary+">Version > <color="+Theme.miscSecondary+">"+metalib.version)
     end function
 
-    for path in fmap(@str, arguments)
-        loadOne(path)
+    arguments = fmap(@str, arguments)
+    last = arguments.pop
+    for path in arguments
+        inspectOne(path)
+        print(" ")
     end for
+    inspectOne(last)
 end function
 
 
