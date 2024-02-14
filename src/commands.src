@@ -1344,10 +1344,13 @@ Commands["netcon"] = function(arguments)
 
     result = Intrinsics.computer.connect_wifi(iface, bssid, essid, password)
     if result isa string then
-        Console.error("Connection failure: "+result)
+        return Console.error("Connection failure: "+result)
     else
         Console.log("Connected to <i>"+essid+"</i> successfully!")
     end if
+
+    performRuntimeLoading
+    performSystemChecks
 end function
 
 
