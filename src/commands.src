@@ -1640,7 +1640,7 @@ Commands["copy"] = function(arguments)
     dest = str(arguments[1])
 
     fdSource = iterateToPath(fd, path)
-    if not fd then return Console.error("Source path does not exist!")
+    if not fdSource then return Console.error("Source path does not exist!")
     fileName = fdSource.name
 
     fdDest = iterateToPath(fd, dest)
