@@ -1,5 +1,6 @@
 Constants = {}
 Vars = {}
+
 Intrinsics = {}
 IntrinsicsHelpers = {}
 Libs = {}
@@ -14,10 +15,11 @@ Helps = {}
 Aliases = {}
 Commands = {}
 
+
 Constants = {
     // 
     // Password is sha256() iterated 25 times
-    // This string represents the "marinette" string
+    // This represents the "marinette" string
     // You are free to change this. And don't reveal it that easily :)
     "password": "27d518c314eec63e57fab0dc420c70d2d4657b3419cda980e7cdb827cc500be5",
     // 

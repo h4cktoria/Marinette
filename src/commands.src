@@ -263,28 +263,41 @@ Commands["svcfind"] = function(arguments)
 end function
 
 
-Helps["maildump"] = "Any - (addr) (port) - See users registered on SMTP service"
+Helps["maildump"] = "Any - (nodeAddr) (locAddr) (port) - See users registered on SMTP service"
 Aliases["maildump"] = ["md"]
 Commands["maildump"] = function(arguments)
-    Conditions.arguments(arguments, 2)
+    Conditions.arguments(arguments, 3)
     Conditions.network
     Conditions.crypto
 
     crypto = Libs.crypto
 
     addr = str(arguments[0])
-    port = arguments[1]
+    locAddr = str(arguments[1])
+    port = arguments[2]
 
     router = getNetworkNode(addr)
     if not router then return Console.error("Incorrect address x.x")
     addr = router.public_ip
     if router.public_ip == get_router.public_ip then addr = router.local_ip
 
-    if not port isa number then return Console.error("Incorrect port x.x")
+    ports = router.used_ports
+    if router.public_ip == get_router.public_ip then ports = getPublicPortsWithLocalStates(addr) + getLocalPorts(addr)
 
-    result = crypto.smtp_user_list(addr, port)
-    if not result then return Console.error("SMTP service is invulnerable ,_,")
-    if result isa string then return Console.error("Smtp user list error: "+result)
+    for availablePort in ports
+        if router.port_info(availablePort).indexOf("smtp") == null then continue
+        if availablePort.port_number != port or availablePort.get_lan_ip != locAddr then continue
+
+        if router.public_ip == get_router.public_ip then
+            result = crypto.smtp_user_list(locAddr, port)
+        else
+            result = crypto.smtp_user_list(addr, port)
+        end if
+
+        if not result then return Console.error("SMTP service is invulnerable ,_,")
+        if result isa string then return Console.error("Smtp user list error: "+result)
+        break
+    end for
 
     output = result.join(char(10))
     output = output.replace("email not found", "-")
