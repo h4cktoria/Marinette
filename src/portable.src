@@ -42,6 +42,24 @@ iterateToPath = function(fd, path)
 end function
 
 // 
+// Returns true if the file got deleted at runtime but is still in memory
+isFdCorrupt = function(fd)
+    return fd.path != "/" and not fd.parent
+end function
+
+// 
+// Iterates file object to the latest non-corrupt one
+iterateToLatestAccessiblePath = function(computer, fd)
+    path = fd.path
+    while true
+        fd = computer.File(path)
+        if fd then break
+        path = parent_path(path) 
+    end while
+    return fd
+end function
+
+// 
 // Checks what access we have got on file object
 // Returns "undetermined" if the access if not root and there is no /home
 checkPermissions = function(fd)
@@ -200,6 +218,8 @@ loadLibraries = function(metaxploit=null)
         if not library then continue
 
         libName = typeof(library).lower
+        if libName == "service" then continue
+
         for removal in ["lib", "client"]
             libName = libName.replace(removal, "")
         end for
@@ -221,34 +241,47 @@ loadLibraries = function(metaxploit=null)
             libs[libName] = library
         end if
     end while
+
     return libs
 end function
 
 // 
 // Source: https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack
 // Simple text editor adapted to work on remote connections
-simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yellow")
+simpleTextEditor = function(fd, SteTheme=null)
+    // 
+    // These are all the colors you need to specify
+    // if you want it to be colored as you wish
+    if not SteTheme then SteTheme = {
+        "line": "orange",
+        "delim": "white",
+        "inputMessage": "yellow",
+        "input": "white",
+        "info": "white",
+        "error": "white",
+    }
+
     // 
     // Renamed it just in case
     STEcmds = {}
 
     STEcmds["h"] = {"name": "h", "desc": "Displays this message."}
     STEcmds["h"]["run"] = function()
-        output = "Commands:" + ""+char(10)+"" 
+        output = "<color="+SteTheme.info+">Commands:"+char(10)
         for command in STEcmds
             commandData = command.value
-            output = output + " " + commandData.name + " " + commandData.desc + ""+char(10)+""
+            output = output+" <color="+SteTheme.info+">"+commandData.name+" "+commandData.desc+char(10)
         end for
-        output = output + "Press any key to continue..."
+        output = output+"<color="+SteTheme.info+">Press any key to continue..."
         return user_input(output, false, true)
     end function
 
     STEcmds["i"] = {"name":"i", "desc":"Insert a line before a number."}
     STEcmds["i"]["run"] = function()
-        input = user_input("[Number] [NewText]"+char(10)+">")
+        input = user_input("<color="+SteTheme.inputMessage+">[Number] [NewText]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
         input = input.split(" ")
         lineNumber = input[0].to_int
-        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
         input.pull
         subStr = input.join(" ")
         if lineNumber >= lines.len then
@@ -272,10 +305,10 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
 
     STEcmds["m"] = {"name":"m", "desc":"Modify a line."}
     STEcmds["m"]["run"] = function()
-        input = user_input("[Number] [NewText]"+char(10)+">")
+        input = user_input("<color="+SteTheme.inputMessage+">[Number] [NewText]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
         input = input.split(" ")
         lineNumber = input[0].to_int
-        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
         input.pull
         subStr = input.join(" ")
         if lineNumber > lines.len then
@@ -283,7 +316,7 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
             outer.text = lines.join(char(10))
             return outer.text
         end if
-        if lineNumber <= 0 then return user_input("Invalid line number.", false ,true)
+        if lineNumber <= 0 then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
         lines[lineNumber - 1] = subStr
         outer.text = lines.join(char(10))
         return outer.text
@@ -291,11 +324,11 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
 
     STEcmds["c"] = {"name":"c", "desc":"Clear a line."}
     STEcmds["c"]["run"] = function()
-        input = user_input("[Number]"+char(10)+">")
+        input = user_input("<color="+SteTheme.inputMessage+">[Number]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
         lineNumber = input.to_int
-        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
-        if lineNumber > lines.len then return user_input("Invalid line number.", false ,true)
-        if lineNumber <= 0 then return user_input("Invalid line number.", false ,true)
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
+        if lineNumber > lines.len then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
+        if lineNumber <= 0 then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
         outer.lines[lineNumber - 1] = ""
         outer.text = lines.join(char(10))
         return outer.text
@@ -303,12 +336,12 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
 
     STEcmds["r"] = {"name":"r", "desc":"Remove a line."}
     STEcmds["r"]["run"] = function()
-        input = user_input("[Number]"+char(10)+">")
+        input = user_input("<color="+SteTheme.inputMessage+">[Number]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
         lineNumber = input.to_int
-        if typeof(lineNumber) != "number" then return user_input("Invalid line number.", false ,true)
-        if lineNumber > lines.len then return user_input("Invalid line number.", false ,true)
-        if lineNumber == 0 then return user_input("Invalid line number.", false ,true)
-        if lineNumber == lines.len and lines.len == 1 then return user_input("Cannot remove the only line.", false ,true)
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
+        if lineNumber > lines.len then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
+        if lineNumber == 0 then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
+        if lineNumber == lines.len and lines.len == 1 then return user_input("<color="+SteTheme.error+">Cannot remove the only line.", false ,true)
         upLines = outer.lines[:lineNumber - 1]
         downLines = outer.lines[lineNumber:]
         outer.lines = upLines + downLines
@@ -320,19 +353,19 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
     STEcmds["x"]["run"] = function()
         // 
         // Changed to print
-        if writeFile then print("Changes saved. Exiting.") else return user_input("Failed to save.", false ,true)
+        if writeFile then print("<color="+SteTheme.info+">Changes saved. Exiting.") else return user_input("<color="+SteTheme.error+">Failed to save.", false ,true)
     end function
 
     STEcmds["s"] = {"name":"s", "desc":"Save changes."}
     STEcmds["s"]["run"] = function()
-        if writeFile then return user_input("Changes saved.", false, true) else return user_input("Failed to save.", false ,true)
+        if writeFile then return user_input("<color="+SteTheme.info+">Changes saved.", false, true) else return user_input("<color="+SteTheme.error+">Failed to save.", false ,true)
     end function
 
     STEcmds["q"] = {"name":"q", "desc":"Exit without save."}
     STEcmds["q"]["run"] = function()
         // 
         // Changed to print
-        print("Changes not saved. Exiting.")
+        print("<color="+SteTheme.info+">Changes not saved. Exiting.")
     end function
 
     writeFile = function()
@@ -340,20 +373,20 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
     end function
 
     execute = function(input = "")
-        if not STEcmds.hasIndex(input) then return user_input("Error: Command not found! Press h for a list of STEcmds."+char(10)+"Press any key to continue", false, true)
+        if not STEcmds.hasIndex(input) then return user_input("<color="+SteTheme.error+">Error: Command not found! Press h for a list of commands."+char(10)+"<color="+SteTheme.info+">Press any key to continue", false, true)
         command = STEcmds[input]
         command.run
     end function
 
     main = function()
-        if fd.is_folder or fd.is_binary then return print("Not a text file. Exiting.")
+        if fd.is_folder or fd.is_binary then return print("<color="+SteTheme.error+">Not a text file. Exiting.")
 
         // 
         // Checking if we're able to read/write the file
         content = fd.get_content
-        if content == null then return print("Insufficient read/write permissions. Exiting.")
+        if content == null then return print("<color="+SteTheme.error+">Insufficient read permissions. Exiting.")
         result = fd.set_content(content)
-        if result != true then return print("Insufficient read/write permissions. Exiting.")
+        if result != true then return print("<color="+SteTheme.error+">Insufficient write permissions. Exiting.")
 
         // 
         // globals() changed to outer() to avoid messing up with global namespace
@@ -367,9 +400,9 @@ simpleTextEditor = function(fd, clLine="orange", clDelim="white", clInput="yello
             outer.lines = outer.text.split(char(10))
             if not lines then lines = [""]
             for i in range(0, lines.len - 1)
-                print("<color="+clLine+">" + (i + 1) + "<color="+clDelim+">:</color> " + lines[i])
+                print("<color="+SteTheme.line+">" + (i + 1) + "<color="+SteTheme.delim+">:</color> " + lines[i])
             end for
-            input = user_input("<color="+clInput+">" + fileName + "></color> ", false, true)
+            input = user_input("<color="+SteTheme.inputMessage+">" + fileName + " > <color="+SteTheme.input+">", false, true)
             execute(input.lower)
 
             // 

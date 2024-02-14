@@ -151,12 +151,12 @@ Commands["sm"] = function(arguments)
     if ["l", "look"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, -1)
 
     if ["n", "new"].indexOf(command) != null then
-        ISessions.add(Intrinsics)
+        SessionsHelpers.add(Intrinsics)
         Console.log("Added new session or updated existing one =)")
     else if ["d", "del"].indexOf(command) != null then
         i = 0; while i < arguments.len; i = i + 1
             id = arguments[i-1]
-            if id isa string or not ISessions.delete(id) then
+            if id isa string or not SessionsHelpers.delete(id) then
                 Console.error("Incorrect ID!")
             else
                 Console.log("Deleted session with ID <i>"+id+"</i> successfully")
@@ -167,15 +167,15 @@ Commands["sm"] = function(arguments)
         end while
     else if ["ld", "load"].indexOf(command) != null then
         id = arguments[0]
-        if id isa string or not ISessions.get(id) then return Console.error("Incorrect ID!")
-        session = ISessions.get(id)
+        if id isa string or not SessionsHelpers.get(id) then return Console.error("Incorrect ID!")
+        session = SessionsHelpers.get(id)
         globals.Intrinsics = session.Intrinsics
         Console.log("Loaded session successfully")
     else if ["l", "look"].indexOf(command) != null then
         output = "ID Object PubAddr LocAddr Port User"
         i = 1
-        while ISessions.get(i) != null
-            session = ISessions.get(i)
+        while SessionsHelpers.get(i) != null
+            session = SessionsHelpers.get(i)
             output = output+char(10)+(i)+" "+session.name
             i = i + 1
         end while
@@ -873,7 +873,7 @@ Commands["ariadne"] = function(arguments)
             intrinsics.file = fd
         end if
 
-        ISessions.add(intrinsics)
+        SessionsHelpers.add(intrinsics)
     end for
 
     Console.log("Gathering exploitation results...")
@@ -930,7 +930,7 @@ Commands["ariadne"] = function(arguments)
 end function
 
 
-Helps["nemesis"] = "Host - (pubAddr) a/all/(locAddr) a/all/(port) [ofargs] - Exploit the remote system"
+Helps["nemesis"] = "Host - (nodeAddr) a/all/(locAddr) a/all/(port) [ofargs] - Exploit the remote system"
 Aliases["nemesis"] = ["nsis", "ns"]
 Commands["nemesis"] = function(arguments)
     Conditions.argumentsMoreThan(arguments, 2)
@@ -1114,7 +1114,7 @@ Commands["nemesis"] = function(arguments)
 
         if result.ofArg != null and is_valid_ip(result.ofArg) then intrinsics.localAddress = result.ofArg
 
-        ISessions.add(intrinsics)
+        SessionsHelpers.add(intrinsics)
     end for
 
     Console.log("Gathering exploitation results...")
@@ -1240,7 +1240,7 @@ Commands["svcon"] = function(arguments)
     intrinsics.port = port
     intrinsics.isConnectionRemote = true
     
-    ISessions.add(intrinsics)
+    SessionsHelpers.add(intrinsics)
     Console.log("Added new session or updated existing one =)")
     Console.log("See <i>sm</i> for more details.")
 end function
@@ -1402,12 +1402,41 @@ Commands["textfile"] = function(arguments)
         else if not result then
             Console.error("Unknown error!")
         else
-            Console.log("File have been created successfully!")
+            Console.log("File has been created successfully!")
         end if
     end function
 
     for path in fmap(@str, arguments)
         textfileOne(path)
+    end for
+end function
+
+
+Helps["directory"] = "Computer - (aps/paths) - Create directories"
+Aliases["directory"] = ["dir"]
+Commands["directory"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.computer
+
+    directoryOne = function(path)
+        fd = Intrinsics.file
+        parts = path.split("/")
+        fileName = parts.pop
+        path = parts.join("/")
+        if path != "" then fd = iterateToPath(fd, path)
+        if not fd or not fd.is_folder then return Console.error("Path does not exist or is not a directory!")
+        result = Intrinsics.computer.create_folder(fd.path, fileName)
+        if result isa string then
+            Console.error("Create folder error: "+result)
+        else if not result then
+            Console.error("Unknown error!")
+        else
+            Console.log("Directory has been created successfully!")
+        end if
+    end function
+
+    for path in fmap(@str, arguments)
+        directoryOne(path)
     end for
 end function
 
@@ -1724,7 +1753,14 @@ Commands["ste"] = function(arguments)
     fd = iterateToPath(Intrinsics.file, path)
 
     if not fd then return Console.error("File not found!")
-    if fd.is_binary or fd.is_folder then return Console.error("Not a text file!")
 
-    simpleTextEditor(fd, Theme.miscPrimary, Theme.miscSecondary, Theme.inputMessage)
+    steTheme = {
+        "line": Theme.miscSecondary,
+        "delim": Theme.miscPrimary,
+        "inputMessage": Theme.inputMessage,
+        "input": Theme.input,
+        "info": Theme.miscSecondary,
+        "error": Theme.error,
+    }
+    simpleTextEditor(fd, steTheme)
 end function

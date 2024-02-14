@@ -1,13 +1,14 @@
 Constants = {}
 Vars = {}
 Intrinsics = {}
+IntrinsicsHelpers = {}
 Libs = {}
 Theme = {}
 Console = {}
 Conditions = {}
 
 Sessions = []
-ISessions = {}
+SessionsHelpers = {}
 
 Helps = {}
 Aliases = {}
@@ -23,7 +24,7 @@ Constants = {
     // Identificator is a signal that lets Marinette find itself in path.
     // You might want to change that if you are PVPing against another player
     // with Marinette, or if you and another player are hacking the same server.
-    "identificator": "TWUQVFXJJAWGVMWDXGZISHQLBQDITFOQ",
+    "identificator": "TAJRNTZANBIXJXHDSRFLNWHVRTWOXWWM",
 }
 
 
@@ -47,6 +48,37 @@ Intrinsics = {
     "port": null,
     "isConnectionRemote": false,
 }
+
+
+IntrinsicsHelpers.getSessionType = function(intrinsics)
+    object = "Host"
+    if intrinsics.isConnectionRemote then
+        if intrinsics.file then object = "File"
+        if intrinsics.computer then object = "Computer"
+        if intrinsics.shell then
+            type = typeof(intrinsics.shell)
+            if type == "shell" then
+                object = "Shell"
+            else if type == "ftpshell" then
+                object = "FtpShell"
+            else
+                object = "UnknownShell"
+            end if
+        end if
+    end if
+    return object
+end function
+
+//
+// Trying to fix Intrinsics.file if the associated file got deleted at runtime
+// Notifying the user if we're not successfull
+IntrinsicsHelpers.tryToFixFdIfCorrupted = function
+    if not isFdCorrupt(Intrinsics.file) then return
+    if Intrinsics.computer then Intrinsics.file = iterateToLatestAccessiblePath(Intrinsics.computer, Intrinsics.file)
+    if not isFdCorrupt(Intrinsics.file) then return Console.log("Fixed file object corruption successfully!")
+    Console.warning("Could not fix file object corruption! :(")
+    Console.warning("Reload the session and hope it's fixed")
+end function
 
 
 // 
@@ -113,23 +145,8 @@ end function
 Console.prompt = function
     fd = Intrinsics.file
     user = checkPermissions(fd)
-    object = "Host"
+    object = IntrinsicsHelpers.getSessionType(Intrinsics)
     locIp = Intrinsics.localAddress
-
-    if Intrinsics.isConnectionRemote then
-        if Intrinsics.file then object = "File"
-        if Intrinsics.computer then object = "Computer"
-        if Intrinsics.shell then
-            type = typeof(Intrinsics.shell)
-            if type == "shell" then
-                object = "Shell"
-            else if type == "ftpshell" then
-                object = "FtpShell"
-            else
-                object = "UnknownShell"
-            end if
-        end if
-    end if
 
     if not locIp then locIp = "LocalHost"
 
@@ -145,6 +162,8 @@ end function
 Console.cmdloop = function
     while true
         input = Console.input(Console.prompt).trim
+        IntrinsicsHelpers.tryToFixFdIfCorrupted
+
         if input.len == 0 then continue
 
         parts = input.split(" ")
@@ -253,10 +272,10 @@ end function
 // 
 // Add session to the Sessions[]
 // Overwrites session if it already exists
-ISessions.add = function(intrinsics)
-    ISessions._preprocess
+SessionsHelpers.add = function(intrinsics)
+    SessionsHelpers._preprocess
 
-    session = ISessions.createSession(intrinsics)
+    session = SessionsHelpers.createSession(intrinsics)
 
     if not session.Intrinsics.isConnectionRemote then
         hostSession = deepCopy(Vars.hostSession)
@@ -265,7 +284,7 @@ ISessions.add = function(intrinsics)
             return
         end if
         hostSession.Intrinsics.isConnectionRemote = true
-        ISessions.add(hostSession.Intrinsics)
+        SessionsHelpers.add(hostSession.Intrinsics)
         Vars.hostSession = deepCopy(session)
         return
     end if
@@ -285,8 +304,8 @@ ISessions.add = function(intrinsics)
     end if
 end function
 
-ISessions.delete = function(id)
-    ISessions._preprocess
+SessionsHelpers.delete = function(id)
+    SessionsHelpers._preprocess
 
     sessions = [Vars.hostSession] + Sessions
     if id < 2 or id > sessions.len then return false
@@ -294,8 +313,8 @@ ISessions.delete = function(id)
     return true
 end function
 
-ISessions.get = function(id)
-    ISessions._preprocess
+SessionsHelpers.get = function(id)
+    SessionsHelpers._preprocess
 
     sessions = [Vars.hostSession] + Sessions
     if id < 1 or id > sessions.len then return
@@ -309,27 +328,12 @@ end function
 //     "name": string,
 //     "Intrinsics": map,
 // ]
-ISessions.createSession = function(intrinsics)
-    object = "Host"
+SessionsHelpers.createSession = function(intrinsics)
+    object = IntrinsicsHelpers.getSessionType(intrinsics)
     pubAddr = intrinsics.publicAddress
     locAddr = intrinsics.localAddress
     port = intrinsics.port
     user = checkPermissions(intrinsics.file)
-    
-    if intrinsics.isConnectionRemote then
-        if intrinsics.file then object = "File"
-        if intrinsics.computer then object = "Computer"
-        if intrinsics.shell then
-            type = typeof(intrinsics.shell)
-            if type == "shell" then
-                object = "Shell"
-            else if type == "ftpshell" then
-                object = "FtpShell"
-            else
-                object = "UnknownShell"
-            end if
-        end if
-    end if
 
     if not pubAddr then pubAddr = "-"
     if not locAddr then locAddr = "-"
@@ -344,7 +348,7 @@ ISessions.createSession = function(intrinsics)
     return session
 end function
 
-ISessions._preprocess = function
+SessionsHelpers._preprocess = function
     // 
     // Sorting sessions by username and object type
     userPredicate = function(iItem, jItem)

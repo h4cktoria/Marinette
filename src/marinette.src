@@ -64,11 +64,11 @@ performRuntimeLoading = function
     // If host session does not exist, simply creating it
     // Else we just overwrite host session with current one
     if Vars.hostSession == null then
-        Vars.hostSession = ISessions.createSession(Intrinsics)
+        Vars.hostSession = SessionsHelpers.createSession(Intrinsics)
     else
-        ISessions.add(Vars.hostSession.Intrinsics)
+        SessionsHelpers.add(Vars.hostSession.Intrinsics)
     end if
-    ISessions.add(Intrinsics)
+    SessionsHelpers.add(Intrinsics)
 end function
 
 // 
