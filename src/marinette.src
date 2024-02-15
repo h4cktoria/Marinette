@@ -40,7 +40,6 @@ performRuntimeLoading = function
     
     shell = get_shell
     computer = shell.host_computer
-    file = computer.File("/")
     
     Intrinsics.publicAddress = null
     Intrinsics.localAddress = null
@@ -57,7 +56,13 @@ performRuntimeLoading = function
     shared = get_custom_object
     if shared.indexes.indexOf("Vars") != null then globals.Vars = deepCopy(shared.Vars)
     if shared.indexes.indexOf("Intrinsics") != null then globals.Intrinsics = deepCopy(shared.Intrinsics)
-    if shared.indexes.indexOf("Libs") != null then globals.Libs = deepCopy(shared.Libs)
+    if shared.indexes.indexOf("Libs") != null then
+        for kv in deepCopy(shared.Libs)
+            libName = kv["key"]
+            library = kv["value"]
+            if Libs.indexes.indexOf(libName) == null then Libs[libName] = library
+        end for
+    end if
     if shared.indexes.indexOf("Sessions") != null then globals.Sessions = deepCopy(shared.Sessions)
 
     // 
