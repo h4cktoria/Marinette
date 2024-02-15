@@ -243,7 +243,7 @@ Commands["svcfind"] = function(arguments)
     Console.log("Starting the lookup...")
     while true
         ip = randomNetworkAddress
-        router = get_router(ip)
+        router = getNetworkNode(ip)
         for port in router.used_ports
             info = router.port_info(port)
             if info.indexOf(service) != null then
@@ -260,49 +260,6 @@ Commands["svcfind"] = function(arguments)
         end for
         Console.error("No <i>"+service+version+"</i> on <i>"+ip+"</i>... X_X")
     end while
-end function
-
-
-Helps["maildump"] = "Any - (nodeAddr) (locAddr) (port) - See users registered on SMTP service"
-Aliases["maildump"] = ["md"]
-Commands["maildump"] = function(arguments)
-    Conditions.arguments(arguments, 3)
-    Conditions.network
-    Conditions.crypto
-
-    crypto = Libs.crypto
-
-    addr = str(arguments[0])
-    locAddr = str(arguments[1])
-    port = arguments[2]
-
-    router = getNetworkNode(addr)
-    if not router then return Console.error("Incorrect address x.x")
-    addr = router.public_ip
-    if router.public_ip == get_router.public_ip then addr = router.local_ip
-
-    ports = router.used_ports
-    if router.public_ip == get_router.public_ip then ports = getPublicPortsWithLocalStates(addr) + getLocalPorts(addr)
-
-    for availablePort in ports
-        if router.port_info(availablePort).indexOf("smtp") == null then continue
-        if availablePort.port_number != port or availablePort.get_lan_ip != locAddr then continue
-
-        if router.public_ip == get_router.public_ip then
-            result = crypto.smtp_user_list(locAddr, port)
-        else
-            result = crypto.smtp_user_list(addr, port)
-        end if
-
-        if not result then return Console.error("SMTP service is invulnerable ,_,")
-        if result isa string then return Console.error("Smtp user list error: "+result)
-        break
-    end for
-
-    output = result.join(char(10))
-    output = output.replace("email not found", "-")
-    output = "User Email"+char(10)+output
-    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 end function
 
 
@@ -335,7 +292,7 @@ Commands["whois"] = function(arguments)
     end function
 
     if arguments.len == 0 then
-        whoisOne(get_router.public_ip)
+        whoisOne(getNetworkNode.public_ip)
     else
         arguments = fmap(@str, arguments)
         last = arguments.pop
@@ -376,7 +333,7 @@ Commands["sysinf"] = function(arguments)
     publicIp = "Unavailable"
     deviceIp = "Unavailable"
     if computer.is_network_active then
-        router = get_router
+        router = getNetworkNode
         bssid = router.bssid_name
         essid = router.essid_name
         kernel = router.kernel_version
@@ -497,6 +454,51 @@ Commands["userchange"] = function(arguments)
         shell.launch(fd.path, "--no-ascii-art --password "+Vars.password)
         exit
     end if
+end function
+
+
+Helps["svcon"] = "Host - (nodeAddr) (locAddr) (port) (user) (pass) (svc) - Connect to remote service"
+Aliases["svcon"] = ["sc"]
+Commands["svcon"] = function(arguments)
+    Conditions.arguments(arguments, 6)
+    Conditions.host
+    Conditions.network
+
+    addr = str(arguments[0])
+    locAddr = str(arguments[1])
+    port = arguments[2]
+    user = str(arguments[3])
+    pass = str(arguments[4])
+    svc = str(arguments[5])
+
+
+    router = getNetworkNode(addr)
+    if not router then return Console.error("Incorrect node address!")
+    
+    addr = router.public_ip
+    if isNodeLocallyAccessible(router) then addr = router.local_ip
+
+    svcPort = getExactPort(addr, locAddr, port)
+    if not svcPort then return Console.error("Could not access such a port!")
+
+    target = addr
+    if isNodeLocallyAccessible(router) then target = locAddr
+    result = Intrinsics.shell.connect_service(addr, port, user, pass, svc)
+    if not result then return Console.error("Connection failed! *x*")
+    if ["shell", "ftpshell"].indexOf(typeof(result)) == null then Console.error("I have never met that kind of shell before...")
+    
+    intrinsics = deepCopy(Intrinsics)
+    intrinsics.shell = result
+    intrinsics.computer = intrinsics.shell.host_computer
+    intrinsics.file = intrinsics.computer.File("/")
+    intrinsics.publicAddress = intrinsics.computer.public_ip
+    intrinsics.localAddress = intrinsics.computer.local_ip
+    intrinsics.port = port
+    intrinsics.isConnectionRemote = true
+    
+    SessionsHelpers.add(intrinsics)
+    Console.log("Added new session or updated existing one =)")
+    Console.log("See <i>sm</i> for more details.")
 end function
 
 
@@ -656,7 +658,7 @@ Commands["nesca"] = function(arguments)
         Console.log("Map on <i>"+domain+" "+router.public_ip+" "+router.local_ip+"</i>...")
         
         output = "Num Out Ins Svc Ver Addr"
-        if router.public_ip != get_router.public_ip then output = output+char(10)+"0 Opened Opened node "+router.kernel_version+" "+router.local_ip
+        if not isNodeLocallyAccessible(router) then output = output+char(10)+"0 Opened Opened node "+router.kernel_version+" "+router.local_ip
         for publicPort in router.used_ports
             localAddr = publicPort.get_lan_ip
             port = publicPort.port_number
@@ -687,7 +689,7 @@ Commands["nesca"] = function(arguments)
 
         for localAddr in router.devices_lan_ip
             node = null
-            if router.public_ip == get_router.public_ip then node = getNetworkNode(localAddr)
+            if isNodeLocallyAccessible(router) then node = getNetworkNode(localAddr)
             if not node then continue
             nodes.push(node)
 
@@ -765,6 +767,43 @@ Commands["nesca"] = function(arguments)
         end for
         nescaOne(last)
     end if
+end function
+
+
+Helps["maildump"] = "Host - (nodeAddr) (locAddr) (port) - See users registered on SMTP service"
+Aliases["maildump"] = ["md"]
+Commands["maildump"] = function(arguments)
+    Conditions.arguments(arguments, 3)
+    Conditions.host
+    Conditions.network
+    Conditions.crypto
+
+    crypto = Libs.crypto
+
+    addr = str(arguments[0])
+    locAddr = str(arguments[1])
+    port = arguments[2]
+
+    router = getNetworkNode(addr)
+    if not router then return Console.error("Incorrect address x.x")
+    addr = router.public_ip
+    if isNodeLocallyAccessible(router) then addr = router.local_ip
+
+    smtpPort = getExactPort(addr, locAddr, port)
+    if not smtpPort then return Console.error("Could not find such a port!")
+    if router.port_info(smtpPort).indexOf("smtp") == null then return Console.error("No smtp service found on this port!")
+
+    target = addr
+    if isNodeLocallyAccessible(router) then target = locAddr
+    result = crypto.smtp_user_list(target, port)
+    if not result then return Console.error("SMTP service is invulnerable ,_,")
+    if result isa string then return Console.error("Smtp user list error: "+result)
+
+    Console.log("Registered users on <i>"+getDomainName(addr)+" "+router.public_ip+" "+locAddr+"</i>...")
+    output = result.join(char(10))
+    output = output.replace("email not found", "-")
+    output = "User Email"+char(10)+output
+    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 end function
 
 
@@ -956,12 +995,12 @@ Commands["nemesis"] = function(arguments)
     router = getNetworkNode(addr)
     if not router then return Console.error("Incorrect address x.x")
     addr = router.public_ip
-    if router.public_ip == get_router.public_ip then addr = router.local_ip
+    if isNodeLocallyAccessible(router) then addr = router.local_ip
 
     ofArgs = ofArgs + fmap(@str, arguments) + router.devices_lan_ip
 
     targets = []
-    if router.public_ip == get_router.public_ip then
+    if isNodeLocallyAccessible(router) then
         for port in getPublicPortsWithLocalStates(addr) + getLocalPorts(addr)
             target = {
                 "publicAddr": router.public_ip,
@@ -974,7 +1013,7 @@ Commands["nemesis"] = function(arguments)
         for localAddr in router.devices_lan_ip
             node = null
             isRouter = false
-            if router.public_ip == get_router.public_ip then
+            if isNodeLocallyAccessible(router) then
                 node = getNetworkNode(localAddr)
                 if node then isRouter = true
             end if
@@ -1012,6 +1051,8 @@ Commands["nemesis"] = function(arguments)
 
     libraries = []
     for target in targets
+        if ["a", "all"].indexOf(argLocAddr) == null and target.localAddr != argLocAddr then continue
+        if ["a", "all"].indexOf(argPort) == null and target.port != argPort then continue
         netSession = metaxploit.net_use(target.ip, target.port)
         if not netSession then continue
         metalib = netSession.dump_lib
@@ -1023,17 +1064,6 @@ Commands["nemesis"] = function(arguments)
         }
         libraries.push(library)
     end for
-
-    i = 0; while i < libraries.len; i = i + 1
-        library = libraries[i-1]
-        if ["a", "all"].indexOf(argLocAddr) == null and library.localAddr != argLocAddr then
-            libraries.remove(i-1)
-            i = i - 1
-        else if ["a", "all"].indexOf(argPort) == null and library.port != argPort then
-            libraries.remove(i-1)
-            i = i - 1
-        end if
-    end while
 
     Console.log("Scanning the remote libraries ("+libraries.len+")...")
     exploits = []
@@ -1216,41 +1246,6 @@ Commands["hostify"] = function(arguments)
 
     Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Vars.password)
     exit
-end function
-
-
-Helps["svcon"] = "Shell - (addr) (port) (user) (pass) (svc) - Connect to remote service"
-Aliases["svcon"] = ["sc"]
-Commands["svcon"] = function(arguments)
-    Conditions.arguments(arguments, 5)
-    Conditions.shell(["shell"])
-    Conditions.network
-
-    addr = str(arguments[0])
-    port = arguments[1]
-    user = str(arguments[2])
-    pass = str(arguments[3])
-    svc = str(arguments[4])
-
-    if not is_valid_ip(addr) then return Console.error("Incorrect address x.x")
-    if not port isa number then return Console.error("Incorrect port number x.x")
-
-    result = Intrinsics.shell.connect_service(addr, port, user, pass, svc)
-    if not result then return Console.error("Connection failed! *x*")
-    if ["shell", "ftpshell"].indexOf(typeof(result)) == null then Console.error("I have never met that kind of shell before...")
-    
-    intrinsics = deepCopy(Intrinsics)
-    intrinsics.shell = result
-    intrinsics.computer = intrinsics.shell.host_computer
-    intrinsics.file = intrinsics.computer.File("/")
-    intrinsics.publicAddress = intrinsics.computer.public_ip
-    intrinsics.localAddress = intrinsics.computer.local_ip
-    intrinsics.port = port
-    intrinsics.isConnectionRemote = true
-    
-    SessionsHelpers.add(intrinsics)
-    Console.log("Added new session or updated existing one =)")
-    Console.log("See <i>sm</i> for more details.")
 end function
 
 

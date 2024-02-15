@@ -686,8 +686,17 @@ end function
 // Returns router or switch of the address
 // Address can be anything(even the website address)
 getNetworkNode = function(address)
-    if not is_valid_ip(address) then address = nslookup(address)
-    if address == "Not found" then return
+    if not address then
+        router = get_router
+        if not router then router = get_switch
+        return router
+    end if
+
+    for addr in [address, "www."+address]
+        if not is_valid_ip(addr) then addr = nslookup(addr)
+        if addr != "Not found" then address = addr
+    end for
+    if not is_valid_ip(address) then return
     
     if is_lan_ip(address) then
         router = get_switch(address)
@@ -756,6 +765,27 @@ getPortlessNodes = function(address)
         if localPorts == null or localPorts isa string or localPorts.len == 0 then nodes.push(localAddress)
     end for
     return nodes
+end function
+
+// 
+// Returns port behind router/switch with exact localAddress and portNumber
+getExactPort = function(nodeAddress, localAddress, portNumber)
+    router = getNetworkNode(nodeAddress)
+    if not router then return
+
+    ports = router.used_ports
+    if isNodeLocallyAccessible(router) then ports = getPublicPortsWithLocalStates(nodeAddress) + getLocalPorts(nodeAddress)
+
+    for port in ports
+        if port.get_lan_ip == localAddress and port.port_number == portNumber then return port
+    end for
+end function
+
+// 
+// Returns true if the router/switch is in the same network as the host
+isNodeLocallyAccessible = function(node)
+    hostNode = getNetworkNode
+    return hostNode and node.public_ip == hostNode.public_ip
 end function
 
 // 
