@@ -51,7 +51,7 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 ### Present <a name="features-present"></a>
 
 -   Foolproof
--   Localization
+-   Localization(>65%)
 -   Session management system
 -   Basic hacking functionality
 -   Simple compile-time configuration
