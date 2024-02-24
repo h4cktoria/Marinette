@@ -51,7 +51,7 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 ### Present <a name="features-present"></a>
 
 -   Foolproof
--   Localization(>65%)
+-   Localization(The only command not localized is `ste` because I am lazy :P)
 -   Session management system
 -   Basic hacking functionality
 -   Simple compile-time configuration
@@ -126,7 +126,7 @@ Fork, put your theme inside of [themeing.src](src/themeing.src), commit and open
 
 ### Translations <a name="contrib-lang">
 
-Want to translate 250+ locale entries for Marinette to be able to speak in your language for free? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
+Want to translate 220+ locale entries for Marinette to be able to speak in your language for free? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
 1. You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
 
@@ -216,7 +216,7 @@ Another cute shell projects:
 -   [Project p1an0Xshell](https://github.com/wh0wfg/greyscripts-p1an0) by Irtalhmu
 -   [Project Vexxed](https://github.com/WizeWizard42/GreyHack-Vexxed) by WizeWizard
 -   [OpenViper](https://github.com/cantemizyurek/viper-3.0) by SkidMall
--   [MTX Franework](https://github.com/tuonux/mtx) by tuonux. Not a shell, just an interesting project that I've decided to include anyway
+-   [MTX Framework](https://github.com/tuonux/mtx) by tuonux. Not a shell, just an interesting project that I've decided to include anyway
 
 If you want me to add your shell, then open an issue and I'll add you as fast as I can! The exception is proprietary software
 

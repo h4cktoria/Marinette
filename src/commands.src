@@ -1226,20 +1226,22 @@ Commands["hostify"] = function(arguments)
     Conditions.shell(["shell"])
     Conditions.network
 
-    Console.log("Looking for permissive directories to upload into...")
+    Console.log(Messages.LogLookingForPermissivePathToUploadInto)
     fdPermissive = findPermissivePath(Intrinsics.file, "wx")
-    if not fdPermissive then return Console.error("No permissive directories to upload into... ,_,")
-    Console.log("Looking for myself at filesystem...")
+    if not fdPermissive then return Console.error(Messages.ErrorCouldNotFindPermissivePathToUploadInto)
+    Console.log(Messages.LogLookingForMyself)
     // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
     fdMarinette = findMyself(Constants.identificator, "--identify-marinette --password "+Vars.password)
-    if not fdMarinette then return Console.error("Could not find Marinette. Where did you put me? D:<")
+    if not fdMarinette then return Console.error(Messages.ErrorCouldNotFindMyself)
     
-    Console.log("Uploading everything neccessary...")
+    Console.log(Messages.LogUploadingNeccessary)
     fdBin = get_shell.host_computer.File(fdMarinette.path)
-    if not fdBin.has_permission("r") then return Console.error("No read access on something important. Change permissions!")
     result = get_shell.scp(fdMarinette.path, fdPermissive.path, Intrinsics.shell)
-    if result isa string then return Console.error("Scp failure: "+result)
-    if not result then return Console.error("Unknown error has occured. Why on earth?..")
+    if result isa string then
+        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "scp", "ERROR": result}))
+    else if not result then
+        return Console.error(Messages.ErrorUnknown)
+    end if
     Console.log("<i>"+fdMarinette.path+"</i> -> <i>"+fdPermissive.path)
 
     marinettePath = fdPermissive.path+"/"+fdMarinette.name
@@ -1251,7 +1253,7 @@ Commands["hostify"] = function(arguments)
     shared.Libs = deepCopy(Libs)
     shared.Sessions = deepCopy(Sessions)
 
-    Console.log("The session is successfully hostified! :D")
+    Console.log(Messages.LogSessionHostifiedSuccessfully)
 
     Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Vars.password)
     exit
@@ -1264,8 +1266,9 @@ Commands["console"] = function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.shell(["shell"])
 
-    Console.log("Starting the in-game console...")
+    Console.log(Messages.LogStartingInGameConsole)
     Intrinsics.shell.start_terminal
+    exit
 end function
 
 
@@ -1275,7 +1278,11 @@ Commands["netint"] = function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.computer
 
-    output = "Iface Chip MonMode"+char(10)+Intrinsics.computer.network_devices
+    netdevices = Intrinsics.computer.network_devices.trim
+    if netdevices == "" then netdevices = "- - -"
+
+    Console.log(Messages.LogGettingNetworkInterfaces)
+    output = Messages.NetintHeader+char(10)+netdevices
     print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 end function
 
@@ -1308,7 +1315,8 @@ Commands["netlook"] = function(arguments)
     end function
     mergeSort(networks, @powerPredicate)
 
-    output = "ID MacAddress Pwr Name Acks"
+    Console.log(Messages.LogSurroundingNetworks)
+    output = Messages.NetlookHeader
     i = 0; for network in networks; i = i + 1
         pwr = network.split(" ")[1].replace("%", "").to_int
         acks = ceil(300000 / pwr)
@@ -1356,9 +1364,9 @@ Commands["netcon"] = function(arguments)
 
     result = Intrinsics.computer.connect_wifi(iface, bssid, essid, password)
     if result isa string then
-        return Console.error("Connection failure: "+result)
+        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "connect_wifi", "ERROR": result}))
     else
-        Console.log("Connected to <i>"+essid+"</i> successfully!")
+        Console.log(replaceF(Messages.LogConnectedToEssidSuccessfully, {"ESSID": essid}))
     end if
 
     performRuntimeLoading
@@ -1372,9 +1380,12 @@ Commands["tasklist"] = function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.computer
 
-    Console.log("All running tasks:")
     lines = Intrinsics.computer.show_procs.split(char(10))
-    output = "User Pid Cpu Mem Task"+char(10)+lines[1:].join(char(10))
+    tasks = lines[1:]
+    if tasks.len == 0 then tasks = ["- - - - -"]
+    
+    Console.log(Messages.LogAllRunningTasks)
+    output = Messages.TasklistHeader+char(10)+tasks.join(char(10))
     print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 end function
 
@@ -1388,11 +1399,11 @@ Commands["taskill"] = function(arguments)
     for pid in removeDuplicates(arguments)
         result = Intrinsics.computer.close_program(pid)
         if result isa string then
-            Console.error("Close program error: "+result)
+            Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "close_program", "ERROR": result}))
         else if not result then
-            Console.error("Unknown error!")
+            Console.error(Messages.ErrorUnknown)
         else
-            Console.log("Killed task successfully!")
+            Console.log(Messages.LogSuccessfullyKilledTask)
         end if
     end for
 end function
@@ -1410,14 +1421,14 @@ Commands["textfile"] = function(arguments)
         fileName = parts.pop
         path = parts.join("/")
         if path != "" then fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error("Path does not exist or is not a directory!")
+        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
         result = Intrinsics.computer.touch(fd.path, fileName)
         if result isa string then
-            Console.error("Touch error: "+result)
+            Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "touch", "ERROR": result}))
         else if not result then
-            Console.error("Unknown error!")
+            Console.error(Messages.ErrorUnknown)
         else
-            Console.log("File has been created successfully!")
+            Console.log(Messages.LogFileHasBeenCreatedSuccessfully)
         end if
     end function
 
@@ -1439,14 +1450,14 @@ Commands["directory"] = function(arguments)
         fileName = parts.pop
         path = parts.join("/")
         if path != "" then fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error("Path does not exist or is not a directory!")
+        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
         result = Intrinsics.computer.create_folder(fd.path, fileName)
         if result isa string then
-            Console.error("Create folder error: "+result)
+            Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "create_folder", "ERROR": result}))
         else if not result then
-            Console.error("Unknown error!")
+            Console.error(Messages.ErrorUnknown)
         else
-            Console.log("Directory has been created successfully!")
+            Console.log(Messages.LogDirectoryHasBeenCreatedSuccessfully)
         end if
     end function
 
@@ -1468,17 +1479,17 @@ Commands["walk"] = function(arguments)
     fd = Intrinsics.file
 
     if ["b", "back"].indexOf(command) != null then
-        if not s isa number then return Console.error("Amount of steps is always a number... o_0")
+        if not s isa number then return Console.error(Messages.ErrorUnknownArguments)
         i = 0; while i < s; i = i + 1
             if fd.parent then fd = fd.parent
         end while
         Intrinsics.file = fd
     else if ["i", "into"].indexOf(command) != null then
         fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error("Directory has not been found... ,_,")
+        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
         Intrinsics.file = fd
     else
-        return Console.error("Unknown second argument. Don't be so mysterious!")
+        return Console.error(Messages.ErrorUnknownArguments)
     end if
 end function
 
@@ -1489,25 +1500,24 @@ Commands["look"] = function(arguments)
     lookOne = function(path)
         fd = Intrinsics.file
         fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error("Directory has not been found... ,_,")
+        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
 
-        Console.log("Files in <i>"+fd.path)
-        output = "Permissions Owner Group Size Type Name"
-        for f in [] + fd.get_folders + fd.get_files
+        Console.log(replaceF(Messages.LogContentsOfPath, {"PATH": fd.path}))
+        output = Messages.LookHeader
+        contents = fd.get_folders + fd.get_files
+        for f in contents
             if f.is_folder then 
-                type = "Folder"
+                type = Messages.Folder
             else if f.is_binary then 
-                type = "Binary"
+                type = Messages.Binary
             else
-                type = "Text"
+                type = Messages.Text
             end if
             permissions = f.permissions
             output = output+char(10)+[permissions[1:],f.owner,f.group,f.size,type,f.name].join(" ")
         end for
+        if contents.len == 0 then output = output+char(10)+"- - - - - -"
         
-        // All lines exchange sorted by
-        // * Name alphanumerically
-        // * By filetype
         lines = output.split(char(10))
         namePredicate = function(iItem, jItem)
             iName = iItem.split(" ")[5]
@@ -1516,9 +1526,9 @@ Commands["look"] = function(arguments)
         end function
         ftPredicate = function(iItem, jItem)
             priority = {
-                "Folder": 2,
-                "Binary": 1,
-                "Text": 0,
+                Messages.Folder: 2,
+                Messages.Binary: 1,
+                Messages.Text: 0,
             }
             iType = iItem.split(" ")[4]
             jType = jItem.split(" ")[4]
@@ -1554,10 +1564,10 @@ Commands["read"] = function(arguments)
     readOne = function(path)
         fd = Intrinsics.file
         fd = iterateToPath(fd, path)
-        if not fd or fd.is_binary or fd.is_folder then return Console.error("There are no readable files in there!")
+        if not fd or fd.is_binary or fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotTextFile)
         content = fd.get_content
-        if content == null then return Console.error("Could not get the contents of a file...")
-        Console.log("Reading file <i>"+fd.path+"</i>...")
+        if content == null then return Console.error(Messages.ErrorCouldReadFile)
+        Console.log(replaceF(Messages.LogContentsOfPath, {"PATH": fd.path}))
         lines = content.split(char(10))
         i = 0; while i < lines.len; i = i + 1
             line = escape(lines[i-1])
@@ -1587,10 +1597,10 @@ Commands["delete"] = function(arguments)
     deleteOne = function(path)
         fd = Intrinsics.file
         fd = iterateToPath(fd, path)
-        if not fd then return Console.error("No such file or directory... 0-0")
+        if not fd then return Console.error(Messages.ErrorPathDoesNotExist)
         result = fd.delete
-        if result != "" then return Console.error("Deletion failure: "+result)
-        Console.log("Deleted <i>"+fd.path+"</i> successfully...")
+        if result != "" then return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "delete", "ERROR": result}))
+        Console.log(replaceF(Messages.LogFileDeletedSuccessfully, {"PATH": fd.path}))
     end function
 
     for path in fmap(@str, arguments)
@@ -1609,7 +1619,7 @@ Commands["copy"] = function(arguments)
     dest = str(arguments[1])
 
     fdSource = iterateToPath(fd, path)
-    if not fdSource then return Console.error("Source path does not exist!")
+    if not fdSource then return Console.error(Messages.ErrorSourcePathDoesNotExist)
     fileName = fdSource.name
 
     fdDest = iterateToPath(fd, dest)
@@ -1622,16 +1632,16 @@ Commands["copy"] = function(arguments)
         fileName = parts.pop
         fdDest = iterateToPath(fd, parts.join("/"))
         if not fdDest and parts.len == 0 then fdDest = fd
-        if not fdDest then return Console.error("Destination directory does not exist!")
+        if not fdDest then return Console.error(Messages.ErrorDesinationPathDoesNotExist)
     end if
 
     result = fdSource.copy(fdDest.path, fileName)
     if result isa string then
-        Console.error("Copy error: "+result)
+        Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "copy", "ERROR": result}))
     else if not result then
-        Console.error("Unknown error!")
+        Console.error(Messages.ErrorUnknown)
     else
-        Console.log("Copied file successfully!")
+        Console.log(Messages.LogCopiedFileSuccessfully)
     end if
 end function
 
@@ -1651,7 +1661,7 @@ Commands["tree"] = function(arguments)
         end for
     end function
 
-    Console.log("Showing file system tree...")
+    Console.log(Messages.LogFileSystemTree)
     fd = iterateToPath(Intrinsics.file, "/")
     recursefd(fd)
 end function
@@ -1664,7 +1674,7 @@ Commands["ste"] = function(arguments)
     path = str(arguments[0])
     fd = iterateToPath(Intrinsics.file, path)
 
-    if not fd then return Console.error("File not found!")
+    if not fd then return Console.error(Messages.ErrorPathDoesntExistOrNotTextFile)
 
     steTheme = {
         "steLine": Theme.miscSecondary,
