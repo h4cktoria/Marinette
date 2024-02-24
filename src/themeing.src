@@ -1,0 +1,97 @@
+// 
+// Most of the color palletes used have been taken from here https://colorhunt.co
+Themes = {}
+
+Themes["Violet"] = {
+    "asciiArt": [
+        "Oo      oO                                                 ",
+        "O O    o o               o                                 ",
+        "o  o  O  O                                 O     O         ",
+        "O   Oo   O                                oOo   oOo        ",
+        "O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. ",
+        "o        O O   o   o     o   o   O OooO'   O     O   OooO' ",
+        "o        O o   O   O     O   O   o O       o     o   O     ",
+        "O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' ",
+        "==========================================================",
+    ],
+    "ascii": "#DCBFFF",
+    "asciiShadow": "#D0A2F7",
+    "prefix": "#E5D4FF",
+    "log": "#D0A2F7",
+    "warning": "#FFECEC",
+    "error": "#FF78C4",
+    "inputMessage": "#D0A2F7",
+    "input": "#DCBFFF",
+    "miscPrimary": "#D0A2F7",
+    "miscSecondary": "#DCBFFF",
+}
+
+Themes["Forest"] = {
+    "asciiArt": [
+        "  __  __               _               _    _        ",
+        " |  \/  |             (_)             | |  | |       ",
+        " | \  / |  __ _  _ __  _  _ __    ___ | |_ | |_  ___ ",
+        " | |\/| | / _` || '__|| || '_ \  / _ \| __|| __|/ _ \",
+        " | |  | || (_| || |   | || | | ||  __/| |_ | |_|  __/",
+        " |_|  |_| \__,_||_|   |_||_| |_| \___| \__| \__|\___|",
+        " ",
+    ],
+    "ascii": "#AAD7D9",
+    "asciiShadow": "#92C7CF",
+    "prefix": "#E5E1DA",
+    "log": "#92C7CF",
+    "warning": "#FFE9AE",
+    "error": "#FFB3B3",
+    "inputMessage": "#92C7CF",
+    "input": "#AAD7D9",
+    "miscPrimary": "#92C7CF",
+    "miscSecondary": "#AAD7D9",
+}
+
+Themes["SkyLight"] = {
+    "asciiArt": [
+        "Oo      oO                                                 ",
+        "O O    o o               o                                 ",
+        "o  o  O  O                                 O     O         ",
+        "O   Oo   O                                oOo   oOo        ",
+        "O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. ",
+        "o        O O   o   o     o   o   O OooO'   O     O   OooO' ",
+        "o        O o   O   O     O   O   o O       o     o   O     ",
+        "O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' ",
+        "==========================================================",
+    ],
+    "ascii": "#7BD3EA",
+    "asciiShadow": "#A1EEBD",
+    "prefix": "#CDFADB",
+    "log": "#7BD3EA",
+    "warning": "#F6F7C4",
+    "error": "#F6D6D6",
+    "inputMessage": "#7BD3EA",
+    "input": "#A1EEBD",
+    "miscPrimary": "#7BD3EA",
+    "miscSecondary": "#A1EEBD",
+}
+
+Themes["ImpellLight"] = {
+    "asciiArt": [
+        "Oo      oO                                                 ",
+        "O O    o o               o                                 ",
+        "o  o  O  O                                 O     O         ",
+        "O   Oo   O                                oOo   oOo        ",
+        "O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. ",
+        "o        O O   o   o     o   o   O OooO'   O     O   OooO' ",
+        "o        O o   O   O     O   O   o O       o     o   O     ",
+        "O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' ",
+        "==========================================================",
+    ],
+    "ascii": "#FAF3F0",
+    "asciiShadow": "#D4E2D4",
+    "prefix": "#DBC4F0",
+    "log": "#D4E2D4",
+    "warning": "#F9F7C9",
+    "error": "#FFCACC",
+    "inputMessage": "#D4E2D4",
+    "input": "#FAF3F0",
+    "miscPrimary": "#D4E2D4",
+    "miscSecondary": "#FAF3F0",
+}

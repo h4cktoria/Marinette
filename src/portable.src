@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////
 // Functions for custom shells
 ////////////////////////////////////////////////////////////
 
@@ -246,172 +246,13 @@ loadLibraries = function(metaxploit=null)
 end function
 
 // 
-// Source: https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack
-// Simple text editor adapted to work on remote connections
-simpleTextEditor = function(fd, SteTheme=null)
-    // 
-    // These are all the colors you need to specify
-    // if you want it to be colored as you wish
-    if not SteTheme then SteTheme = {
-        "line": "orange",
-        "delim": "white",
-        "inputMessage": "yellow",
-        "input": "white",
-        "info": "white",
-        "error": "white",
-    }
-
-    // 
-    // Renamed it just in case
-    STEcmds = {}
-
-    STEcmds["h"] = {"name": "h", "desc": "Displays this message."}
-    STEcmds["h"]["run"] = function()
-        output = "<color="+SteTheme.info+">Commands:"+char(10)
-        for command in STEcmds
-            commandData = command.value
-            output = output+" <color="+SteTheme.info+">"+commandData.name+" "+commandData.desc+char(10)
-        end for
-        output = output+"<color="+SteTheme.info+">Press any key to continue..."
-        return user_input(output, false, true)
-    end function
-
-    STEcmds["i"] = {"name":"i", "desc":"Insert a line before a number."}
-    STEcmds["i"]["run"] = function()
-        input = user_input("<color="+SteTheme.inputMessage+">[Number] [NewText]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
-        input = input.split(" ")
-        lineNumber = input[0].to_int
-        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        input.pull
-        subStr = input.join(" ")
-        if lineNumber >= lines.len then
-            outer.lines.push(subStr)
-            outer.text = lines.join(char(10))
-            return outer.text
-        end if
-        if lineNumber == 0 then
-            outer.lines.reverse
-            outer.lines.push(subStr)
-            outer.lines.reverse
-            outer.text = lines.join(char(10))
-            return outer.text
-        end if
-        upLines = lines[:lineNumber - 1]
-        downLines = lines[lineNumber - 1:]
-        lines = upLines + [subStr] + downLines
-        outer.text = lines.join(char(10))
-        return outer.text
-    end function
-
-    STEcmds["m"] = {"name":"m", "desc":"Modify a line."}
-    STEcmds["m"]["run"] = function()
-        input = user_input("<color="+SteTheme.inputMessage+">[Number] [NewText]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
-        input = input.split(" ")
-        lineNumber = input[0].to_int
-        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        input.pull
-        subStr = input.join(" ")
-        if lineNumber > lines.len then
-            outer.lines.push(subStr)
-            outer.text = lines.join(char(10))
-            return outer.text
-        end if
-        if lineNumber <= 0 then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        lines[lineNumber - 1] = subStr
-        outer.text = lines.join(char(10))
-        return outer.text
-    end function
-
-    STEcmds["c"] = {"name":"c", "desc":"Clear a line."}
-    STEcmds["c"]["run"] = function()
-        input = user_input("<color="+SteTheme.inputMessage+">[Number]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
-        lineNumber = input.to_int
-        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        if lineNumber > lines.len then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        if lineNumber <= 0 then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        outer.lines[lineNumber - 1] = ""
-        outer.text = lines.join(char(10))
-        return outer.text
-    end function
-
-    STEcmds["r"] = {"name":"r", "desc":"Remove a line."}
-    STEcmds["r"]["run"] = function()
-        input = user_input("<color="+SteTheme.inputMessage+">[Number]"+char(10)+"<color="+SteTheme.inputMessage+">> <color="+SteTheme.input+">")
-        lineNumber = input.to_int
-        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        if lineNumber > lines.len then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        if lineNumber == 0 then return user_input("<color="+SteTheme.error+">Invalid line number.", false ,true)
-        if lineNumber == lines.len and lines.len == 1 then return user_input("<color="+SteTheme.error+">Cannot remove the only line.", false ,true)
-        upLines = outer.lines[:lineNumber - 1]
-        downLines = outer.lines[lineNumber:]
-        outer.lines = upLines + downLines
-        outer.text = lines.join(char(10))
-        return outer.text
-    end function
-
-    STEcmds["x"] = {"name":"x", "desc":"Save and exit."}
-    STEcmds["x"]["run"] = function()
-        // 
-        // Changed to print
-        if writeFile then print("<color="+SteTheme.info+">Changes saved. Exiting.") else return user_input("<color="+SteTheme.error+">Failed to save.", false ,true)
-    end function
-
-    STEcmds["s"] = {"name":"s", "desc":"Save changes."}
-    STEcmds["s"]["run"] = function()
-        if writeFile then return user_input("<color="+SteTheme.info+">Changes saved.", false, true) else return user_input("<color="+SteTheme.error+">Failed to save.", false ,true)
-    end function
-
-    STEcmds["q"] = {"name":"q", "desc":"Exit without save."}
-    STEcmds["q"]["run"] = function()
-        // 
-        // Changed to print
-        print("<color="+SteTheme.info+">Changes not saved. Exiting.")
-    end function
-
-    writeFile = function()
-        if outer.file.set_content(outer.text) != 1 then return null else return true
-    end function
-
-    execute = function(input = "")
-        if not STEcmds.hasIndex(input) then return user_input("<color="+SteTheme.error+">Error: Command not found! Press h for a list of commands."+char(10)+"<color="+SteTheme.info+">Press any key to continue", false, true)
-        command = STEcmds[input]
-        command.run
-    end function
-
-    main = function()
-        if fd.is_folder or fd.is_binary then return print("<color="+SteTheme.error+">Not a text file. Exiting.")
-
-        // 
-        // Checking if we're able to read/write the file
-        content = fd.get_content
-        if content == null then return print("<color="+SteTheme.error+">Insufficient read permissions. Exiting.")
-        result = fd.set_content(content)
-        if result != true then return print("<color="+SteTheme.error+">Insufficient write permissions. Exiting.")
-
-        // 
-        // globals() changed to outer() to avoid messing up with global namespace
-        // Removed dependency on the computer because why would you ever want it xd
-        fileName = fd.name
-        outer.file = fd
-        outer.text = fd.get_content
-
-        while true
-            clear_screen
-            outer.lines = outer.text.split(char(10))
-            if not lines then lines = [""]
-            for i in range(0, lines.len - 1)
-                print("<color="+SteTheme.line+">" + (i + 1) + "<color="+SteTheme.delim+">:</color> " + lines[i])
-            end for
-            input = user_input("<color="+SteTheme.inputMessage+">" + fileName + " > <color="+SteTheme.input+">", false, true)
-            execute(input.lower)
-
-            // 
-            // Needed hack so that it won't exit the entire program
-            if "xq".indexOf(input) != null then return
-        end while
-
-    end function; main
+// Returns one value after the param in params
+getParamValue = function(param)
+    paramIndex = params.indexOf(param)
+    if paramIndex < (params.len - 1) then return params[paramIndex + 1]
 end function
+
+
 
 
 //////////////////////////////////////////////////////////// 
@@ -678,6 +519,8 @@ mergeSort = function(arr, predicate, start, end_)
 end function
 
 
+
+
 //////////////////////////////////////////////////////////// 
 // Networking
 ////////////////////////////////////////////////////////////
@@ -788,6 +631,7 @@ isNodeLocallyAccessible = function(node)
     return hostNode and node.public_ip == hostNode.public_ip
 end function
 
+
 // 
 // Generates random IP
 randomNetworkAddress = function
@@ -804,6 +648,7 @@ randomNetworkAddress = function
     end while
     return ip
 end function
+
 
 //
 // nslookup, but reversed
@@ -856,25 +701,6 @@ getDomainPhoneNumber = function(address)
 end function
 
 
-// 
-// format_columns(), but with the first line being colored with headerColor,
-// and all the others with columnsColor
-formatColumnsColored = function(columns, headerColor, columnsColor)
-    columns = format_columns(columns)
-    lines = columns.split(char(10))
-    lines[0] = "<color="+headerColor+">"+lines[0]
-    i = 1; while i < lines.len; i = i + 1
-        lines[i-1] = "<color="+columnsColor+">"+lines[i-1]
-    end while
-    return lines.join(char(10))
-end function
-
-// 
-// Returns one value after the param in params
-getParamValue = function(param)
-    paramIndex = params.indexOf(param)
-    if paramIndex < (params.len - 1) then return params[paramIndex + 1]
-end function
 
 
 //////////////////////////////////////////////////////////// 
@@ -1027,6 +853,431 @@ sha256 = function(input)
 	return hash
 end function
 
+// 
+// Source: https://github.com/Finko42/GreyHack
+// Key is a string of 16 characters
+// Plaintext can be any length < 1,000,000
+// Two choices: "encrypt" or "decrypt"
+aes128 = function(choice, key, text)
+
+    if typeof(key) != "string" then return null
+    if key.len != 16 then return null
+    if typeof(text) != "string" then return null
+    if typeof(choice) != "string" then return null
+
+    byte_key = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    for i in key.indexes
+            byte_key[i] = key[i].code
+    end for
+    key = byte_key[0:]
+
+    // Define lookup tables
+    Sbox = []
+    Sbox=Sbox+[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38]
+    Sbox=Sbox+[54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179]
+    Sbox=Sbox+[41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64]
+    Sbox=Sbox+[143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70]
+    Sbox=Sbox+[238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174]
+    Sbox=Sbox+[8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105]
+    Sbox=Sbox+[217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22]
+
+    Rcon = [1, 2, 4, 8, 16, 32, 64, 128, 27, 54]
+
+    Mult2 = []
+    Mult2=Mult2+[0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90]
+    Mult2=Mult2+[92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,142,144,146,148,150,152,154,156,158]
+    Mult2=Mult2+[160,162,164,166,168,170,172,174,176,178,180,182,184,186,188,190,192,194,196,198,200,202,204,206,208,210,212,214,216,218,220,222,224]
+    Mult2=Mult2+[226,228,230,232,234,236,238,240,242,244,246,248,250,252,254,27,25,31,29,19,17,23,21,11,9,15,13,3,1,7,5,59,57,63,61,51,49,55,53,43,41]
+    Mult2=Mult2+[47,45,35,33,39,37,91,89,95,93,83,81,87,85,75,73,79,77,67,65,71,69,123,121,127,125,115,113,119,117,107,105,111,109,99,97,103,101,155]
+    Mult2=Mult2+[153,159,157,147,145,151,149,139,137,143,141,131,129,135,133,187,185,191,189,179,177,183,181,171,169,175,173,163,161,167,165,219,217]
+    Mult2=Mult2+[223,221,211,209,215,213,203,201,207,205,195,193,199,197,251,249,255,253,243,241,247,245,235,233,239,237,227,225,231,229]
+
+
+    SubBytes = function(column)
+            column = column[0:]
+            for i in column.indexes
+                    column[i] = Sbox[column[i]]
+            end for
+            return column
+    end function
+
+    WordXor = function(word1, word2)
+            result = [0, 0, 0, 0]
+            for i in result.indexes
+                    result[i] = bitwise("^", word1[i], word2[i])
+            end for
+            return result
+    end function
+
+    AddRoundKey = function(state, key, roundNum)
+            roundKey = key[roundNum*4:roundNum*4+4]
+            return [WordXor(state[0], roundKey[0]), WordXor(state[1], roundKey[1]), WordXor(state[2], roundKey[2]), WordXor(state[3], roundKey[3])]
+    end function
+
+    ExpandKey = function(key)
+            W = [key[0:4], key[4:8], key[8:12], key[12:16]]
+
+            for i in range(4, 40, 4)
+                    W = W + [[], [], [], []]
+                    W[i] = W[i-1][1:] + [W[i-1][0]] // RotWord
+                    W[i] = SubBytes(W[i])
+                    W[i] = WordXor(W[i-4], W[i])
+                    W[i][0] = bitwise("^", Rcon[i/4-1], W[i][0])
+                    for j in range(i+1, i+3)
+                            W[j] = WordXor(W[j-4], W[j-1])
+                    end for
+            end for
+            return W
+    end function
+
+    aesEncrypt = function(key, block) // Expects already formatted block
+            Mult2 = @Mult2
+            key = key[0:]
+            State = block[0:]
+
+            // Declaring functions
+            ShiftRows = function(state)
+                    state = state[0:]
+                    tmp = state[0][1]
+                    state[0][1] = state[1][1]
+                    state[1][1] = state[2][1]
+                    state[2][1] = state[3][1]
+                    state[3][1] = tmp
+
+                    for i in range(1)
+                            tmp = state[0][2]
+                            state[0][2] = state[1][2]
+                            state[1][2] = state[2][2]
+                            state[2][2] = state[3][2]
+                            state[3][2] = tmp
+                    end for
+
+                    tmp = state[3][3]
+                    state[3][3] = state[2][3]
+                    state[2][3] = state[1][3]
+                    state[1][3] = state[0][3]
+                    state[0][3] = tmp
+                    return state
+            end function
+
+            matrix = [[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]]
+
+            MixColumns = function(state)
+                    state = state[0:]
+                    for column in state.indexes
+                            endcolumn = [0, 0, 0, 0]
+                            for i in matrix.indexes
+                                    tmp = state[column][0:]
+                                    for j in matrix[i].indexes
+                                            if matrix[i][j] == 1 then continue
+                                            tmp[j] = Mult2[state[column][j]]
+                                            if matrix[i][j] != 3 then continue
+                                            tmp[j] = bitwise("^", tmp[j], state[column][j])
+                                    end for
+                                    endcolumn[i] = bitwise("^", bitwise("^", bitwise("^", tmp[0], tmp[1]), tmp[2]), tmp[3])
+                            end for
+                            state[column] = endcolumn[0:]
+                    end for
+                    return state
+            end function
+
+            // The algorithm
+            State = AddRoundKey(State, key, 0)
+
+            for round in range(1, 9)
+                    State = [SubBytes(State[0]), SubBytes(State[1]), SubBytes(State[2]), SubBytes(State[3])]
+                    State = ShiftRows(State)
+                    State = MixColumns(State)
+                    State = AddRoundKey(State, key, round)
+            end for
+
+            State = [SubBytes(State[0]), SubBytes(State[1]), SubBytes(State[2]), SubBytes(State[3])]
+            State = ShiftRows(State)
+            State = AddRoundKey(State, key, 10)
+
+            return State
+    end function
+
+
+    aesDecrypt = function(key, block) // Expects already formatted block
+            Mult2 = @Mult2
+            Sbox = @Sbox
+            key = key[0:]
+            State = block[0:]
+
+            // Declare functions
+            InvShiftRows = function(state)
+                    state = state[0:]
+                    tmp = state[3][1]
+                    state[3][1] = state[2][1]
+                    state[2][1] = state[1][1]
+                    state[1][1] = state[0][1]
+                    state[0][1] = tmp
+
+                    for i in range(1)
+                            tmp = state[3][2]
+                            state[3][2] = state[2][2]
+                            state[2][2] = state[1][2]
+                            state[1][2] = state[0][2]
+                            state[0][2] = tmp
+                    end for
+
+                    tmp = state[0][3]
+                    state[0][3] = state[1][3]
+                    state[1][3] = state[2][3]
+                    state[2][3] = state[3][3]
+                    state[3][3] = tmp
+                    return state
+            end function
+
+            InvSubBytes = function(column)
+                    column = column[0:]
+                    for i in column.indexes
+                            column[i] = Sbox.indexOf(column[i])
+                    end for
+                    return column
+            end function
+
+            matrix = [[14, 11, 13, 9], [9, 14, 11, 13], [13, 9, 14, 11], [11, 13, 9, 14]]
+
+            InvMixColumns = function(state)
+                    state = state[0:]
+                    for column in state.indexes
+                            endcolumn = [0, 0, 0, 0]
+                            for i in matrix.indexes
+                                    tmp = state[column][0:]
+                                    for j in matrix[i].indexes
+                                            if matrix[i][j] == 9 then
+                                                    tmp[j] = bitwise("^", Mult2[Mult2[Mult2[state[column][j]]]], state[column][j])
+                                            else if matrix[i][j] == 11 then
+                                                    tmp[j] = bitwise("^", Mult2[bitwise("^", Mult2[Mult2[state[column][j]]], state[column][j])], state[column][j])
+                                            else if matrix[i][j] == 13 then
+                                                    tmp[j] = bitwise("^", Mult2[Mult2[bitwise("^", Mult2[state[column][j]], state[column][j])]], state[column][j])
+                                            else
+                                                    tmp[j] = Mult2[bitwise("^", Mult2[bitwise("^", Mult2[state[column][j]], state[column][j])], state[column][j])]
+                                            end if
+                                    end for
+                                    endcolumn[i] = bitwise("^", bitwise("^", bitwise("^", tmp[0], tmp[1]), tmp[2]), tmp[3])
+                            end for
+                            state[column] = endcolumn[0:]
+                    end for
+                    return state
+            end function
+
+            // The actual algorithm
+            State = AddRoundKey(State, key, 10)
+
+            for round in range(9, 1)
+                    State = InvShiftRows(State)
+                    State = [InvSubBytes(State[0]), InvSubBytes(State[1]), InvSubBytes(State[2]), InvSubBytes(State[3])]
+                    State = AddRoundKey(State, key, round)
+                    State = InvMixColumns(State)
+            end for
+
+            State = InvShiftRows(State)
+            State = [InvSubBytes(State[0]), InvSubBytes(State[1]), InvSubBytes(State[2]), InvSubBytes(State[3])]
+            State = AddRoundKey(State, key, 0)
+
+            return State
+    end function
+
+
+    // Generate IV
+    IV = []
+    for byte in key
+            IV = IV + [floor(rnd(byte)*256)] // Warning: rnd is not cryptographically secure
+    end for
+
+    key = ExpandKey(key)
+
+    b64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+    if choice == "encrypt" then
+            Blocks = [[]]
+            b=0
+            for char in text
+                    Blocks[b] = Blocks[b] + [code(char)]
+                    if Blocks[b].len == 16 then
+                            Blocks = Blocks + [[]]
+                            b=b+1
+                    end if
+            end for
+
+            // Pad with CMS (Crytographic Message Syntax)
+            padNum = 16 - Blocks[-1].len
+            for i in range(padNum-1)
+                    Blocks[-1] = Blocks[-1] + [padNum]
+            end for
+
+            // XOR first block with IV
+            for i in IV.indexes
+                    Blocks[0][i] = bitwise("^", Blocks[0][i], IV[i])
+            end for
+
+            // Format blocks
+            for i in Blocks.indexes
+                    Blocks[i] = [Blocks[i][0:4], Blocks[i][4:8], Blocks[i][8:12], Blocks[i][12:16]]
+            end for
+
+            // Encode blocks
+            Blocks[0] = aesEncrypt(key, Blocks[0])
+            if Blocks.len > 1 then
+                    for i in range(1, Blocks.len-1)
+                            for column in Blocks[i].indexes
+                                    for byte in Blocks[i][column].indexes
+                                            Blocks[i][column][byte] = bitwise("^", Blocks[i][column][byte], Blocks[i-1][column][byte])
+                                    end for
+                            end for
+                            Blocks[i] = aesEncrypt(key, Blocks[i])
+                    end for
+            end if
+
+            // Convert blocks to array of bytes
+            arr = []
+            for Block in Blocks
+                    for column in Block
+                            for byte in column
+                                    arr = arr + [byte]
+                            end for
+                    end for
+            end for
+
+            // Convert array into base 64
+            output = ""
+            for i in range(0, arr.len-1, 3)
+                    buffer = arr[i]*65536
+                    if arr.hasIndex(i+1) then
+                            buffer = buffer+arr[i+1]*256
+                            if arr.hasIndex(i+2) then buffer = buffer+arr[i+2]
+                    end if
+
+                    if arr.hasIndex(i+2) then
+                            for j in range(3)
+                                    output = output + b64Table[floor(buffer/64^j)%64]
+                            end for
+                    else
+                            if arr.hasIndex(i+1) then
+                                    for j in range(3,1)
+                                            output = output + b64Table[floor(buffer/64^j)%64]
+                                    end for
+                            else
+                                    for j in range(3,2)
+                                            output = output + b64Table[floor(buffer/64^j)%64]
+                                    end for
+                            end if
+                    end if
+            end for
+            return output
+    end if
+
+    if choice == "decrypt" then
+            if text.len % 4 == 1 then return null
+
+            // Convert base 64 into sextet array
+            s_arr = text.values
+            for i in s_arr.indexes
+                    tmp = b64Table.indexOf(s_arr[i])
+                    if tmp == null then return null
+                    s_arr[i] = tmp
+            end for
+
+            // Convert sextets to bytes
+            b_arr = []
+            for i in range(0, s_arr.len-1, 4)
+                    buffer = s_arr[i]*262144
+                    if s_arr.hasIndex(i+1) then
+                            buffer = buffer+s_arr[i+1]*4096
+                            if s_arr.hasIndex(i+2) then
+                                    buffer = buffer+s_arr[i+2]*64
+                                    if s_arr.hasIndex(i+3) then buffer = buffer+s_arr[i+3]
+                            end if
+                    end if
+
+                    if s_arr.hasIndex(i+3) then
+                            for j in range(2)
+                                    b_arr = b_arr + [floor(buffer/256^j)%256]
+                            end for
+                    else
+                            if s_arr.hasIndex(i+2) then
+                                    for j in range(2,1)
+                                            b_arr = b_arr + [floor(buffer/256^j)%256]
+                                    end for
+                            else
+                                    b_arr = b_arr + [floor(buffer/65526)%256]
+                            end if
+                    end if
+            end for
+
+            // Convert byte array to blocks
+            Blocks = [[]]
+            b=0
+            while b_arr.len > 0
+                    if Blocks[b].len == 16 then
+                            Blocks = Blocks + [[]]
+                            b=b+1
+                    end if
+                    Blocks[b] = Blocks[b] + [b_arr.pull]
+            end while
+            if Blocks[-1].len != 16 then return null
+
+            // Format blocks
+            for i in Blocks.indexes
+                    Blocks[i] = [Blocks[i][0:4], Blocks[i][4:8], Blocks[i][8:12], Blocks[i][12:16]]
+            end for
+
+            // Decode blocks
+            NewBlocks = Blocks[0:]
+            for i in Blocks.indexes
+                    NewBlocks[i] = aesDecrypt(key, Blocks[i])
+            end for
+
+            // XOR blocks
+            for column in Blocks[0].indexes
+                    for byte in Blocks[i][column].indexes
+                            NewBlocks[0][column][byte] = bitwise("^", NewBlocks[0][column][byte], IV[column*4+byte])
+                    end for
+            end for
+            if Blocks.len > 1 then
+                    for i in range(1, Blocks.len-1)
+                            for column in Blocks[i].indexes
+                                    for byte in Blocks[i][column].indexes
+                                            NewBlocks[i][column][byte] = bitwise("^", NewBlocks[i][column][byte], Blocks[i-1][column][byte])
+                                    end for
+                            end for
+                    end for
+            end if
+
+            Blocks = NewBlocks[0:]
+
+            // Convert blocks to array of bytes
+            arr = []
+            for Block in Blocks
+                    for column in Block
+                            for byte in column
+                                    arr = arr + [byte]
+                            end for
+                    end for
+            end for
+
+            // Remove padding
+            if arr[-1] > 16 or arr[-1] == 0 then return null
+            for i in range(arr[-1]-1)
+                    arr.pop
+            end for
+
+            // Convert array to text
+            output = ""
+            for byte in arr
+                    output = output + char(byte)
+            end for
+            return output
+    end if
+
+    return null
+end function
+
+
+
 
 //////////////////////////////////////////////////////////// 
 // Security
@@ -1034,9 +1285,643 @@ end function
 
 // 
 // Checks if any of the prohibited characters are in the string
-isInputValid = function(input, prohibited=["<", ">", "\", """"])
+isInputValid = function(input, prohibited=null)
+    if not prohibited then prohibited = ["<", ">", "\", """", char(10)]
     for char in prohibited
         if input.indexOf(char) != null then return false
     end for
     return true
+end function
+
+
+
+
+//////////////////////////////////////////////////////////// 
+// Localization
+////////////////////////////////////////////////////////////
+
+localesCompile = function(languageCode, localeEntries)
+    compiled = deepCopy(localeEntries)
+    for kv in compiled
+        entryName = kv["key"]
+        entry = compiled[entryName]
+        if entry.indexes.indexOf(languageCode) == null then
+            compiled[entryName] = "**"+entryName+" FOR "+languageCode+" IS MISSING**"
+        else
+            compiled[entryName] = entry[languageCode]
+        end if
+    end for
+    return compiled
+end function
+
+
+
+
+//////////////////////////////////////////////////////////// 
+// String functions
+////////////////////////////////////////////////////////////
+
+replaceF = function(strF, words)
+    for kv in words
+        wordF = "{"+str(kv["key"])+"}"
+        toReplace = str(kv["value"])
+        strF = strF.replace(wordF, toReplace)
+    end for
+    return strF
+end function
+
+// 
+// format_columns(), but with the first line being colored with headerColor,
+// and all the others with columnsColor
+formatColumnsColored = function(columns, headerColor, columnsColor)
+    columns = format_columns(columns)
+    lines = columns.split(char(10))
+    lines[0] = "<color="+headerColor+">"+lines[0]
+    i = 1; while i < lines.len; i = i + 1
+        lines[i-1] = "<color="+columnsColor+">"+lines[i-1]
+    end while
+    return lines.join(char(10))
+end function
+
+// 
+// Escapes print formatting
+escape = function(str)
+    sequences = {
+        "<": "< ",
+        ">": " >",
+        "\n": "\\n",
+    }
+    for kv in sequences
+        str = str.replace(kv["key"], kv["value"])
+    end for
+    return str
+end function
+
+randomString = function(length)
+    ascii = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".values
+    generated = ""
+    i = 0; while i < length; i = i + 1
+        ascii.shuffle
+        generated = generated + ascii[0]
+    end while
+    return generated
+end function
+
+
+
+
+//////////////////////////////////////////////////////////// 
+// Number functions
+////////////////////////////////////////////////////////////
+
+randomNumber = function(min, max)
+    return floor(rnd * (max - min + 1) + min)
+end function
+
+
+
+
+//////////////////////////////////////////////////////////// 
+// Email
+////////////////////////////////////////////////////////////
+
+getMailId = function(mail)
+    parts = mail.split(char(10))
+    return parts[2].replace("MailID:", "").trim
+end function
+
+getMailAuthor = function(mail)
+    parts = mail.split(char(10))
+    return parts[3].replace("From:", "").trim
+end function
+
+getMailSubject = function(mail)
+    parts = mail.split(char(10))
+    return parts[4].replace("Subject:", "").trim
+end function
+
+getMailMessage = function(metamail, mailId)
+    content = metamail.read(mailId)
+    if content == "Mail not found" then return
+    lines = content.split(char(10))
+    return lines[3:(lines.len-2)].join(char(10))
+end function
+
+
+
+
+//////////////////////////////////////////////////////////// 
+// Integratable programs
+////////////////////////////////////////////////////////////
+
+// 
+// Source: https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack
+// Simple text editor adapted to work on remote connections
+simpleTextEditor = function(fd, SteTheme=null, SteMessages=null)
+    // 
+    // These are all the colors you need to specify
+    // if you want it to be colored as you wish
+    if not SteTheme then SteTheme = {
+        "steLine": "orange",
+        "steDelimiter": "white",
+        "steInputMessage": "yellow",
+        "steInput": "white",
+        "steInfo": "white",
+        "steError": "white",
+    }
+    
+    // 
+    // SteMessages a.k.a. compiled locale
+    if not SteMessages then SteMessages = {}
+
+    // 
+    // Renamed it just in case
+    STEcmds = {}
+
+    STEcmds["h"] = {"name": "h", "desc": "Displays this message."}
+    STEcmds["h"]["run"] = function()
+        output = "<color="+SteTheme.steInfo+">Commands:"+char(10)
+        for command in STEcmds
+            commandData = command.value
+            output = output+" <color="+SteTheme.steInfo+">"+commandData.name+" "+commandData.desc+char(10)
+        end for
+        output = output+"<color="+SteTheme.steInfo+">Press any key to continue..."
+        return user_input(output, false, true)
+    end function
+
+    STEcmds["i"] = {"name":"i", "desc":"Insert a line before a number."}
+    STEcmds["i"]["run"] = function()
+        input = user_input("<color="+SteTheme.steInputMessage+">[Number] [NewText]"+char(10)+"<color="+SteTheme.steInputMessage+">> <color="+SteTheme.steInput+">")
+        input = input.split(" ")
+        lineNumber = input[0].to_int
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        input.pull
+        subStr = input.join(" ")
+        if lineNumber >= lines.len then
+            outer.lines.push(subStr)
+            outer.text = lines.join(char(10))
+            return outer.text
+        end if
+        if lineNumber == 0 then
+            outer.lines.reverse
+            outer.lines.push(subStr)
+            outer.lines.reverse
+            outer.text = lines.join(char(10))
+            return outer.text
+        end if
+        upLines = lines[:lineNumber - 1]
+        downLines = lines[lineNumber - 1:]
+        lines = upLines + [subStr] + downLines
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["m"] = {"name":"m", "desc":"Modify a line."}
+    STEcmds["m"]["run"] = function()
+        input = user_input("<color="+SteTheme.steInputMessage+">[Number] [NewText]"+char(10)+"<color="+SteTheme.steInputMessage+">> <color="+SteTheme.steInput+">")
+        input = input.split(" ")
+        lineNumber = input[0].to_int
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        input.pull
+        subStr = input.join(" ")
+        if lineNumber > lines.len then
+            outer.lines.push(subStr)
+            outer.text = lines.join(char(10))
+            return outer.text
+        end if
+        if lineNumber <= 0 then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        lines[lineNumber - 1] = subStr
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["c"] = {"name":"c", "desc":"Clear a line."}
+    STEcmds["c"]["run"] = function()
+        input = user_input("<color="+SteTheme.steInputMessage+">[Number]"+char(10)+"<color="+SteTheme.steInputMessage+">> <color="+SteTheme.steInput+">")
+        lineNumber = input.to_int
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        if lineNumber > lines.len then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        if lineNumber <= 0 then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        outer.lines[lineNumber - 1] = ""
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["r"] = {"name":"r", "desc":"Remove a line."}
+    STEcmds["r"]["run"] = function()
+        input = user_input("<color="+SteTheme.steInputMessage+">[Number]"+char(10)+"<color="+SteTheme.steInputMessage+">> <color="+SteTheme.steInput+">")
+        lineNumber = input.to_int
+        if typeof(lineNumber) != "number" then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        if lineNumber > lines.len then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        if lineNumber == 0 then return user_input("<color="+SteTheme.steError+">Invalid line number.", false ,true)
+        if lineNumber == lines.len and lines.len == 1 then return user_input("<color="+SteTheme.steError+">Cannot remove the only line.", false ,true)
+        upLines = outer.lines[:lineNumber - 1]
+        downLines = outer.lines[lineNumber:]
+        outer.lines = upLines + downLines
+        outer.text = lines.join(char(10))
+        return outer.text
+    end function
+
+    STEcmds["x"] = {"name":"x", "desc":"Save and exit."}
+    STEcmds["x"]["run"] = function()
+        // 
+        // Changed to print
+        if writeFile then print("<color="+SteTheme.steInfo+">Changes saved. Exiting.") else return user_input("<color="+SteTheme.steError+">Failed to save.", false ,true)
+    end function
+
+    STEcmds["s"] = {"name":"s", "desc":"Save changes."}
+    STEcmds["s"]["run"] = function()
+        if writeFile then return user_input("<color="+SteTheme.steInfo+">Changes saved.", false, true) else return user_input("<color="+SteTheme.steError+">Failed to save.", false ,true)
+    end function
+
+    STEcmds["q"] = {"name":"q", "desc":"Exit without save."}
+    STEcmds["q"]["run"] = function()
+        // 
+        // Changed to print
+        print("<color="+SteTheme.steInfo+">Changes not saved. Exiting.")
+    end function
+
+    writeFile = function()
+        if outer.file.set_content(outer.text) != 1 then return null else return true
+    end function
+
+    execute = function(input = "")
+        if not STEcmds.hasIndex(input) then return user_input("<color="+SteTheme.steError+">Error: Command not found! Press h for a list of commands."+char(10)+"<color="+SteTheme.steInfo+">Press any key to continue", false, true)
+        command = STEcmds[input]
+        command.run
+    end function
+
+    main = function()
+        if fd.is_folder or fd.is_binary then return print("<color="+SteTheme.steError+">STE: Not a text file. Exiting.")
+
+        // 
+        // Checking if we're able to read/write the file
+        content = fd.get_content
+        if content == null then return print("<color="+SteTheme.steError+">STE: Insufficient read permissions. Exiting.")
+        result = fd.set_content(content)
+        if result != true then return print("<color="+SteTheme.steError+">STE: Insufficient write permissions. Exiting.")
+
+        // 
+        // globals() changed to outer() to avoid messing up with global namespace
+        // Removed dependency on the computer because why would you ever want it xd
+        fileName = fd.name
+        outer.file = fd
+        outer.text = fd.get_content
+
+        while true
+            clear_screen
+            outer.lines = outer.text.split(char(10))
+            if not lines then lines = [""]
+            for i in range(0, lines.len - 1)
+                print("<color="+SteTheme.steLine+">" + (i + 1) + "<color="+SteTheme.steDelimiter+">:</color> " + lines[i])
+            end for
+            input = user_input("<color="+SteTheme.steInputMessage+">" + fileName + " > <color="+SteTheme.steInput+">", false, true)
+            execute(input.lower)
+
+            // 
+            // Needed hack so that it won't exit the entire program
+            if input and "xq".indexOf(input) != null then return
+        end while
+
+    end function; main
+end function
+
+// 
+// Open Cleaner - System cleaning utility
+// Object is a shell, computer or file
+// Starting from file the functionality gets a downgrade
+openCleaner = function(object=null, OCtheme=null, OCmessages=null)
+    if not OCtheme then OCtheme = {
+        "ocPrefix": "yellow",
+        "ocLog": "white",
+        "ocWarning": "orange",
+        "ocError": "red",
+        "ocInputMessage": "yellow",
+        "ocInput": "white",
+    }
+
+    // 
+    // Compiled locale entries
+    if not OCmessages then
+        OCmessages = {}
+
+        OCmessages.ocWipedBy                            = "Wiped with Open Cleaner"
+        OCmessages.ocErrorStringGeneral                 = "Error in call of <i>{FUNC}()</i>: {ERROR}"
+        OCmessages.ocLogSuccessfullFileDeletion         = "Successfully deleted <i>{PATH}</i>"
+        OCmessages.ocErrorFailedFileWipe                = "Could not wipe <i>{PATH}</i>!"
+        OCmessages.ocLogSuccessfullFileWipe             = "Successfully wiped <i>{PATH}</i>"
+        OCmessages.ocLogNoTextFilesIn                   = "No text files in <i>{PATH}</i>"
+        OCmessages.ocLogNoFilesIn                       = "No files in <i>{PATH}</i>"
+        OCmessages.ocWarningCouldNotFindPath            = "Could not find <i>{PATH}</i>!"
+        OCmessages.ocWarningPathNotDirectory            = "Path <i>{PATH}</i> is not a directory!"
+        OCmessages.ocLogPathAlreadyWiped                = "Path <i>{PATH}</i> is already wiped"
+        OCmessages.ocLogWipingPath                      = "Wiping <i>{PATH}</i>..."
+        OCmessages.ocWarningPathNotTextFile             = "Path <i>{PATH}</i> is not a text file!"
+        OCmessages.ocLogWipingAllUsersPath              = "Wiping all users' <i>{PATH}</i>..."
+        OCmessages.ocWarningCouldNotFindAnyPath         = "Could not find any <i>{PATH}</i>"
+        OCmessages.ocErrorThisCommandRequiresComputer   = "Command <i>{COMMAND}</i> requires at least a computer to work!"
+        OCmessages.ocLogThanksAndQuit                   = "Thank you for using me. Quiting"
+        OCmessages.ocErrorCouldNotCreateTempLog         = "Could not create temporary log file!"
+        OCmessages.ocErrorTempLogDeleted                = "Temporary log file has got deleted right after the creation!"
+        OCmessages.ocErrorCommandNotFound               = "There is no such command! Type <i>help</i> to see what is available"
+        OCmessages.ocLogWelcomeMessage                  = "Welcome to Open Cleaner"
+
+        OCmessages.ocHelpEntrySysbin                    = "Wipe /bin"
+        OCmessages.ocHelpEntrySyslog                    = "Wipe /var/system.log"
+        OCmessages.ocHelpEntrySyspassword               = "Wipe /etc/passwd"
+        OCmessages.ocHelpEntryUsertrash                 = "Wipe all users' ~/.Trash"
+        OCmessages.ocHelpEntryUserconfig                = "Wipe all users' ~/Config"
+        OCmessages.ocHelpEntryUserdesktop               = "Wipe all users' ~/Desktop"
+        OCmessages.ocHelpEntryRecommended               = "Apply syspasswd, usertrash, userconfig and syslog"
+        OCmessages.ocHelpEntryHelp                      = "Available commands list"
+        OCmessages.ocHelpEntryClear                     = "Empty console window"
+        OCmessages.ocHelpEntryQuit                      = "Quit Open Cleaner"
+    end if
+
+
+    // 
+    // Constants
+    WIPE_CONTENT = OCmessages.ocWipedBy
+
+
+    // 
+    // Variables
+    computer = null
+    file = null
+
+
+    // 
+    // Routines
+    deleteFile = function(fd)
+        yield
+        result = fd.delete
+        if result and result isa string then
+            OCconsole.error(replaceF(OCmessages.ocErrorStringGeneral, {"FUNC": "delete", "ERROR": result}))
+        else
+            OCconsole.log(replaceF(OCmessages.ocLogSuccessfullFileDeletion, {"PATH": fd.path}))
+        end if
+    end function
+
+    overwriteFile = function(fd)
+        result = fd.set_content(WIPE_CONTENT)
+        if result isa string then
+            OCconsole.error(replaceF(OCmessages.ocErrorStringGeneral, {"FUNC": "set_content", "ERROR": result}))
+        else if not result then
+            OCconsole.error(replaceF(OCmessages.ocErrorFailedFileWipe, {"PATH": fd.path}))
+        else
+            OCconsole.log(replaceF(OCmessages.ocLogSuccessfullFileWipe, {"PATH": fd.path}))
+        end if
+    end function
+
+    overwriteDirectory = function(fd)
+        textfiles = []
+        for textfd in fd.get_files
+            if not textfd.is_folder and not textfd.is_binary then textfiles.push(textfd)
+        end for
+        if textfiles.len == 0 then return OCconsole.log(replaceF(OCmessages.ocLogNoTextFilesIn, {"PATH": fd.path}))
+        for textfd in textfiles
+            overwriteFile(textfd)
+        end for
+    end function
+
+    emptyDirectory = function(fd)
+        contents = fd.get_folders+fd.get_files
+        if contents.len == 0 then return OCconsole.log(replaceF(OCmessages.ocLogNoFilesIn, {"PATH": fd.path}))
+        for fd in contents
+            deleteFile(fd)
+        end for
+    end function
+
+    getUsersDirectories = function
+        homes = []
+
+        rootfd = iterateToPath(file, "/root")
+        if rootfd then homes.push(rootfd)
+
+        homefd = iterateToPath(file, "/home")
+        if homefd then
+            for dirfd in homefd.get_folders
+                homes.push(dirfd)
+            end for
+        end if
+
+        return homes
+    end function
+
+
+    OCconsole = {}
+
+    OCconsole._printWithColorAndTime = function(color, message=" ")
+        currentTime = current_date.split(" - ")[1]
+        print("<color="+OCtheme.ocPrefix+">-"+currentTime+"- <color="+color+">"+message)
+    end function
+    
+    OCconsole.log = function(message=" ")
+        OCconsole._printWithColorAndTime(OCtheme.ocLog, message)
+    end function
+
+    OCconsole.warning = function(message=" ")
+        OCconsole._printWithColorAndTime(OCtheme.ocWarning, message)
+    end function
+
+    OCconsole.error = function(message=" ")
+        OCconsole._printWithColorAndTime(OCtheme.ocError, message)
+    end function
+
+    OCconsole.input = function(message=" ")
+        input = user_input("<color="+OCtheme.ocInputMessage+">"+message+"<color="+OCtheme.ocInput+">")
+        if isInputValid(input) then return input
+        return ""
+    end function
+
+
+    // 
+    // Commands
+    OCcommands = {}
+
+    OCcommands["sysbin"] = function
+        whitelist = ["cd", "reboot"]
+        
+        fd = iterateToPath(file, "/bin")
+        if not fd then return OCconsole.warning(replaceF(OCmessages.ocWarningCouldNotFindPath, {"PATH": "/bin"}))
+        if not fd.is_folder then return OCconsole.warning(replaceF(OCmessages.ocWarningPathNotDirectory, {"PATH": "/bin"}))
+        
+        wipeBinaries = fd.get_folders
+        for binary in fd.get_files
+            name = binary.name
+            if whitelist.indexOf(name) != null then continue
+            if name[0] == name[0].upper then continue
+            wipeBinaries.push(binary)
+        end for
+
+        if wipeBinaries.len == 0 then return OCconsole.log(replaceF(OCmessages.ocLogPathAlreadyWiped, {"PATH": "/bin"}))
+        OCconsole.log(replaceF(OCmessages.ocLogWipingPath, {"PATH": "/bin"}))
+        for binary in wipeBinaries
+            deleteFile(binary)
+        end for
+    end function
+
+    OCcommands["syslog"] = function
+        if not computer then return OCconsole.error(replaceF(OCmessages.ocErrorThisCommandRequiresComputer, {"COMMAND": "syslog"}))
+
+        OCconsole.log(replaceF(OCmessages.ocLogWipingPath, {"PATH": "/var/system.log"}))
+        
+        tempname = ".system.log"
+        result = computer.touch("/var", tempname)
+        if result isa string then
+            return OCconsole.error(replaceF(OCmessages.ocErrorStringGeneral, {"FUNC": "touch", "ERROR": result}))
+        else if not result then
+            return OCconsole.error(OCmessages.ocErrorCouldNotCreateTempLog)
+        end if
+
+        tempfd = iterateToPath(file, "/var/"+tempname)
+        // 
+        // This check is a counter of proactive protections
+        if not tempfd then return OCconsole.error(OCmessages.ocErrorTempLogDeleted)
+
+        // 
+        // We don't care if it succeeds because there can be a scenario
+        // where we have no read but have write access
+        tempfd.set_content(WIPE_CONTENT)
+
+        result = tempfd.move("/var", "system.log")
+        if result isa string then
+            OCconsole.error(replaceF(OCmessages.ocErrorStringGeneral, {"FUNC": "move", "ERROR": result}))
+        else if not result then
+            OCconsole.error(replaceF(OCmessages.ocErrorFailedFileWipe, {"PATH": "/var/system.log"}))
+        else
+            OCconsole.log(replaceF(OCmessages.ocLogSuccessfullFileWipe, {"PATH": "/var/system.log"}))
+        end if
+    end function
+
+    OCcommands["syspasswd"] = function
+        fd = iterateToPath(file, "/etc/passwd")
+        if not fd then return OCconsole.warning(replaceF(OCmessages.ocWarningCouldNotFindPath, {"PATH": "/etc/passwd"}))
+        if fd.is_binary or fd.is_folder then return OCconsole.warning(OCmessages.ocWarningPathNotTextFile, {"PATH": "/etc/passwd"})
+
+        OCconsole.log(replaceF(OCmessages.ocLogWipingPath, {"PATH": "/etc/passwd"}))
+        overwriteFile(fd)
+    end function
+
+    OCcommands["usertrash"] = function
+        trashes = []
+
+        for homefd in getUsersDirectories
+            trashfd = iterateToPath(homefd, homefd.path+"/.Trash")
+            if trashfd then trashes.push(trashfd)
+        end for
+
+        if trashes.len == 0 then return OCconsole.warning(replaceF(OCmessages.ocWarningCouldNotFindAnyPath, {"PATH": "~/.Trash"}))
+        OCconsole.log(replaceF(OCmessages.ocLogWipingAllUsersPath, {"PATH": "~/.Trash"}))
+        for trashfd in trashes
+            emptyDirectory(trashfd)
+        end for
+    end function
+
+    OCcommands["userconfig"] = function
+        configs = []
+
+        for homefd in getUsersDirectories
+            configfd = iterateToPath(homefd, homefd.path+"/Config")
+            if configfd then configs.push(configfd)
+        end for
+
+        if configs.len == 0 then return OCconsole.warning(replaceF(OCmessages.ocWarningCouldNotFindAnyPath, {"PATH": "~/Config"}))
+        OCconsole.log(replaceF(OCmessages.ocLogWipingAllUsersPath, {"PATH": "~/Config"}))
+        for configfd in configs
+            overwriteDirectory(configfd)
+        end for
+    end function
+
+    OCcommands["userdesktop"] = function
+        desktops = []
+
+        for homefd in getUsersDirectories
+            desktopfd = iterateToPath(homefd, homefd.path+"/Desktop")
+            if desktopfd and desktopfd.is_folder then desktops.push(desktopfd)
+        end for
+
+        if desktops.len == 0 then return OCconsole.warning(replaceF(OCmessages.ocWarningCouldNotFindAnyPath, {"PATH": "~/Desktop"}))
+        OCconsole.log(replaceF(OCmessages.ocLogWipingAllUsersPath, {"PATH": "~/Desktop"}))
+        for desktopfd in desktops
+            emptyDirectory(desktopfd)
+        end for
+    end function
+
+    OCcommands["rec"] = function
+        OCcommands["syspasswd"]
+        print(" ")
+        OCcommands["usertrash"]
+        print(" ")
+        OCcommands["userconfig"]
+        print(" ")
+        OCcommands["syslog"]
+    end function
+
+    OCcommands["help"] = function
+        lines = [
+            "sysbin - "+OCmessages.ocHelpEntrySysbin,
+            "syslog - "+OCmessages.ocHelpEntrySyslog,
+            "syspasswd - "+OCmessages.ocHelpEntrySyspassword,
+            "usertrash - "+OCmessages.ocHelpEntryUsertrash,
+            "userconfig - "+OCmessages.ocHelpEntryUserconfig,
+            "userdesktop - "+OCmessages.ocHelpEntryUserdesktop,
+            "rec - "+OCmessages.ocHelpEntryRecommended,
+            "help, h, ? - "+OCmessages.ocHelpEntryHelp,
+            "clear, cls - "+OCmessages.ocHelpEntryClear,
+            "quit, q - "+OCmessages.ocHelpEntryQuit,
+        ]
+        for line in lines
+            print("<color="+OCtheme.ocLog+">"+line)
+        end for
+    end function
+
+    OCcommands["clear"] = @clear_screen
+
+    OCcommands["quit"] = function
+        OCconsole.log(OCmessages.ocLogThanksAndQuit)
+    end function
+
+
+    // 
+    // Aliases
+    OCcommands["h"] = @OCcommands["help"]
+    OCcommands["?"] = @OCcommands["help"]
+
+    OCcommands["cls"] = @OCcommands["clear"]
+
+    OCcommands["q"] = @OCcommands["quit"]
+
+
+    // 
+    // Determining the object
+    if not object then object = get_shell
+    type = typeof(object).lower
+    if type == "shell" then
+        computer = object.host_computer
+        file = computer.File("/")
+    else if type == "computer" then
+        computer = object
+        file = computer.File("/")
+    else if type == "file" then
+        file = iterateToPath(object, "/")
+    end if
+
+
+    OCconsole.log(OCmessages.ocLogWelcomeMessage)
+    while true
+        input = OCconsole.input("OC > ")
+        if not input then continue
+
+        if OCcommands.indexes.indexOf(input) == null then
+            OCconsole.error(OCmessages.ocErrorCommandNotFound)
+            continue
+        end if
+
+        OCcommands[input]
+
+        // 
+        // A needed hack for portability
+        if ["q", "quit"].indexOf(input) != null then return
+    end while
 end function

@@ -1,3 +1,5 @@
+import_code("/home/guest/Sources/Marinette/src/localization.src")
+import_code("/home/guest/Sources/Marinette/src/themeing.src")
 import_code("/home/guest/Sources/Marinette/src/portable.src")
 import_code("/home/guest/Sources/Marinette/src/marilib.src")
 import_code("/home/guest/Sources/Marinette/src/commands.src")
@@ -21,7 +23,7 @@ performPasswordChecking = function
             return
         end if
     end if
-    exit(Console.error("Incorrect password! :("))
+    exit(Console.error(Messages.ErrorIncorrectPassword))
 end function
 
 // 
@@ -36,7 +38,7 @@ end function
 // 
 // Loads stuff that could be loaded only at runtime
 performRuntimeLoading = function
-    Console.log("Performing runtime loading...")
+    Console.log(Messages.LogRuntimeLoading)
     
     shell = get_shell
     computer = shell.host_computer
@@ -79,17 +81,16 @@ end function
 // 
 // Checks if full Marinette's functionality can be used
 performSystemChecks = function
-    Console.log("Performing system checks...")
+    Console.log(Messages.LogSystemChecks)
     
     haveAllPassed = true
     if not (Intrinsics.publicAddress and Intrinsics.localAddress) then haveAllPassed = false
     if Libs.len < 4 then haveAllPassed = false
 
     if not haveAllPassed then
-        Console.warning("Something is bad! @_@")
-        Console.warning("See <i>sysinf</i> for more details.")
+        Console.warning(Messages.WarningFailedSystemChecks)
     else
-        Console.log("All checks have successfully been passed! ^_^")
+        Console.log(Messages.LogSuccessfullSystemChecks)
     end if
 end function
 
@@ -97,13 +98,13 @@ end function
 
 
 main = function
-    if params.indexOf("--password") == null then exit(Console.error("Marinette is protected! You shall not pass! ~"))
+    if params.indexOf("--password") == null then exit(Console.error(Messages.ErrorNoPassword))
     performPasswordChecking
 
     if params.indexOf("--identify-marinette") != null then throwIdentifyingSignal
     if params.indexOf("--no-ascii-art") == null then Console.asciiArt
     if params.indexOf("--no-runtime-loading") == null then performRuntimeLoading
     if params.indexOf("--no-system-checks") == null then performSystemChecks
-
+    
     Console.cmdloop
 end function; main

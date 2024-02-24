@@ -4,52 +4,75 @@
 from pathlib import PurePath, Path
 
 
+def gh_init():
+    return (
+        "s=get_shell\n"
+        "hc=s.host_computer\n"
+        "gf=function(p);return hc.File(p);end function\n"
+        "df=function(p);f=gf(p);if f then f.delete;end function\n"
+        "cf=function(p,n);hc.touch(p,n);end function\n"
+        "cfl=function(p,n);hc.create_folder(p,n);end function\n"
+        "app=function(p,c);f=gf(p);o=f.get_content;f.set_content(o+c+char(10));end function\n"
+    )
+
+
 def delete_file(path):
     file = PurePath(path)
-    return (
-        f'file = get_shell.host_computer.File("{file}")\n'
-        f'if file then file.delete\n'
-    )
+    return f'df("{file}")\n'
 
 
 def create_file(path):
     file = PurePath(path)
     parent = str(file.parent)
     name = file.name
-    return f'get_shell.host_computer.touch("{parent}", "{name}")\n'
+    return f'cf("{parent}","{name}")\n'
 
 
 def create_folder(path):
     file = PurePath(path)
     parent = str(file.parent)
     name = file.name
-    return f'get_shell.host_computer.create_folder("{parent}", "{name}")\n'
+    return f'cfl("{parent}","{name}")\n'
 
 
 def append(path, content):
     file = PurePath(path)
-    return (
-        f'file = get_shell.host_computer.File("{path}")\n'
-        f'old = file.get_content\n'
-        f'file.set_content(old + "{content}" + char(10))\n'
-    )
+    return f'app("{path}","{content}")\n'
+
+
+def create_project_structure_recursively(project_fd, installer_fd, game_path):
+    for path in project_fd.iterdir():
+        new_path = str(PurePath(game_path) / path.name)
+        if path.is_dir():
+            installer_fd.write(create_folder(new_path))
+            create_project_structure_recursively(path, installer_fd, new_path)
+            continue
+        installer_fd.write(create_file(new_path))
+
+
+def write_text_files(project_fd, installer_fd, game_path):
+    for path in project_fd.iterdir():
+        if path.is_dir():
+            continue
+        if "LICENSE" in path.name or "README" in path.name:
+            installer_fd.write(delete_file(f"/home/guest/Sources/Marinette/{path.name}"))
+            installer_fd.write(create_file(f"/home/guest/Sources/Marinette/{path.name}"))
+            with open(path.absolute(), "r") as path_fd:
+                lines = path_fd.readlines()
+                lines = map(lambda line: line.replace("\n", ""), lines)
+                lines = map(lambda line: line.replace("\"", "\"\""), lines)
+                for line in lines:
+                    installer_fd.write(append(f"/home/guest/Sources/Marinette/{path.name}", line))
 
 
 if __name__ == "__main__":
-    fn = Path(__file__).name.replace(".py", ".src")
-    with open(f"scripts/{fn}", "w") as script_file:
-        script_file.write(create_folder("/home/guest/Sources/Marinette"))
-        script_file.write(create_folder("/home/guest/Sources/Marinette/src"))
-        
-        script_file.write(delete_file("/home/guest/Sources/Marinette/LICENSE"))
-        script_file.write(create_file("/home/guest/Sources/Marinette/LICENSE"))
+    filename = Path(__file__).name.replace(".py", ".src")
+    with open(f"scripts/{filename}", "w") as installer:
+        installer.write(gh_init())
+        installer.write(create_folder("/home"))
+        installer.write(create_folder("/home/guest/Sources"))
+        installer.write(create_folder("/home/guest/Sources/Marinette"))
 
-        with open("LICENSE", "r") as license_file:
-            lines = license_file.readlines()
-            lines = map(lambda line: line.replace("\n", ""), lines)
-            lines = map(lambda line: line.replace("\"", "\"\""), lines)
-            for line in lines:
-                script_file.write(append("/home/guest/Sources/Marinette/LICENSE", line))
-
-        for src in Path("src").iterdir():
-            script_file.write(create_file(f"/home/guest/Sources/Marinette/src/{src.name}"))
+        root = Path(".")
+        create_project_structure_recursively(root, installer, "/home/guest/Sources/Marinette")
+        write_text_files(root, installer, "/home/guest/Sources/Marinette")

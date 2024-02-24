@@ -4,7 +4,9 @@ Vars = {}
 Intrinsics = {}
 IntrinsicsHelpers = {}
 Libs = {}
+
 Theme = {}
+Messages = {}
 Console = {}
 Conditions = {}
 
@@ -23,10 +25,18 @@ Constants = {
     // You are free to change this. And don't reveal it that easily :)
     "password": "27d518c314eec63e57fab0dc420c70d2d4657b3419cda980e7cdb827cc500be5",
     // 
-    // Identificator is a signal that lets Marinette find itself in path.
+    // Identificator is a signal that lets Marinette find itself in path
     // You might want to change that if you are PVPing against another player
     // with Marinette, or if you and another player are hacking the same server.
     "identificator": "XRZSWUOWZNGHWNDTOHZYUCIMBTAIKQWN",
+    // 
+    // Literally a language which Marinette will be speaking with you in
+    // See localization.src to see all available languages
+    "language": "English",
+    // 
+    // Colors which Marinette will use
+    // See themeing.src to see all available themes
+    "theme": "Violet",
 }
 
 
@@ -53,18 +63,18 @@ Intrinsics = {
 
 
 IntrinsicsHelpers.getSessionType = function(intrinsics)
-    object = "Host"
+    object = Messages.SessionTypeHost
     if intrinsics.isConnectionRemote then
-        if intrinsics.file then object = "File"
-        if intrinsics.computer then object = "Computer"
+        if intrinsics.file then object = Messages.SessionTypeFile
+        if intrinsics.computer then object = Messages.SessionTypeComputer
         if intrinsics.shell then
             type = typeof(intrinsics.shell)
             if type == "shell" then
-                object = "Shell"
+                object = Messages.SessionTypeShell
             else if type == "ftpshell" then
-                object = "FtpShell"
+                object = Messages.SessionTypeFtpShell
             else
-                object = "UnknownShell"
+                object = Messages.SessionTypeUnknownShell
             end if
         end if
     end if
@@ -77,37 +87,21 @@ end function
 IntrinsicsHelpers.tryToFixFdIfCorrupted = function
     if not isFdCorrupt(Intrinsics.file) then return
     if Intrinsics.computer then Intrinsics.file = iterateToLatestAccessiblePath(Intrinsics.computer, Intrinsics.file)
-    if not isFdCorrupt(Intrinsics.file) then return Console.log("Fixed file object corruption successfully!")
-    Console.warning("Could not fix file object corruption! :(")
-    Console.warning("Reload the session and hope it's fixed")
+    if not isFdCorrupt(Intrinsics.file) then return Console.log(Messages.LogSuccessfullFdCorruptionFix)
+    Console.warning(Messages.WarningFailedFdCorruptionFix)
 end function
 
 
 // 
-// Color palletes used are here https://colorhunt.co
-Theme = {
-    "asciiArt": [
-        "Oo      oO                                                 ",
-        "O O    o o               o                                 ",
-        "o  o  O  O                                 O     O         ",
-        "O   Oo   O                                oOo   oOo        ",
-        "O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. ",
-        "o        O O   o   o     o   o   O OooO'   O     O   OooO' ",
-        "o        O o   O   O     O   O   o O       o     o   O     ",
-        "O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' ",
-        "==========================================================",
-    ],
-    "ascii": "#DCBFFF",
-    "asciiShadow": "#D0A2F7",
-    "prefix": "#E5D4FF",
-    "log": "#D0A2F7",
-    "warning": "#FFECEC",
-    "error": "#FF78C4",
-    "inputMessage": "#D0A2F7",
-    "input": "#DCBFFF",
-    "miscPrimary": "#D0A2F7",
-    "miscSecondary": "#DCBFFF",
-}
+// Defaulting to fallback and map appending the chosen theme if exists
+Theme = Themes["Violet"]
+if Themes.indexes.indexOf(Constants.theme) != null then Theme = Theme + Themes[Constants.theme]
+
+
+// 
+// Compiling the locale with a specific language code for it to be usable
+// Missing entries will still be usable, but with an error message indicating that instead
+Messages = localesCompile(Constants.language, Locales)
 
 
 Console.asciiArt = function
@@ -150,12 +144,12 @@ Console.prompt = function
     object = IntrinsicsHelpers.getSessionType(Intrinsics)
     locIp = Intrinsics.localAddress
 
-    if not locIp then locIp = "LocalHost"
+    if not locIp then locIp = Messages.NetLocalHost
 
     msg = Theme.inputMessage
     inp = Theme.input
     lines = [
-        " <color="+msg+"> <b>"+user+"</b> as <b>"+object+"</b> on <b>"+locIp+"</b> in <b>"+fd.path,
+        " <color="+msg+"> "+replaceF(Messages.ConsolePromptHeader, {"USER": user, "SESSION": object, "LAN": locIp, "PATH": fd.path}),
         "<color="+msg+">% <color="+inp+">",
     ]
     return lines.join(char(10))
@@ -180,8 +174,7 @@ Console.cmdloop = function
             end for
 
             if Commands.indexes.indexOf(command) == null then
-                Console.error("Sorry! No such command available! (=0_0=)")
-                Console.error("See <i>help</i> to get some!")
+                Console.error(Messages.ErrorCommandNotFound)
                 continue
             end if
         end if
@@ -198,27 +191,31 @@ end function
 
 Conditions.arguments = function(arguments, count)
     if arguments.len == count then return
-    Console.error("Incorrect arguments count! (x^x)")
+    Console.error(replaceF(Messages.ErrorIncorrectAmountOfArguments, {"AMOUNT": count}))
     Console.cmdloop
 end function
 
 Conditions.argumentsMoreThan = function(arguments, count)
-    if arguments.len <= count then Conditions.arguments(arguments, -1)
+    if arguments.len > count then return
+    Console.error(replaceF(Messages.ErrorAmountOfArgumentsTooFew, {"AMOUNT": count}))
+    Console.cmdloop
 end function
 
 Conditions.argumentsFewerThan = function(arguments, count)
-    if arguments.len >= count then Conditions.arguments(arguments, -1)
+    if arguments.len < count then return
+    Console.error(replaceF(Messages.ErrorAmountOfArgumentsTooMuch, {"AMOUNT": count}))
+    Console.cmdloop
 end function
 
 Conditions.host = function
     if not Intrinsics.isConnectionRemote then return
-    Console.error("I need to be run on host!")
+    Console.error(replaceF(Messages.ErrorIncorrectSessionType, {"SESSION": Messages.SessionTypeHost}))
     Console.cmdloop
 end function
 
 Conditions.remote = function
     if Intrinsics.isConnectionRemote then return
-    Console.error("I need to be run on a remote connection!")
+    Console.error(replaceF(Messages.ErrorSessionNotRemote, {"HOST": Messages.SessionTypeHost}))
     Console.cmdloop
 end function
 
@@ -227,47 +224,44 @@ Conditions.shell = function(preciseTypes=null)
         if not preciseTypes then return
         if preciseTypes.indexOf(typeof(Intrinsics.shell)) != null then return
     end if
-    if preciseTypes then
-        Console.error("I need one of these: "+str(preciseTypes)+" !")
-    else
-        Console.error("I need a shell!")
-    end if
+    if not preciseTypes then preciseTypes = ["shell", "ftpshell"]
+    Console.error(replaceF(Messages.ErrorSessionNotShell, {"SHELLS": str(preciseTypes)}))
     Console.cmdloop
 end function
 
 Conditions.computer = function
     if Intrinsics.computer then return
-    Console.error("I am a computer addict!")
+    Console.error(replaceF(Messages.ErrorIncorrectSessionType, {"SESSION": Messages.SessionTypeComputer}))
     Console.cmdloop
 end function
 
 Conditions.network = function
     if get_shell.host_computer.is_network_active then return
-    Console.error("I want network connection!")
+    Console.error(Messages.ErrorNoNetworkConnection)
     Console.cmdloop
 end function
 
 Conditions.crypto = function
     if Libs.indexes.indexOf("crypto") != null then return
-    Console.error("No crypto library!")
+    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "crypto"}))
     Console.cmdloop
 end function
 
 Conditions.apt = function
     if Libs.indexes.indexOf("apt") != null then return
-    Console.error("No apt library!")
+    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "apt"}))
     Console.cmdloop
 end function
 
 Conditions.metaxploit = function
     if Libs.indexes.indexOf("metaxploit") != null then return
-    Console.error("No metaxploit library!")
+    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "metaxploit"}))
     Console.cmdloop
 end function
 
 Conditions.blockchain = function
     if Libs.indexes.indexOf("blockchain") != null then return
-    Console.error("No blockchain library!")
+    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "blockchain"}))
     Console.cmdloop
 end function
 
@@ -366,11 +360,11 @@ SessionsHelpers._preprocess = function
     end function
     objectPredicate = function(iItem, jItem)
         priority = {
-            "Host": 4,
-            "Shell": 3,
-            "FtpShell": 2,
-            "Computer": 1,
-            "File": 0,
+            Messages.SessionTypeHost: 4,
+            Messages.SessionTypeShell: 3,
+            Messages.SessionTypeFtpShell: 2,
+            Messages.SessionTypeComputer: 1,
+            Messages.SessionTypeFile: 0,
         }
         iObject = iItem.name.split(" ")[0]
         jObject = jItem.name.split(" ")[0]
