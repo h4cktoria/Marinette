@@ -126,7 +126,7 @@ Fork, put your theme inside of [themeing.src](src/themeing.src), commit and open
 
 ### Translations <a name="contrib-lang">
 
-Want to translate 121+ locale entries for Marinette to be able to speak in your language for free? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
+Want to translate 250+ locale entries for Marinette to be able to speak in your language for free? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
 1. You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
 
