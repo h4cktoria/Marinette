@@ -51,7 +51,7 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 ### Present <a name="features-present"></a>
 
 -   Foolproof
--   Localization(The only command not localized is `ste` because I am lazy :P)
+-   Localizable and localized into different languages(The only command not localized is `ste` because I am lazy :P)
 -   Session management system
 -   Basic hacking functionality
 -   Simple compile-time configuration
@@ -243,6 +243,7 @@ Special thanks and credits goes to:
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
 -   [rocketorbit](https://github.com/rocketorbit) - for [Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack)
+-   Guest - for Ukraininan translation
 -   Simonize - for color theme
 
 If I've somehow forgotten to mention you in here then accept my apologizes! Open an issue and I'll add you as fast as I can!
