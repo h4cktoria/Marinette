@@ -28,7 +28,7 @@ Constants = {
     // Identificator is a signal that lets Marinette find itself in path
     // You might want to change that if you are PVPing against another player
     // with Marinette, or if you and another player are hacking the same server.
-    "identificator": "XRZSWUOWZNGHWNDTOHZYUCIMBTAIKQWN",
+    "identificator": "DRKTTSVBHFFQBDFRPBYQCPZJSTMKXFYX",
     // 
     // Literally a language which Marinette will be speaking with you in
     // See localization.src to see all available languages
@@ -342,6 +342,19 @@ SessionsHelpers.createSession = function(intrinsics)
     }
 
     return session
+end function
+
+SessionsHelpers.getAllSessionsNames = function
+    sessions = []
+    if Vars.hostSession then sessions.push(Vars.hostSession)
+    sessions = sessions + Sessions
+    
+    sessionNames = []
+    for session in sessions
+        sessionNames.push(session)
+    end for
+
+    return sessionNames
 end function
 
 SessionsHelpers._preprocess = function

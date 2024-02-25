@@ -56,7 +56,7 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 -   Basic hacking functionality
 -   Simple compile-time configuration
 -   Source-independent security of compromising information(kinda?)
--   Stability and reliability over other(mostly proprietary) shells
+-   --Stability and reliability over other(mostly proprietary) shells-- NEVERMIND LOL. I've just figured I've got a severe bug in session management
 
 
 ### Future <a name="features-future"></a>
