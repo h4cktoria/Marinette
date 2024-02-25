@@ -271,8 +271,11 @@ end function
 SessionsHelpers.add = function(intrinsics)
     SessionsHelpers._preprocess
 
+    intrinsics = deepCopy(intrinsics)
     session = SessionsHelpers.createSession(intrinsics)
 
+    // 
+    // No idea what this code does :P
     if not session.Intrinsics.isConnectionRemote then
         hostSession = deepCopy(Vars.hostSession)
         if hostSession.name.split(" ")[1:] == session.name.split(" ")[1:] then
@@ -325,6 +328,8 @@ end function
 //     "Intrinsics": map,
 // ]
 SessionsHelpers.createSession = function(intrinsics)
+    intrinsics = deepCopy(intrinsics)
+
     object = IntrinsicsHelpers.getSessionType(intrinsics)
     pubAddr = intrinsics.publicAddress
     locAddr = intrinsics.localAddress
@@ -342,19 +347,6 @@ SessionsHelpers.createSession = function(intrinsics)
     }
 
     return session
-end function
-
-SessionsHelpers.getAllSessionsNames = function
-    sessions = []
-    if Vars.hostSession then sessions.push(Vars.hostSession)
-    sessions = sessions + Sessions
-    
-    sessionNames = []
-    for session in sessions
-        sessionNames.push(session)
-    end for
-
-    return sessionNames
 end function
 
 SessionsHelpers._preprocess = function

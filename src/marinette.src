@@ -40,8 +40,7 @@ end function
 performRuntimeLoading = function
     Console.log(Messages.LogRuntimeLoading)
     
-    shell = get_shell
-    computer = shell.host_computer
+    computer = get_shell.host_computer
     
     Intrinsics.publicAddress = null
     Intrinsics.localAddress = null
@@ -55,18 +54,34 @@ performRuntimeLoading = function
     // Loads the most recent versions if metaxploit has been found
     globals.Libs = loadLibraries
 
+
     shared = get_custom_object
-    if shared.indexes.indexOf("Vars") != null then globals.Vars = deepCopy(shared.Vars)
-    if shared.indexes.indexOf("Intrinsics") != null then globals.Intrinsics = deepCopy(shared.Intrinsics)
+
+    if shared.indexes.indexOf("Vars") != null then 
+        globals.Vars = deepCopy(shared.Vars)
+        shared.remove("Vars")
+    end if
+
+    if shared.indexes.indexOf("Intrinsics") != null then
+        globals.Intrinsics = deepCopy(shared.Intrinsics)
+        shared.remove("Intrinsics")
+    end if
+
     if shared.indexes.indexOf("Libs") != null then
         for kv in deepCopy(shared.Libs)
             libName = kv["key"]
             library = kv["value"]
             if Libs.indexes.indexOf(libName) == null then Libs[libName] = library
         end for
+        shared.remove("Libs")
     end if
-    if shared.indexes.indexOf("Sessions") != null then globals.Sessions = deepCopy(shared.Sessions)
 
+    if shared.indexes.indexOf("Sessions") != null then
+        globals.Sessions = deepCopy(shared.Sessions)
+        shared.remove("Sessions")
+    end if
+
+    
     // 
     // If host session does not exist, simply creating it
     // Else we just overwrite host session with current one
