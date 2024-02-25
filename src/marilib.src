@@ -28,7 +28,7 @@ Constants = {
     // Identificator is a signal that lets Marinette find itself in path
     // You might want to change that if you are PVPing against another player
     // with Marinette, or if you and another player are hacking the same server.
-    "identificator": "DRKTTSVBHFFQBDFRPBYQCPZJSTMKXFYX",
+    "identificator": "QHKLUEJOGYJKEHWFHKYPYACTVKCBMUOZ",
     // 
     // Literally a language which Marinette will be speaking with you in
     // See localization.src to see all available languages
