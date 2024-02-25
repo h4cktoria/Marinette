@@ -56,7 +56,7 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 -   Basic hacking functionality
 -   Simple compile-time configuration
 -   Source-independent security of compromising information(kinda?)
--   ~~Stability and reliability over other(mostly proprietary) shells~~ NEVERMIND LOL. ~~I've just figured I've got a severe bug in session management~~ I think I've got it fixed
+-   ~~Stability and reliability over other(mostly proprietary) shells~~ NEVERMIND LOL. ~~I've just figured I've got a severe bug in session management.~~ I think I've got it fixed
 
 
 ### Future <a name="features-future"></a>
@@ -90,26 +90,26 @@ Reliable way frees yourself from these problems
 
 ### Unreliable, fast way <a name="unreliable-install"></a>
 
-1.  Copy [marinette_installer.src](scripts/marinette_installer.src) into the game directory. It will create the project structure at neccessary for successfull compilation
-2.  Copy-Paste every source file from [src](src) into the in-game **/home/guest/Sources/Marinette/src**
+1.  Copy [marinette_installer.src](scripts/marinette_installer.src) into the Code Editor, compile and run the binary. It will create the project structure neccessary for successfull compilation
+2.  Copy every source file from [src](src) into the in-game **/home/guest/Sources/Marinette/src**
 3.  (Optionally) Change the stuff in **marilib.src**
     1.  Change the **Constants.identificator** to some 32 characters long string
     2.  Change the **Constants.language** to something defined in [localization.src](src/localization.src)
     3.  Change the **Constants.theme** to something defined in [themeing.src](src/themeing.src)
-4.  Compile **marinette.src**. Launch marinette with `--password marinette` parameters. Congratulations!
+4.  Compile **marinette.src**. Launch Marinette with `--password marinette` parameters. Congratulations!
 
 
 ### Reliable, (kinda?)slow way <a name="reliable-install"></a>
 
 1.  Download the repository to your computer
-2.  From the root of the project, launch **scripts/marinette_installer.py**. It'll create **marinette_installer.src**
+2.  From the root of the project, run **scripts/marinette_installer.py**. It'll create **marinette_installer.src**
 3.  Repeat steps 1-2 from [Unreliable way](#unreliable-install)
 4.  (Optionally) Change the stuff in **marilib.src**
     1.  From the root of the project, launch **scripts/hash_password.py** with the desired password. You'll get a hashed password you can set in **Constants.password**
     2.  From the root of the project, launch **scripts/identifying_signal.py**. You'll get random identificator you can set in **Constants.identificator**
     3.  Change the **Constants.language** to something defined in [localization.src](src/localization.src)
     4.  Change the **Constants.theme** to something defined in [themeing.src](src/themeing.src)
-5.  Compile **marinette.src**. Launch marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
+5.  Compile **marinette.src**. Launch Marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
 
 
 
@@ -139,12 +139,12 @@ Once you're done, scroll to the bottom of the [localization.src](src/localizatio
 
 ### Bug report <a name="contrib-bugreport">
 
-Open up an issue and wait for my response!
+Open up an issue and wait for my response
 
 
 ### Features/Commands/Bug fixes/etc <a name="contrib-code">
 
-If you want to contribute to the code, then look at it first. Still want to contribute? Then you should also know there is absolutely no documentation(lazy me) and you have to guess what and how to change things so they doesn't break! STILL want to contribute? Okie, great! Fork, make source changes, write what exactly you've changed, commit and open the pull request
+If you want to contribute to the code, then look at it first. Still want to contribute? Then you should also know there is absolutely no documentation(lazy me) and you have to guess what and how to change things so they doesn't break! STILL want to contribute? Okie, great! Fork, make source changes, commit, write what exactly you've changed and open the pull request
 
 
 
