@@ -81,15 +81,15 @@ performRuntimeLoading = function
         shared.remove("Sessions")
     end if
 
-    
     // 
     // If host session does not exist, simply creating it
     // Else we just overwrite host session with current one
-    if Vars.hostSession == null then
-        Vars.hostSession = SessionsHelpers.createSession(Intrinsics)
-    else
-        SessionsHelpers.add(Vars.hostSession.Intrinsics)
-    end if
+    // if Vars.hostSession == null then
+    //     Vars.hostSession = SessionsHelpers.createSession(Intrinsics)
+    // else
+    //     SessionsHelpers.add(Vars.hostSession.Intrinsics)
+    // end if
+    
     SessionsHelpers.add(Intrinsics)
 end function
 

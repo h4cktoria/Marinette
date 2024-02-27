@@ -367,6 +367,7 @@ fmap = function(func, arr)
 end function
 
 cycleSort = function(arr, predicate, start, end_)
+    if arr.len == 0 then return
 	if start == null then start = 0
     if end_ == null then end_ = arr.len - 1
 
@@ -403,6 +404,7 @@ cycleSort = function(arr, predicate, start, end_)
 end function
 
 insertionSort = function(arr, predicate, start, end_)
+    if arr.len == 0 then return
 	if start == null then start = 0
     if end_ == null then end_ = arr.len - 1
 
@@ -420,6 +422,7 @@ insertionSort = function(arr, predicate, start, end_)
 end function
 
 quickSort = function(arr, predicate, low, high)
+    if arr.len == 0 then return
     if low == null then low = 0
     if high == null then high = arr.len - 1
 
@@ -452,6 +455,7 @@ quickSort = function(arr, predicate, low, high)
 end function
 
 selectionSort = function(arr, predicate, start, end_)
+    if arr.len == 0 then return
 	if start == null then start = 0
     if end_ == null then end_ = arr.len - 1
 
@@ -473,6 +477,7 @@ selectionSort = function(arr, predicate, start, end_)
 end function
 
 mergeSort = function(arr, predicate, start, end_)
+    if arr.len == 0 then return
     if start == null then start = 0
     if end_ == null then end_ = arr.len - 1
 

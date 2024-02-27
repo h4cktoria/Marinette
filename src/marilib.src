@@ -158,6 +158,9 @@ end function
 Console.cmdloop = function
     while true
         input = Console.input(Console.prompt).trim
+
+        // 
+        // Various handlers that get executed each loop
         IntrinsicsHelpers.tryToFixFdIfCorrupted
 
         if input.len == 0 then continue
@@ -265,23 +268,27 @@ Conditions.blockchain = function
     Console.cmdloop
 end function
 
+
 // 
 // Add session to the Sessions[]
 // Overwrites session if it already exists
 SessionsHelpers.add = function(intrinsics)
-    SessionsHelpers._preprocess
-
     intrinsics = deepCopy(intrinsics)
     session = SessionsHelpers.createSession(intrinsics)
 
     // 
     // No idea what this code does :P
     if not session.Intrinsics.isConnectionRemote then
+        if not Vars.hostSession then
+            Vars.hostSession = SessionsHelpers.createSession(Intrinsics)
+            return
+        end if
         hostSession = deepCopy(Vars.hostSession)
         if hostSession.name.split(" ")[1:] == session.name.split(" ")[1:] then
             Vars.hostSession = deepCopy(session)
             return
         end if
+        
         hostSession.Intrinsics.isConnectionRemote = true
         SessionsHelpers.add(hostSession.Intrinsics)
         Vars.hostSession = deepCopy(session)
@@ -304,8 +311,6 @@ SessionsHelpers.add = function(intrinsics)
 end function
 
 SessionsHelpers.delete = function(id)
-    SessionsHelpers._preprocess
-
     sessions = [Vars.hostSession] + Sessions
     if id < 2 or id > sessions.len then return false
     Sessions.remove(id-1 - 1)
@@ -313,9 +318,7 @@ SessionsHelpers.delete = function(id)
 end function
 
 SessionsHelpers.get = function(id)
-    SessionsHelpers._preprocess
-
-    sessions = [Vars.hostSession] + Sessions
+    sessions = [Vars.hostSession] + deepCopy(Sessions)
     if id < 1 or id > sessions.len then return
     return deepCopy(sessions[id-1])
 end function
@@ -349,32 +352,10 @@ SessionsHelpers.createSession = function(intrinsics)
     return session
 end function
 
-SessionsHelpers._preprocess = function
-    // 
-    // Sorting sessions by username and object type
-    userPredicate = function(iItem, jItem)
-        priority = {
-            "root": 2,
-            "guest": 1,
-        }
-        iUser = iItem.name.split(" ")[4]
-        jUser = jItem.name.split(" ")[4]
-        if priority.indexes.indexOf(iUser) == null then priority[iUser] = rnd
-        if priority.indexes.indexOf(jUser) == null then priority[jUser] = rnd
-        return priority[iUser] < priority[jUser]
-    end function
-    objectPredicate = function(iItem, jItem)
-        priority = {
-            Messages.SessionTypeHost: 4,
-            Messages.SessionTypeShell: 3,
-            Messages.SessionTypeFtpShell: 2,
-            Messages.SessionTypeComputer: 1,
-            Messages.SessionTypeFile: 0,
-        }
-        iObject = iItem.name.split(" ")[0]
-        jObject = jItem.name.split(" ")[0]
-        return priority[iObject] < priority[jObject]
-    end function
-    mergeSort(Sessions, @userPredicate)
-    mergeSort(Sessions, @objectPredicate)
+SessionsHelpers.getSessionsNames = function
+    names = []
+    for session in deepCopy(Sessions)
+        names.push(session.name)
+    end for
+    return names
 end function

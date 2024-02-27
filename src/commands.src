@@ -139,10 +139,10 @@ Commands["sm"] = function(arguments)
     Conditions.argumentsMoreThan(arguments, 0)
     
     command = arguments.pull
-    if ["n", "new"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, -1)
-    if ["d", "del"].indexOf(command) != null and arguments.len == 0 then return Conditions.arguments(arguments, -1)
-    if ["ld", "load"].indexOf(command) != null and arguments.len != 1 then return Conditions.arguments(arguments, -1)
-    if ["l", "look"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, -1)
+    if ["n", "new"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, 1)
+    if ["d", "del"].indexOf(command) != null and arguments.len == 0 then return Conditions.argumentsMoreThan(arguments, 1)
+    if ["ld", "load"].indexOf(command) != null and arguments.len != 1 then return Conditions.arguments(arguments, 2)
+    if ["l", "look"].indexOf(command) != null and arguments.len != 0 then return Conditions.argumentsMoreThan(arguments, 1)
 
     if ["n", "new"].indexOf(command) != null then
         SessionsHelpers.add(Intrinsics)
@@ -153,10 +153,10 @@ Commands["sm"] = function(arguments)
             if id isa string or not SessionsHelpers.delete(id) then
                 Console.error(Messages.ErrorIncorrectSessionId)
             else
-                Console.log(replaceF(Messages.LogSuccessfullSessionDeletion, {"ID": id}))
                 j = i-1; while j < arguments.len; j = j + 1
                     arguments[j-1] = arguments[j-1] - 1
                 end while
+                Console.log(replaceF(Messages.LogSuccessfullSessionDeletion, {"ID": id}))
             end if
         end while
     else if ["ld", "load"].indexOf(command) != null then
