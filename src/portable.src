@@ -260,29 +260,6 @@ end function
 ////////////////////////////////////////////////////////////
 
 // 
-// Copies the first layer of a map or each element of a list
-shallowCopy = function(collection)
-    listCopy = function(list_)
-        copy = []
-        for i in list_
-            copy.push(@i)
-        end for
-        return copy
-    end function
-
-    mapCopy = function(map_)
-        copy = {}
-        for kv in map_
-            copy[@kv["key"]] = @kv["value"]
-        end for
-        return copy
-    end function
-
-    if collection isa list then return listCopy(collection)
-    if collection isa map then return mapCopy(collection)
-end function
-
-// 
 // Copies a list/map until the elements in it are recursively exhausted
 // If a map has classID index, omits the recursive copying and just returns that map
 deepCopy = function(collection)
@@ -297,7 +274,7 @@ deepCopy = function(collection)
                 copied.push(@i)
             end if
         end for
-        return copied
+        return copied + []
     end function
 
     mapCopy = function(map_)
@@ -312,7 +289,7 @@ deepCopy = function(collection)
                 copied[@kv["key"]] = @kv["value"]
             end if
         end for
-        return copied
+        return copied + {}
     end function
 
     if collection isa list then return listCopy(collection)

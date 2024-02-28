@@ -283,6 +283,7 @@ SessionsHelpers.add = function(intrinsics)
             Vars.hostSession = SessionsHelpers.createSession(Intrinsics)
             return
         end if
+        
         hostSession = deepCopy(Vars.hostSession)
         if hostSession.name.split(" ")[1:] == session.name.split(" ")[1:] then
             Vars.hostSession = deepCopy(session)
