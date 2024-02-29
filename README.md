@@ -126,7 +126,7 @@ Fork, put your theme inside of [themeing.src](src/themeing.src), commit and open
 
 ### Translations <a name="contrib-lang">
 
-Want to translate 220+ locale entries for Marinette to be able to speak in your language for free? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
+Want to translate 220+ locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
 1. You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
 
@@ -187,7 +187,7 @@ Seriously, though, because everything made with love should be named as a human 
 
 **A**: TL;DR: Best for the players' and developers' freedom
 
-I've figured no one cares about license of your application in Grey Hack, so I've decided I want to give users complete freedom over the application. You got it from github? You're free to do whatever you want with it. You've hacked another player and stealen the sources? You're free to do whatever you want. You've got the source by exploiting a game? Yes, you guessed it, you're still free to do whatever you want. Full source availability also means I'll try my best so that it's leakage doesn't mean a game over for the user
+I've figured no one cares about license of your application in Grey Hack, so I've decided I want to give users complete freedom over Marinette. You've got her from github? You're free to do whatever you want with her. You've hacked another player and stealen the sources? You're free to do whatever you want. You've got the sources by exploiting a game? Yes, you guessed it, you're still free to do whatever you want. Full source availability also means I'll try my best so that it's leakage doesn't mean a game over for the user
 
 
 **Q: Why the Reliable way is so tedious?**
