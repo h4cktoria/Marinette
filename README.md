@@ -244,6 +244,6 @@ Special thanks and credits goes to:
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
 -   [rocketorbit](https://github.com/rocketorbit) - for [Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack)
 -   Guest - for Ukrainian translation
--   Simonize - for color theme
+-   Simonize - for color scheme and Polish translation
 
 If I've somehow forgotten to mention you in here then accept my apologizes! Open an issue and I'll add you as fast as I can!
