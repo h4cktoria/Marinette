@@ -128,11 +128,10 @@ Fork, put your theme inside of [themeing.src](src/themeing.src), commit and open
 
 Want to translate 220+ locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
-1. You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
-
-2. If you feel your language doesn't have an English terminology counterpart, just transliterate it. Examples of such terminology: localhost, service, hash, to crack, etc
-
-3. Marinette's pronouns are she/her, so if your language has them, translate accordingly
+1.  You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
+2.  If you feel your language doesn't have an English terminology counterpart, just transliterate it. Examples of such terminology: "LocalHost", "Service", "Hash", "Crack", etc
+3.  Marinette's pronouns are she/her, so if your language has them, translate accordingly
+4.  Glued words CAN'T be translated as separate!!! For example, "PublicAddress" can't be translated as "Public Address" in your language
 
 Once you're done, scroll to the bottom of the [localization.src](src/localization.src), make 4 new lines and append your locale after the latest one, commit and open the pull request
 

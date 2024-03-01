@@ -958,7 +958,7 @@ Locales.LogSuccessfullSessionsUpdate[_language]                 = "Pomyslnie zak
 Locales.ErrorIncorrectSessionId[_language]                      = "Niewlasciwy ID sesji!"
 Locales.LogSuccessfullSessionDeletion[_language]                = "Usunieto sesje z ID: <i>{ID}</i> pomyslnie"
 Locales.LogSuccessfullSessionLoad[_language]                    = "Wczytano sesje pomyslnie"
-Locales.SmHeader[_language]                                     = "ID Objekt Adres Publiczny Adres Lokalny Port Uzytkownik"
+Locales.SmHeader[_language]                                     = "ID Objekt Adres PubAdres LokPort Uzytkownik"
 Locales.ErrorUnknownArguments[_language]                        = "Unknown arguments passed into the command"
 Locales.LogHashCracking[_language]                              = "Rozpoczynanie rozszyfrowywania punktu kontrolnego!"
 Locales.ErrorUncrackableHash[_language]                         = "<i>{HASH}</i>: niemozliwy do scrackowania"
@@ -1147,5 +1147,3 @@ Locales.ocHelpEntryRecommended[_language]                       = "Zastosuj sysp
 Locales.ocHelpEntryHelp[_language]                              = "Lista dostepnych komend"
 Locales.ocHelpEntryClear[_language]                             = "Wyczysc okno konsoli"
 Locales.ocHelpEntryQuit[_language]                              = "Opusc Open Cleaner"
-
-

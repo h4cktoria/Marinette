@@ -420,9 +420,9 @@ Commands["inspect"] = function(arguments)
 end function
 
 
-Helps["userchange"] = Messages.HelpEntryUserchange
-Aliases["userchange"] = ["uc"]
-Commands["userchange"] = function(arguments)
+Helps["subuser"] = Messages.HelpEntryUserchange
+Aliases["subuser"] = ["subu"]
+Commands["subuser"] = function(arguments)
     Conditions.arguments(arguments, 2)
     Conditions.host
 
@@ -435,7 +435,7 @@ Commands["userchange"] = function(arguments)
     else
         Console.log(Messages.LogLookingForMyself)
         // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
-        fd = findMyself(Constants.identificator, "--identify-marinette --password "+Vars.password)
+        fd = findMyself(get_shell, Constants.identificator, "--identify-marinette --password "+Vars.password)
         if not fd then return Console.error(Messages.ErrorCouldNotFindMyself)
 
         Intrinsics.shell = shell
@@ -1229,22 +1229,28 @@ Commands["hostify"] = function(arguments)
     Console.log(Messages.LogLookingForPermissivePathToUploadInto)
     fdPermissive = findPermissivePath(Intrinsics.file, "wx")
     if not fdPermissive then return Console.error(Messages.ErrorCouldNotFindPermissivePathToUploadInto)
-    Console.log(Messages.LogLookingForMyself)
-    // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
-    fdMarinette = findMyself(Constants.identificator, "--identify-marinette --password "+Vars.password)
-    if not fdMarinette then return Console.error(Messages.ErrorCouldNotFindMyself)
-    
-    Console.log(Messages.LogUploadingNeccessary)
-    fdBin = get_shell.host_computer.File(fdMarinette.path)
-    result = get_shell.scp(fdMarinette.path, fdPermissive.path, Intrinsics.shell)
-    if result isa string then
-        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "scp", "ERROR": result}))
-    else if not result then
-        return Console.error(Messages.ErrorUnknown)
-    end if
-    Console.log("<i>"+fdMarinette.path+"</i> -> <i>"+fdPermissive.path)
 
-    marinettePath = fdPermissive.path+"/"+fdMarinette.name
+    marinettePath = null
+    fdMarinette = findMyself(Intrinsics.shell, Constants.identificator, "--identify-marinette --password "+Vars.password, true)
+    if fdMarinette and fdMarinette.has_permission("x") then marinettePath = fdMarinette.path
+    if not marinettePath then
+        Console.log(Messages.LogLookingForMyself)
+        // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
+        fdMarinette = findMyself(get_shell, Constants.identificator, "--identify-marinette --password "+Vars.password)
+        if not fdMarinette then return Console.error(Messages.ErrorCouldNotFindMyself)
+        
+        Console.log(Messages.LogUploadingNeccessary)
+        fdBin = get_shell.host_computer.File(fdMarinette.path)
+        result = get_shell.scp(fdMarinette.path, fdPermissive.path, Intrinsics.shell)
+        if result isa string then
+            return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "scp", "ERROR": result}))
+        else if not result then
+            return Console.error(Messages.ErrorUnknown)
+        end if
+        Console.log("<i>"+fdMarinette.path+"</i> -> <i>"+fdPermissive.path)
+        marinettePath = fdPermissive.path+"/"+fdMarinette.name
+    end if
+
     Intrinsics.isConnectionRemote = false
 
     shared = get_custom_object
