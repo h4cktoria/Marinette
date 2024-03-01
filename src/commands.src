@@ -1468,7 +1468,7 @@ end function
 
 
 Helps["walk"] = Messages.HelpEntryWalk
-Aliases["walk"] = ["w"]
+Aliases["walk"] = ["w", "cd"]
 Commands["walk"] = function(arguments)
     Conditions.arguments(arguments, 2)
 
