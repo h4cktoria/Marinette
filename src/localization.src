@@ -196,8 +196,21 @@ Locales.HelpEntrySte                                = {}
 Locales.HelpEntryOpenCleaner                        = {}
 
 
-Locales.ocWipedBy                                   = {}
-Locales.ocErrorStringGeneral                        = {}
+Locales.tpLogWelcomeMessage                         = {}
+Locales.tpLogThanksAndQuit                          = {}
+Locales.tpErrorCommandNotFound                      = {}
+Locales.tpErrorIncorrectAmountOfArguments           = {}
+Locales.tpErrorAmountOfArgumentsTooFew              = {}
+Locales.tpErrorAmountOfArgumentsTooMuch             = {}
+Locales.tpErrorNoHelpEntries                        = {}
+Locales.tpErrorStringGeneral                        = {}
+
+Locales.tpHelpEntryHelp                             = {}
+Locales.tpHelpEntryClear                            = {}
+Locales.tpHelpEntryQuit                             = {}
+
+
+Locales.ocWipeContent                               = {}
 Locales.ocLogSuccessfullFileDeletion                = {}
 Locales.ocErrorFailedFileWipe                       = {}
 Locales.ocLogSuccessfullFileWipe                    = {}
@@ -211,11 +224,8 @@ Locales.ocWarningPathNotTextFile                    = {}
 Locales.ocLogWipingAllUsersPath                     = {}
 Locales.ocWarningCouldNotFindAnyPath                = {}
 Locales.ocErrorThisCommandRequiresComputer          = {}
-Locales.ocLogThanksAndQuit                          = {}
 Locales.ocErrorCouldNotCreateTempLog                = {}
 Locales.ocErrorTempLogDeleted                       = {}
-Locales.ocErrorCommandNotFound                      = {}
-Locales.ocLogWelcomeMessage                         = {}
 
 Locales.ocHelpEntrySysbin                           = {}
 Locales.ocHelpEntrySyslog                           = {}
@@ -224,9 +234,6 @@ Locales.ocHelpEntryUsertrash                        = {}
 Locales.ocHelpEntryUserconfig                       = {}
 Locales.ocHelpEntryUserdesktop                      = {}
 Locales.ocHelpEntryRecommended                      = {}
-Locales.ocHelpEntryHelp                             = {}
-Locales.ocHelpEntryClear                            = {}
-Locales.ocHelpEntryQuit                             = {}
 
 
 
@@ -423,11 +430,17 @@ Locales.HelpEntryDelete[_language]                              = Locales.Sessio
 Locales.HelpEntryCopy[_language]                                = Locales.SessionTypeFile[_language]+" - (ap/path) (dest) - Copy files"
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Get file system tree"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ap/path) - Simple text editor"
-Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - System cleaning utility"
+Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[cmd] - System cleaning utility"
 
 
-Locales.ocWipedBy[_language]                                    = "Wiped with Open Cleaner"
-Locales.ocErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
+Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
+Locales.tpErrorAmountOfArgumentsTooFew[_language]               = Locales.ErrorAmountOfArgumentsTooFew[_language]
+Locales.tpErrorAmountOfArgumentsTooMuch[_language]              = Locales.ErrorAmountOfArgumentsTooMuch[_language]
+Locales.tpErrorNoHelpEntries[_language]                         = Locales.ErrorNoHelpEntries[_language]
+
+
+Locales.ocWipeContent[_language]                                = "Wiped with Open Cleaner"
+Locales.tpErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
 Locales.ocLogSuccessfullFileDeletion[_language]                 = "Successfully deleted <i>{PATH}</i>"
 Locales.ocErrorFailedFileWipe[_language]                        = "Could not wipe <i>{PATH}</i>!"
 Locales.ocLogSuccessfullFileWipe[_language]                     = "Successfully wiped <i>{PATH}</i>"
@@ -441,11 +454,11 @@ Locales.ocWarningPathNotTextFile[_language]                     = "Path <i>{PATH
 Locales.ocLogWipingAllUsersPath[_language]                      = "Wiping all users' <i>{PATH}</i>..."
 Locales.ocWarningCouldNotFindAnyPath[_language]                 = "Could not find any <i>{PATH}</i>"
 Locales.ocErrorThisCommandRequiresComputer[_language]           = "Command <i>{COMMAND}</i> requires at least a computer to work!"
-Locales.ocLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
+Locales.tpLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
 Locales.ocErrorCouldNotCreateTempLog[_language]                 = "Could not create temporary log file!"
 Locales.ocErrorTempLogDeleted[_language]                        = "Temporary log file has got deleted right after the creation!"
-Locales.ocErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
-Locales.ocLogWelcomeMessage[_language]                          = "Welcome to Open Cleaner"
+Locales.tpErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
+Locales.tpLogWelcomeMessage[_language]                          = "Welcome to {PROGRAM}"
 
 Locales.ocHelpEntrySysbin[_language]                            = "Wipe /bin"
 Locales.ocHelpEntrySyslog[_language]                            = "Wipe /var/system.log"
@@ -454,9 +467,9 @@ Locales.ocHelpEntryUsertrash[_language]                         = "Wipe all user
 Locales.ocHelpEntryUserconfig[_language]                        = "Wipe all users' ~/Config"
 Locales.ocHelpEntryUserdesktop[_language]                       = "Wipe all users' ~/Desktop"
 Locales.ocHelpEntryRecommended[_language]                       = "Apply syspasswd, usertrash, userconfig and syslog"
-Locales.ocHelpEntryHelp[_language]                              = "Available commands list"
-Locales.ocHelpEntryClear[_language]                             = "Empty console window"
-Locales.ocHelpEntryQuit[_language]                              = "Quit Open Cleaner"
+Locales.tpHelpEntryHelp[_language]                              = "Available commands list"
+Locales.tpHelpEntryClear[_language]                             = "Empty console window"
+Locales.tpHelpEntryQuit[_language]                              = "Quit {PROGRAM}"
 
 
 
@@ -653,11 +666,17 @@ Locales.HelpEntryDelete[_language]                              = Locales.Sessio
 Locales.HelpEntryCopy[_language]                                = Locales.SessionTypeFile[_language]+" - (ап/путь) (назн) - Копировать файл"
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Получить файловую систему в виде дерева"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ап/путь) - Простой редактор текста"
-Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - Утилита для очистки системы"
+Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утилита для очистки системы"
 
 
-Locales.ocWipedBy[_language]                                    = "Очищено с помощью Open Cleaner"
-Locales.ocErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
+Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
+Locales.tpErrorAmountOfArgumentsTooFew[_language]               = Locales.ErrorAmountOfArgumentsTooFew[_language]
+Locales.tpErrorAmountOfArgumentsTooMuch[_language]              = Locales.ErrorAmountOfArgumentsTooMuch[_language]
+Locales.tpErrorNoHelpEntries[_language]                         = Locales.ErrorNoHelpEntries[_language]
+
+
+Locales.ocWipeContent[_language]                                = "Очищено с помощью Open Cleaner"
+Locales.tpErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
 Locales.ocLogSuccessfullFileDeletion[_language]                 = "Успешно удалён <i>{PATH}</i>"
 Locales.ocErrorFailedFileWipe[_language]                        = "Не удалось очистить <i>{PATH}</i>!"
 Locales.ocLogSuccessfullFileWipe[_language]                     = "Успешно очищен <i>{PATH}</i>"
@@ -671,11 +690,11 @@ Locales.ocWarningPathNotTextFile[_language]                     = "Путь <i>{
 Locales.ocLogWipingAllUsersPath[_language]                      = "Очищаю <i>{PATH}</i> для всех пользователей..."
 Locales.ocWarningCouldNotFindAnyPath[_language]                 = "Не удалось найти ни одного <i>{PATH}</i>"
 Locales.ocErrorThisCommandRequiresComputer[_language]           = "Комманда <i>{COMMAND}</i> требует как минимум компьютер для своей работы!"
-Locales.ocLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
+Locales.tpLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
 Locales.ocErrorCouldNotCreateTempLog[_language]                 = "Не удалось создать временный файл журнала!"
 Locales.ocErrorTempLogDeleted[_language]                        = "Временный файл журнала удалён сразу после своего создания!"
-Locales.ocErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
-Locales.ocLogWelcomeMessage[_language]                          = "Добро пожаловать в Open Cleaner"
+Locales.tpErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
+Locales.tpLogWelcomeMessage[_language]                          = "Добро пожаловать в {PROGRAM}"
 
 Locales.ocHelpEntrySysbin[_language]                            = "Очистить /bin"
 Locales.ocHelpEntrySyslog[_language]                            = "Очистить /var/system.log"
@@ -684,9 +703,9 @@ Locales.ocHelpEntryUsertrash[_language]                         = "Очисти�
 Locales.ocHelpEntryUserconfig[_language]                        = "Очистить ~/Config для всех пользователей"
 Locales.ocHelpEntryUserdesktop[_language]                       = "Очистить ~/Desktop для всех пользователей"
 Locales.ocHelpEntryRecommended[_language]                       = "Применить syspasswd, usertrash, userconfig и syslog"
-Locales.ocHelpEntryHelp[_language]                              = "Справка с доступными командами"
-Locales.ocHelpEntryClear[_language]                             = "Опустошить окно консоли"
-Locales.ocHelpEntryQuit[_language]                              = "Выключить Open Cleaner"
+Locales.tpHelpEntryHelp[_language]                              = "Справка с доступными командами"
+Locales.tpHelpEntryClear[_language]                             = "Опустошить окно консоли"
+Locales.tpHelpEntryQuit[_language]                              = "Выключить {PROGRAM}"
 
 
 
@@ -883,11 +902,17 @@ Locales.HelpEntryDelete[_language]                              = Locales.Sessio
 Locales.HelpEntryCopy[_language]                                = Locales.SessionTypeFile[_language]+" - (абсШлях/шлях) (призначення) - Скопіювати файл"
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Отримати файлову систему у вигляді дерева"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (абсШлях/шлях) - Простий текстовий редактор"
-Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - Утиліта для очищення системи"
+Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утиліта для очищення системи"
 
 
-Locales.ocWipedBy[_language]                                    = "Очищено за допомогою Open Cleaner"
-Locales.ocErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
+Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
+Locales.tpErrorAmountOfArgumentsTooFew[_language]               = Locales.ErrorAmountOfArgumentsTooFew[_language]
+Locales.tpErrorAmountOfArgumentsTooMuch[_language]              = Locales.ErrorAmountOfArgumentsTooMuch[_language]
+Locales.tpErrorNoHelpEntries[_language]                         = Locales.ErrorNoHelpEntries[_language]
+
+
+Locales.ocWipeContent[_language]                                = "Очищено за допомогою Open Cleaner"
+Locales.tpErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
 Locales.ocLogSuccessfullFileDeletion[_language]                 = "Успішно видалений <i>{PATH}</i>"
 Locales.ocErrorFailedFileWipe[_language]                        = "Не вдалося очистити <i>{PATH}</i>!"
 Locales.ocLogSuccessfullFileWipe[_language]                     = "Успішно очищенно <i>{PATH}</i>"
@@ -901,11 +926,11 @@ Locales.ocWarningPathNotTextFile[_language]                     = "Шлях <i>{
 Locales.ocLogWipingAllUsersPath[_language]                      = "Очищаю <i>{PATH}</i> для всіх користувачів..."
 Locales.ocWarningCouldNotFindAnyPath[_language]                 = "Не вдалося знайти ні одного <i>{PATH}</i>"
 Locales.ocErrorThisCommandRequiresComputer[_language]           = "Комманда <i>{COMMAND}</i> потребує як мінімум комп'ютер для своєї роботи!"
-Locales.ocLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
+Locales.tpLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
 Locales.ocErrorCouldNotCreateTempLog[_language]                 = "Не вдалося створити тимчасовий файл журналу!"
 Locales.ocErrorTempLogDeleted[_language]                        = "Тимчасовий файл журналу видалений після свого створення!"
-Locales.ocErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
-Locales.ocLogWelcomeMessage[_language]                          = "Вітаємо в Open Cleaner"
+Locales.tpErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
+Locales.tpLogWelcomeMessage[_language]                          = "Вітаємо в {PROGRAM}"
 
 Locales.ocHelpEntrySysbin[_language]                            = "Очистити /bin"
 Locales.ocHelpEntrySyslog[_language]                            = "Очистити /var/system.log"
@@ -914,9 +939,9 @@ Locales.ocHelpEntryUsertrash[_language]                         = "Очисти�
 Locales.ocHelpEntryUserconfig[_language]                        = "Очистити ~/Config для всіх користувачвв"
 Locales.ocHelpEntryUserdesktop[_language]                       = "Очистити ~/Desktop для всіх користувачів"
 Locales.ocHelpEntryRecommended[_language]                       = "Прийняти syspasswd, usertrash, userconfig и syslog"
-Locales.ocHelpEntryHelp[_language]                              = "Довідка с доступними командами"
-Locales.ocHelpEntryClear[_language]                             = "Очистити термінал"
-Locales.ocHelpEntryQuit[_language]                              = "Вимкнути Open Cleaner"
+Locales.tpHelpEntryHelp[_language]                              = "Довідка с доступними командами"
+Locales.tpHelpEntryClear[_language]                             = "Очистити термінал"
+Locales.tpHelpEntryQuit[_language]                              = "Вимкнути {PROGRAM}"
 
 
 
@@ -1113,11 +1138,17 @@ Locales.HelpEntryDelete[_language]                              = Locales.Sessio
 Locales.HelpEntryCopy[_language]                                = Locales.SessionTypeFile[_language]+" - (ap/path) (dest) - Skopiuj pliki"
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Uzyskaj drzewo systemu plikow"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ap/path) - Zwykly edytor tekstu"
-Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - Narzedzie czyszczenia systemu"
+Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[cmd] - Narzedzie czyszczenia systemu"
 
 
-Locales.ocWipedBy[_language]                                    = "Wyczyszczono Open Cleaner-em"
-Locales.ocErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
+Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
+Locales.tpErrorAmountOfArgumentsTooFew[_language]               = Locales.ErrorAmountOfArgumentsTooFew[_language]
+Locales.tpErrorAmountOfArgumentsTooMuch[_language]              = Locales.ErrorAmountOfArgumentsTooMuch[_language]
+Locales.tpErrorNoHelpEntries[_language]                         = Locales.ErrorNoHelpEntries[_language]
+
+
+Locales.ocWipeContent[_language]                                = "Wyczyszczono Open Cleaner-em"
+Locales.tpErrorStringGeneral[_language]                         = Locales.ErrorStringGeneral[_language]
 Locales.ocLogSuccessfullFileDeletion[_language]                 = "Pomyslnie usunieto <i>{PATH}</i>"
 Locales.ocErrorFailedFileWipe[_language]                        = "Nie udalo sie wyczyscic <i>{PATH}</i>!"
 Locales.ocLogSuccessfullFileWipe[_language]                     = "Pomyslnie wyczyszczono <i>{PATH}</i>"
@@ -1131,11 +1162,11 @@ Locales.ocWarningPathNotTextFile[_language]                     = "Sciezka <i>{P
 Locales.ocLogWipingAllUsersPath[_language]                      = "Czyszczenie <i>{PATH}</i> wszystkich uzytkownikow..."
 Locales.ocWarningCouldNotFindAnyPath[_language]                 = "Nie znaleziono zadnych <i>{PATH}</i>"
 Locales.ocErrorThisCommandRequiresComputer[_language]           = "Komenda <i>{COMMAND}</i> wymaga przynajmniej komputera by dzialac!"
-Locales.ocLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
+Locales.tpLogThanksAndQuit[_language]                           = Locales.LogThanksAndQuit[_language]
 Locales.ocErrorCouldNotCreateTempLog[_language]                 = "Nie udalo sie utworzyc pliku tymczasowego!"
 Locales.ocErrorTempLogDeleted[_language]                        = "Plik tymczasowy zostal usuniety po utworzeniu!"
-Locales.ocErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
-Locales.ocLogWelcomeMessage[_language]                          = "Witaj w Open Cleaner"
+Locales.tpErrorCommandNotFound[_language]                       = Locales.ErrorCommandNotFound[_language]
+Locales.tpLogWelcomeMessage[_language]                          = "Witaj w {PROGRAM}"
 
 Locales.ocHelpEntrySysbin[_language]                            = "Wyczysc /bin"
 Locales.ocHelpEntrySyslog[_language]                            = "Wyczysc /var/system.log"
@@ -1144,6 +1175,6 @@ Locales.ocHelpEntryUsertrash[_language]                         = "Wyczysc ~/.Tr
 Locales.ocHelpEntryUserconfig[_language]                        = "Wyczysc ~/Config wszystkich uzytkownikow"
 Locales.ocHelpEntryUserdesktop[_language]                       = "Wyczysc ~/Desktop wszystkich uzytkownikow"
 Locales.ocHelpEntryRecommended[_language]                       = "Zastosuj syspasswd, usertrash, userconfig i syslog"
-Locales.ocHelpEntryHelp[_language]                              = "Lista dostepnych komend"
-Locales.ocHelpEntryClear[_language]                             = "Wyczysc okno konsoli"
-Locales.ocHelpEntryQuit[_language]                              = "Opusc Open Cleaner"
+Locales.tpHelpEntryHelp[_language]                              = "Lista dostepnych komend"
+Locales.tpHelpEntryClear[_language]                             = "Wyczysc okno konsoli"
+Locales.tpHelpEntryQuit[_language]                              = "Opusc {PROGRAM}"

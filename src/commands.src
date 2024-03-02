@@ -1695,19 +1695,14 @@ end function
 
 
 Helps["ocleaner"] = Messages.HelpEntryOpenCleaner
+Aliases["ocleaner"] = ["oc"]
 Commands["ocleaner"] = function(arguments)
-    Conditions.arguments(arguments, 0)
+    Conditions.argumentsMoreThan(arguments, 0)
+
+    command = fmap(@str, arguments).join(" ")
 
     object = Intrinsics.file
     if Intrinsics.computer then object = Intrinsics.computer
 
-    OCtheme = {
-        "ocPrefix": Theme.prefix,
-        "ocLog": Theme.miscSecondary,
-        "ocWarning": Theme.warning,
-        "ocError": Theme.error,
-        "ocInputMessage": Theme.inputMessage,
-        "ocInput": Theme.input,
-    }
-    openCleaner(object, OCtheme, Messages)
+    openCleaner(object, Theme, Messages, command)
 end function

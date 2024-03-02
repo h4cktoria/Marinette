@@ -55,8 +55,8 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 -   Session management system
 -   Basic hacking functionality
 -   Simple compile-time configuration
--   Source-independent security of compromising information(kinda?)
--   ~~Stability and reliability over other(mostly proprietary) shells~~ NEVERMIND LOL. ~~I've just figured I've got a severe bug in session management.~~ I think I've got it fixed
+-   Stability and reliability over other(mostly proprietary) shells
+-   Source leakage proof protection of backed-in sensitive user data
 
 
 ### Future <a name="features-future"></a>

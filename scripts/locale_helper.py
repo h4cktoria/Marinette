@@ -37,7 +37,10 @@ for language, locale in locales.items():
     print(language)
     for entry in locales["Locales"]:
         if entry not in locale:
-            print(f"{entry} = \"NOT TRANSLATED ENTRY\"")
+            # print(f"{entry} = \"NOT TRANSLATED ENTRY\"")
+            entryName = entry.replace("Locales.", "").replace("[_language]", "")
+            languageCode = language.replace("\"", "")
+            print(f"{entry} = \"**{entryName} FOR {languageCode} IS MISSING**\"")
             foundAbsentEntries = True
     if not foundAbsentEntries:
         print("No absent entries found\n")
