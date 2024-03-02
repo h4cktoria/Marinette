@@ -1706,3 +1706,31 @@ Commands["ocleaner"] = function(arguments)
 
     openCleaner(object, Theme, Messages, command)
 end function
+
+
+Helps["run"] = Messages.HelpEntryRun
+Aliases["run"] = ["exe"]
+Commands["run"] = function(arguments)
+    Conditions.argumentsMoreThan(arguments, 0)
+    Conditions.shell(["shell"])
+
+    binaryPath = str(arguments.pull)
+    binaryArgs = null
+    if arguments.len > 0 then binaryArgs = fmap(@str, arguments).join(" ")
+
+    fd = iterateToPath(Intrinsics.file, binaryPath)
+    if not fd or not fd.is_binary then return Console.error(Messages.ErrorPathDoesntExistOrNotBinary)
+
+    Console.log(Messages.LogRunningBinary)
+    if not binaryArgs then
+        result = Intrinsics.shell.launch(fd.path)
+    else
+        result = Intrinsics.shell.launch(fd.path, binaryArgs)
+    end if
+
+    if result isa string then
+        Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "launch", "ERROR": result}))
+    else if not result then
+        Console.error(Messages.ErrorCouldNotLaunchBinary)
+    end if
+end function

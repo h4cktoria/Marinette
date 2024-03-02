@@ -237,12 +237,15 @@ Special thanks and credits goes to:
 
 -   [Kurouzu](https://steamcommunity.com/profiles/76561198135838638) - for [Grey Hack](https://store.steampowered.com/app/605230/Grey_Hack/)
 -   [Joe Strout](https://github.com/JoeStrout) - for [MiniScript](https://github.com/JoeStrout/miniscript)
+-   [A lot of people](https://github.com/python/) - for [Python](https://en.wikipedia.org/wiki/Python_(programming_language))
 -   [Clover](https://github.com/cloverrfoxx) - for [Lunar](https://github.com/cloverrfoxx/greyhack), from where I've taken and adapted a lot of design choices
 -   [Roupi](https://www.greyrepo.xyz/users/roupi) - for [Scan class module](https://www.greyrepo.xyz/posts/scan-class)
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
 -   [rocketorbit](https://github.com/rocketorbit) - for [Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack)
--   Guest - for Ukrainian translation
--   Simonize - for color scheme(see `NoAuthV3Ocean` theme) and Polish translation
+-   [Guest](https://github.com/fmmaks666) - for Ukrainian translation
+-   [Simonize](https://github.com/Simoniko) - for color scheme(see `NoAuthV3Ocean` theme) and Polish translation
+
+You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people! <3
 
 If I've somehow forgotten to mention you in here then accept my apologizes! Open an issue and I'll add you as fast as I can!

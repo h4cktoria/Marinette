@@ -156,6 +156,9 @@ Locales.ErrorSourcePathDoesNotExist                 = {}
 Locales.ErrorDesinationPathDoesNotExist             = {}
 Locales.LogCopiedFileSuccessfully                   = {}
 Locales.LogFileSystemTree                           = {}
+Locales.ErrorPathDoesntExistOrNotBinary             = {}
+Locales.ErrorCouldNotLaunchBinary                   = {}
+Locales.LogRunningBinary                            = {}
 
 Locales.HelpEntryHelp                               = {}
 Locales.HelpEntryLicense                            = {}
@@ -194,6 +197,7 @@ Locales.HelpEntryCopy                               = {}
 Locales.HelpEntryTree                               = {}
 Locales.HelpEntrySte                                = {}
 Locales.HelpEntryOpenCleaner                        = {}
+Locales.HelpEntryRun                                = {}
 
 
 Locales.tpLogWelcomeMessage                         = {}
@@ -393,6 +397,9 @@ Locales.ErrorSourcePathDoesNotExist[_language]                  = "Source path d
 Locales.ErrorDesinationPathDoesNotExist[_language]              = "Destination directory does not exist!"
 Locales.LogCopiedFileSuccessfully[_language]                    = "Copied file successfully"
 Locales.LogFileSystemTree[_language]                            = "File system tree"
+Locales.ErrorPathDoesntExistOrNotBinary[_language]              = "Path does not exist or is not a binary!"
+Locales.ErrorCouldNotLaunchBinary[_language]                    = "Could not launch an external binary!"
+Locales.LogRunningBinary[_language]                             = "Running an external binary..."
 
 Locales.HelpEntryHelp[_language]                                = Locales.SessionTypeAny[_language]+" - [cmd] - Available commands list"
 Locales.HelpEntryLicense[_language]                             = Locales.SessionTypeAny[_language]+" - Get licensing details"
@@ -431,6 +438,7 @@ Locales.HelpEntryCopy[_language]                                = Locales.Sessio
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Get file system tree"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ap/path) - Simple text editor"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[cmd] - System cleaning utility"
+Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - (ap/path) [args] - Run external binary"
 
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
@@ -629,6 +637,9 @@ Locales.ErrorSourcePathDoesNotExist[_language]                  = "Исходн�
 Locales.ErrorDesinationPathDoesNotExist[_language]              = "Директория назначения не существует!"
 Locales.LogCopiedFileSuccessfully[_language]                    = "Файл успешно скопирован"
 Locales.LogFileSystemTree[_language]                            = "Дерево файловой системы"
+Locales.ErrorPathDoesntExistOrNotBinary[_language]              = "Путь не существует или не является бинарным файлом!"
+Locales.ErrorCouldNotLaunchBinary[_language]                    = "Не удалось запустить посторонний бинарный файл!"
+Locales.LogRunningBinary[_language]                             = "Запускаю посторонний бинарный файл..."
 
 Locales.HelpEntryHelp[_language]                                = Locales.SessionTypeAny[_language]+" - [комды] - Справка с доступными командами"
 Locales.HelpEntryLicense[_language]                             = Locales.SessionTypeAny[_language]+" - Подробности лицензирования"
@@ -667,6 +678,7 @@ Locales.HelpEntryCopy[_language]                                = Locales.Sessio
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Получить файловую систему в виде дерева"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ап/путь) - Простой редактор текста"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утилита для очистки системы"
+Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - (ап/пути) [аргы] - Запустить посторонний бинарный файл"
 
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
