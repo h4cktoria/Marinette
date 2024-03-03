@@ -63,8 +63,13 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 
 -   Mail client
 -   Wallet client
+-   Service installer
+-   Advanced text editor
 -   Vulnerability database
--   More system administration utilities
+-   Some of the utilities made portable
+-   Integration to the server the end user can setup
+-   Administration utility to manage permissions and users
+-   And more :P
 
 
 ### No time(HIGHELY unlikely to be implemented!) <a name="features-notime"></a>
@@ -243,7 +248,7 @@ Special thanks and credits goes to:
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
 -   [rocketorbit](https://github.com/rocketorbit) - for [Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack)
--   [Guest](https://github.com/fmmaks666) - for Ukrainian translation
+-   [Guest](https://github.com/fmmaks666) - for Ukrainian translation and plugins implementation
 -   [Simonize](https://github.com/Simoniko) - for color scheme(see `NoAuthV3Ocean` theme) and Polish translation
 
 You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people! <3

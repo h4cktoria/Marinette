@@ -1,0 +1,85 @@
+plugins = get_custom_object
+
+Loaded = {}
+
+// TODO: Add sessions
+API = {
+	"language": Constants["language"],
+	"Console": Console,
+	"Theme": Theme,
+	"Libs": Libs,
+	"Helpers": Intrinsics,
+	"Conditions": Conditions,
+}
+
+API.register_command = function(name, command, aliases, help="Undocumented command")
+	if not str(@command).matches("FUNCTION\(\w+\)") then
+		Console.error(name + ": Command is unsupported")
+		return
+	end if
+	Commands[name] = @command
+	if aliases then
+		Aliases[name] = aliases
+	end if
+end function
+
+// TODO: Better register_help
+API.register_help = function(name, help)
+	Helps[name] = help
+end function
+
+API.import_api = function(scope)
+	for i in self.indexes
+		if i == "__isa" then continue end if
+		scope[i] = @self[i]
+	end for
+end function
+
+
+plugins.Plugin = {
+	"classID": "Plugin",
+	"author": "Unknown",
+	"plugin": "Untitled",
+	"info": "New best plugin",
+}
+plugins.Plugin.init = function(api)
+	Console.error("Not Imlemented")
+end function
+
+plugins.Plugin.commands = function(s)
+	Console.error("Define your commands here")
+end function
+
+plugins.register_plugin = function(class, name)
+	if not class isa plugins.Plugin then
+		Console.error("* Plugin has invalid definition")
+	end if
+	if not name then
+		plugins[class.classID] = class
+		return
+	end if
+
+	plugins[name] = class
+end function
+
+loadPlugin = function(shell, location, className)
+	Console.log(replaceF("Loading plugin: {PLUGIN}", {"PLUGIN": location}))
+	if plugins.hasIndex(className) then
+		plugins[className].init(new API)
+		plugins[className].commands(plugins[className], new API)
+		Loaded[className] = plugins[className]
+		return
+	end if
+	
+	shell.launch(location)
+	if not plugins.hasIndex(className) then
+		Console.error("Couldn't load plugin")
+		return
+	end if
+	if not plugins[className] isa plugins.Plugin then
+		Console.error("Plugin has invalid definition")
+	end if
+	plugins[className].init(new API)
+	plugins[className].commands(plugins[className], new API)
+	Loaded[className] = plugins[className]
+end function
