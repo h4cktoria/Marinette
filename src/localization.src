@@ -198,6 +198,7 @@ Locales.HelpEntryTree                               = {}
 Locales.HelpEntrySte                                = {}
 Locales.HelpEntryOpenCleaner                        = {}
 Locales.HelpEntryRun                                = {}
+Locales.HelpEntryTheme                              = {}
 
 
 Locales.tpLogWelcomeMessage                         = {}
@@ -439,6 +440,7 @@ Locales.HelpEntryTree[_language]                                = Locales.Sessio
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ap/path) - Simple text editor"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[cmd] - System cleaning utility"
 Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - (ap/path) [args] - Run external binary"
+Locales.HelpEntryTheme[_language]                               = Locales.SessionTypeAny[_language]+" - Take a look at applied theme"
 
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
@@ -679,6 +681,7 @@ Locales.HelpEntryTree[_language]                                = Locales.Sessio
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ап/путь) - Простой редактор текста"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утилита для очистки системы"
 Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - (ап/пути) [аргы] - Запустить посторонний бинарный файл"
+Locales.HelpEntryTheme[_language]                               = Locales.SessionTypeAny[_language]+" - Взглянуть на применённую тему"
 
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
@@ -919,6 +922,8 @@ Locales.HelpEntryTree[_language]                                = Locales.Sessio
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (абсШлях/шлях) - Простий текстовий редактор"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утиліта для очищення системи"
 Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - (абсШлях/шлях) [аргументи] - Запустити сторонній бінарний файл"
+Locales.HelpEntryTheme[_language]                               = Locales.SessionTypeAny[_language]+" - **HelpEntryTheme FOR Ukrainian IS MISSING**"
+
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
 Locales.tpErrorAmountOfArgumentsTooFew[_language]               = Locales.ErrorAmountOfArgumentsTooFew[_language]
@@ -1157,7 +1162,8 @@ Locales.HelpEntryCopy[_language]                                = Locales.Sessio
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Uzyskaj drzewo systemu plikow"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (ap/path) - Zwykly edytor tekstu"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[cmd] - Narzedzie czyszczenia systemu"
-Locales.HelpEntryRun[_language]                                 = "**HelpEntryRun FOR Polish IS MISSING**"
+Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - **HelpEntryRun FOR Polish IS MISSING**"
+Locales.HelpEntryTheme[_language]                               = Locales.SessionTypeAny[_language]+" - **HelpEntryTheme FOR Polish IS MISSING**"
 
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]

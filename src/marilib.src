@@ -104,8 +104,7 @@ if Themes.indexes.indexOf(Constants.theme) != null then Theme = Theme + Themes[C
 Messages = localesCompile(Constants.language, Locales)
 
 
-Console.asciiArt = function
-    art = Theme.asciiArt
+Console.asciiArt = function(art)
     i = 0; while i < art.len; i = i + 1
         if i < round(art.len / 1.8) then
             print("<color="+Theme.ascii+">"+art[i-1])

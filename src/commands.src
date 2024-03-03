@@ -66,12 +66,15 @@ Commands["help"] = function(arguments)
         categories = removeDuplicates(foundHelps.indexes)
         typePredicate = function(iItem, jItem)
             priority = {
-                Messages.SessionTypeAny: 0,
-                Messages.SessionTypeHost: 1,
-                Messages.SessionTypeShell: 2,
-                Messages.SessionTypeComputer: 3,
-                Messages.SessionTypeFile: 4,
+                Messages.SessionTypeAny: "A"*32,
+                Messages.SessionTypeHost: "A"*31+"B",
+                Messages.SessionTypeShell: "A"*31+"C",
+                Messages.SessionTypeComputer: "A"*31+"D",
+                Messages.SessionTypeFile: "A"*31+"E",
+                Messages.HelpUndeterminedDescription: "A"*31+"F",
             }
+            if priority.indexes.indexOf(iItem) == null then priority[iItem] = iItem
+            if priority.indexes.indexOf(jItem) == null then priority[jItem] = jItem
             return priority[iItem] > priority[jItem]
         end function
         mergeSort(categories, @typePredicate)
@@ -1733,4 +1736,40 @@ Commands["run"] = function(arguments)
     else if not result then
         Console.error(Messages.ErrorCouldNotLaunchBinary)
     end if
+end function
+
+
+Helps["theme"] = Messages.HelpEntryTheme
+Commands["theme"] = function(arguments)
+    Conditions.arguments(arguments, 0)
+    
+    asciiArt = [
+        "  __  __          _          _   _       ",
+        " |  \/  |__ _ _ _(_)_ _  ___| |_| |_ ___ ",
+        " | |\/| / _` | '_| | ' \/ -_)  _|  _/ -_)",
+        " |_|  |_\__,_|_| |_|_||_\___|\__|\__\___|",
+    ]
+    Console.asciiArt(asciiArt)
+
+    print(" ")
+
+    asciiLen = asciiArt[-1].len - 8
+
+    logMessage = "Log:     "
+    Console.log(logMessage+randomString(asciiLen - logMessage.len))
+
+    warningMessage = "Warning: "
+    Console.warning(warningMessage+randomString(asciiLen - warningMessage.len))
+
+    errorMessage = "Error:   "
+    Console.error(errorMessage+randomString(asciiLen - errorMessage.len))
+
+    print(" ")
+    table = [
+        "This Is An Example Table",
+        "------ ---- ---- --------- -------",
+        "this is table example element",
+        "this is another example element",
+    ].join(char(10))
+    print(formatColumnsColored(table, Theme.miscPrimary, Theme.miscSecondary))
 end function

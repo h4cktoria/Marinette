@@ -106,7 +106,7 @@ main = function
     performPasswordChecking
 
     if params.indexOf("--identify-marinette") != null then throwIdentifyingSignal
-    if params.indexOf("--no-ascii-art") == null then Console.asciiArt
+    if params.indexOf("--no-ascii-art") == null then Console.asciiArt(Theme.asciiArt)
     if params.indexOf("--no-runtime-loading") == null then performRuntimeLoading
     if params.indexOf("--no-system-checks") == null then performSystemChecks
     
