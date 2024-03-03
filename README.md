@@ -67,7 +67,7 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 -   Advanced text editor
 -   Vulnerability database
 -   Some of the utilities made portable
--   Integration to the server the end user can setup
+-   Integration with the server the end user can setup
 -   Administration utility to manage permissions and users
 -   And more :P
 
