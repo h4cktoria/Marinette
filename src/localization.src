@@ -918,8 +918,7 @@ Locales.HelpEntryCopy[_language]                                = Locales.Sessio
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Отримати файлову систему у вигляді дерева"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (абсШлях/шлях) - Простий текстовий редактор"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утиліта для очищення системи"
-Locales.HelpEntryRun[_language]                                 = "Запустити сторонній бінарний файл"
-
+Locales.HelpEntryRun[_language]                                 = Locales.SessionTypeShell[_language]+" - (абсШлях/шлях) [аргументи] - Запустити сторонній бінарний файл"
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
 Locales.tpErrorAmountOfArgumentsTooFew[_language]               = Locales.ErrorAmountOfArgumentsTooFew[_language]
