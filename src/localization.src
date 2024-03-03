@@ -878,8 +878,8 @@ Locales.ErrorDesinationPathDoesNotExist[_language]              = "Директ�
 Locales.LogCopiedFileSuccessfully[_language]                    = "Файл успішно скопійований"
 Locales.LogFileSystemTree[_language]                            = "Дерево файлової системи"
 Locales.ErrorPathDoesntExistOrNotBinary[_language]              = "Шлях не інсує або не є бінарним файлом/"
-Locales.ErrorCouldNotLaunchBinary[_language]                    = "Не вдалося запустити посторонній бінарний фалй"
-Locales.LogRunningBinary[_language]                             = "Запускаю посторонній бінарний файл"
+Locales.ErrorCouldNotLaunchBinary[_language]                    = "Не вдалося запустити сторонній бінарний фалй"
+Locales.LogRunningBinary[_language]                             = "Запускаю сторонній бінарний файл"
 
 Locales.HelpEntryHelp[_language]                                = Locales.SessionTypeAny[_language]+" - [команди] - Довідка з доступними командами"
 Locales.HelpEntryLicense[_language]                             = Locales.SessionTypeAny[_language]+" - Відомості ліцензування"
@@ -918,7 +918,7 @@ Locales.HelpEntryCopy[_language]                                = Locales.Sessio
 Locales.HelpEntryTree[_language]                                = Locales.SessionTypeFile[_language]+" - Отримати файлову систему у вигляді дерева"
 Locales.HelpEntrySte[_language]                                 = Locales.SessionTypeFile[_language]+" - (абсШлях/шлях) - Простий текстовий редактор"
 Locales.HelpEntryOpenCleaner[_language]                         = Locales.SessionTypeFile[_language]+" - ?/h/help/[кмнд] - Утиліта для очищення системи"
-Locales.HelpEntryRun[_language]                                 = "Запустити посторонній бінарний файл"
+Locales.HelpEntryRun[_language]                                 = "Запустити сторонній бінарний файл"
 
 
 Locales.tpErrorIncorrectAmountOfArguments[_language]            = Locales.ErrorIncorrectAmountOfArguments[_language]
