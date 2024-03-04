@@ -133,10 +133,10 @@ Fork, put your theme inside of [themeing.src](src/themeing.src), commit and open
 
 Want to translate 220+ locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
-1.  You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
-2.  If you feel your language doesn't have an English terminology counterpart, just transliterate it. Examples of such terminology: "LocalHost", "Service", "Hash", "Crack", etc
-3.  Marinette's pronouns are she/her, so if your language has them, translate accordingly
-4.  Glued words CAN'T be translated as separate!!! For example, "PublicAddress" can't be translated as "Public Address" in your language
+-   You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
+-   If you feel your language doesn't have an English terminology counterpart, just transliterate it. Examples of such terminology: "LocalHost", "Service", "Hash", "Crack", etc
+-   Marinette's pronouns are she/her, so if your language has them, translate accordingly
+-   Glued words CAN'T be translated as separate! For example, "PublicAddress" can't be translated as "Public Address" in your language
 
 Once you're done, scroll to the bottom of the [localization.src](src/localization.src), make 4 new lines and append your locale after the latest one, commit and open the pull request
 
@@ -148,7 +148,25 @@ Open up an issue and wait for my response
 
 ### Features/Commands/Bug fixes/etc <a name="contrib-code">
 
-If you want to contribute to the code, then look at it first. Still want to contribute? Then you should also know there is absolutely no documentation(lazy me) and you have to guess what and how to change things so they doesn't break! STILL want to contribute? Okie, great! Fork, make source changes, commit, write what exactly you've changed and open the pull request
+If you want to contribute to the code, then look at it first. Still want to contribute? Then you should also know there is absolutely no documentation(lazy me) and you have to guess what and how to change things so they doesn't break! STILL want to contribute? Okie, great! There are conventions you need to follow:
+
+-   No Object Programming:
+    -   No classes - `map` object is either a [Namespace](https://en.wikipedia.org/wiki/Namespace) or a [Structure](https://en.wikipedia.org/wiki/Record_(computer_science))
+    -   No classes means no class instances. `new` keyword is prohibited
+    -   `.classID` is an indicator of a Grey Hack object and therefore is prohibited
+    -   Use `typeof()` for Grey Hack objects, `isa` for built-in primitive types
+    -   No `super` and `self`
+-   CamelCase for namespaces and structures, camelCase for routines and variables, _camelCase for something not meant to be available
+-   If you want your routine to have default arguments, make them `null` by default and in routine body do neccessary check to default it. Example:
+```javascript 
+routine = function(nonDefaultArg, defaultArg=null)
+    if defaultArg == null then defaultArg = ... //Something you need
+end function
+```
+-   Define global constants in `Constants`
+-   PLEASE AVOID global variables. If you REALLY need them, define in `Vars`
+
+Follow these and you should be fine! Fork, make source changes, commit, write what exactly you've changed and open the pull request
 
 
 
