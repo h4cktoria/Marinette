@@ -91,6 +91,8 @@ These are what I plan to implement, in no particular order, as integratable prog
 
 ## How to contribute? <a name="contribution"></a>
 
+In the current state, I REALLY don't recommend you to contribute to Marinette because it's far from being complete. Anyway...
+
 There are several ways you can contribute to Marinette
 
 
