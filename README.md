@@ -83,7 +83,7 @@ These are what I plan to implement, in no particular order, as integratable prog
     1.  From the root of the project, run **scripts/config_password.py** with the desired password. Set the value in **Config.password**
     2.  From the root of the project, run **scripts/config_identificator.py**. Set the value in **Config.identificator**
     3.  (Optionally) From the root of the project, run **scripts/config_available_languages.py**. Set the desired language in **Config.language**
-    4.  (Optionally) From the root of the project, run **scripts/config_available_thenes.py**. Set the desired theme in **Config.theme**
+    4.  (Optionally) From the root of the project, run **scripts/config_available_themes.py**. Set the desired theme in **Config.theme**
 5.  Compile **marinette.src**. Launch Marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
 
 
@@ -96,19 +96,19 @@ There are several ways you can contribute to Marinette
 
 ### Themes <a name="contrib-themes">
 
-Fork, put your theme inside of [themes](themes), run [src_make_themeing.py](src/src_make_themeing.py), commit and open the pull request
+Fork, put your theme inside of [themes](themes), run [src_make_themeing.py](scripts/src_make_themeing.py), commit and open the pull request
 
 
 ### Translations <a name="contrib-lang">
 
-Want to translate a lot locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
+Want to translate a lot locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [locales](locales). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
 -   You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
 -   If you feel your language doesn't have an English terminology counterpart, just transliterate it. Examples of such terminology: "LocalHost", "Service", "Hash", "Crack", etc
 -   Marinette's pronouns are she/her, so if your language has them, translate accordingly
 -   Glued words CAN'T be translated as separate! For example, "PublicAddress" can't be translated as "Public Address" in your language
 
-Once you're done, scroll to the bottom of the [localization.src](src/localization.src), make 4 new lines and append your locale after the latest one, commit and open the pull request
+Once you're done, put your locale file into [locales](locales), run [src_make_localization.py](scripts/src_make_localization.py), commit and open the pull request
 
 
 ### Bug report <a name="contrib-bugreport">
