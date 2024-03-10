@@ -101,6 +101,8 @@ Fork, put your theme inside of [themes](themes), run [src_make_themeing.py](src/
 
 ### Translations <a name="contrib-lang">
 
+NOT ACCEPTING USING THIS METHOD! I've forgot to change translation contribution with last commit and will do it later
+
 Want to translate a lot locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
 -   You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
