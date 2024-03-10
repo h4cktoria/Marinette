@@ -96,7 +96,7 @@ There are several ways you can contribute to Marinette
 
 ### Themes <a name="contrib-themes">
 
-Fork, put your theme inside of [themes](themes), [src_make_themeing.py](src/src_make_themeing.py) run commit and open the pull request
+Fork, put your theme inside of [themes](themes), run [src_make_themeing.py](src/src_make_themeing.py), commit and open the pull request
 
 
 ### Translations <a name="contrib-lang">
