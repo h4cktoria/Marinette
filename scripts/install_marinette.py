@@ -41,7 +41,9 @@ def append(path, content):
 
 
 def create_project_structure_recursively(project_fd, installer_fd, game_path):
-    for path in project_fd.iterdir():
+    dirs = list(project_fd.iterdir())
+    dirs.sort()
+    for path in dirs:
         new_path = str(PurePath(game_path) / path.name)
         if path.is_dir():
             installer_fd.write(create_folder(new_path))
@@ -51,7 +53,9 @@ def create_project_structure_recursively(project_fd, installer_fd, game_path):
 
 
 def write_text_files(project_fd, installer_fd, game_path):
-    for path in project_fd.iterdir():
+    files = list(project_fd.iterdir())
+    files.sort()
+    for path in files:
         if path.is_dir():
             continue
         if "LICENSE" in path.name or "README" in path.name:
@@ -65,14 +69,18 @@ def write_text_files(project_fd, installer_fd, game_path):
                     installer_fd.write(append(f"/home/guest/Sources/Marinette/{path.name}", line))
 
 
-if __name__ == "__main__":
-    filename = Path(__file__).name.replace(".py", ".src")
-    with open(f"scripts/{filename}", "w") as installer:
-        installer.write(gh_init())
-        installer.write(create_folder("/home"))
-        installer.write(create_folder("/home/guest/Sources"))
-        installer.write(create_folder("/home/guest/Sources/Marinette"))
+import src_make_localization
+import src_make_themeing
+import src_make_integrated
 
-        root = Path(".")
-        create_project_structure_recursively(root, installer, "/home/guest/Sources/Marinette")
-        write_text_files(root, installer, "/home/guest/Sources/Marinette")
+
+filename = Path(__file__).name.replace(".py", ".src")
+with open(f"scripts/{filename}", "w") as installer:
+    installer.write(gh_init())
+    installer.write(create_folder("/home"))
+    installer.write(create_folder("/home/guest/Sources"))
+    installer.write(create_folder("/home/guest/Sources/Marinette"))
+
+    root = Path(".")
+    create_project_structure_recursively(root, installer, "/home/guest/Sources/Marinette")
+    write_text_files(root, installer, "/home/guest/Sources/Marinette")

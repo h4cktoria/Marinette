@@ -1,0 +1,23 @@
+Themes["NoAuthV3Ocean"] = {
+    "asciiArt": [
+        "Oo      oO                                                 ",
+        "O O    o o               o                                 ",
+        "o  o  O  O                                 O     O         ",
+        "O   Oo   O                                oOo   oOo        ",
+        "O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. ",
+        "o        O O   o   o     o   o   O OooO'   O     O   OooO' ",
+        "o        O o   O   O     O   O   o O       o     o   O     ",
+        "O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' ",
+        "==========================================================",
+    ],
+    "ascii": "#98E4FF",
+    "asciiShadow": "#87C4FF",
+    "prefix": "white",
+    "log": "#98E4FF",
+    "warning": "#FFEED9",
+    "error": "#FF8080",
+    "inputMessage": "#FFB996",
+    "input": "white",
+    "miscPrimary": "white",
+    "miscSecondary": "#98E4FF",
+}

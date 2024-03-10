@@ -2,13 +2,30 @@
 
 Cute, simple and open source shell
 
-![Initialization](etc/marinette_launch.png)
-![Nesca command](etc/marinette_nesca.png)
-![Session Manager](etc/marinette_sm.png)
+```text
+Oo      oO                                                 
+O O    o o               o                                 
+o  o  O  O                                 O     O         
+O   Oo   O                                oOo   oOo        
+O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. 
+o        O O   o   o     o   o   O OooO'   O     O   OooO' 
+o        O o   O   O     O   O   o O       o     o   O     
+O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' 
+==========================================================
+-16:17- Loading various systems...
+-16:17- Checking various systems...
+-16:17- Everything is loaded successfully
+  Username as Host on 192.168.1.2 in /
+% 
+```
+
+(Yes, I'm lazy to make screenshots)
 
 Important note: this is **NOT A REAL HACKING TOOLKIT**! This has been made, works and will work only in the game called Grey Hack!
 
 This repository is the only place where you can get Marinette without any risks. DON'T trust in-game websites!!!
+
+Back to MVP state
 
 
 
@@ -16,20 +33,16 @@ This repository is the only place where you can get Marinette without any risks.
 ## Table of contents
 
 1.  [Description](#description)
-2.  [Features](#features)
-    1.  [Present](#features-present)
-    2.  [Future](#features-future)
-    3.  [No time](#features-notime)
+2.  [Roadmap](#roadmap)
 3.  [How to install?](#installation-guide)
-    1.  [Unreliable, fast way](#unreliable-install)
-    2.  [Reliable, slow way](#reliable-install)
 4.  [How to contribute?](#contribution)
     -   [Themes](#contrib-themes)
     -   [Translations](#contrib-lang)
     -   [Bug report](#contrib-bugreport)
-    -   [Features/Commands/Bug fixes/etc](#contrib-code)
 5.  [Frequently Asked Questions](#faq)
-6.  [Similar projects](#similar-projects)
+6.  [Other interesting projects](#similar-projects)
+    -   [Shells](#similar-projects-shells)
+    -   [Other](#similar-projects-other)
 7.  [License](#license)
 8.  [Thanks and Credits](#thanks-and-credits)
 
@@ -45,75 +58,32 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 
 
 
-## Features <a name="features"></a>
+## Roadmap <a name="roadmap"></a>
 
+These are what I plan to implement, in no particular order, as integratable programs(So that they are trivial to port into any other script):
 
-### Present <a name="features-present"></a>
-
--   Foolproof
--   Localizable and localized into different languages(The only command not localized is `ste` because I am lazy :P)
--   Session management system
--   Basic hacking functionality
--   Simple compile-time configuration
--   Source leakage proof protection of baked-in sensitive user data
--   Stability and reliability over other(mostly proprietary) shells
-
-
-### Future <a name="features-future"></a>
-
--   Mail client
--   Wallet client
--   Service installer
--   Advanced text editor
--   Vulnerability database
--   Some of the utilities made portable
--   Integration with the server the end user can setup
--   Administration utility to manage permissions and users
--   And more :P
-
-
-### No time(HIGHELY unlikely to be implemented!) <a name="features-notime"></a>
-
--   Fancy themeing
--   Runtime configuration
--   Shell expansions, scripting, pipelines, etc.
+-   Antivirus
+-   Text editor
+-   File manager
+-   Task manager
+-   Package manager
+-   Network scanner
+-   Users & Groups manager
+-   Network cracker and manager
 
 
 
 
 ## How to install? <a name="installation-guide"></a>
 
-There are two ways to install Marinette: Unreliable and reliable
-
-Unreliable is unreliable because you aren't:
-1.  Dynamically creating a script for making the in-game folder structure. I can easily forget to update it when doing yet another commit
-2.  Changing the password of the executable, since it's iterated with sha256() 25 times and can be changed only with a script
-3.  Randomly generating the identificator, which may result in identificator collision with another Marinette user
-
-Reliable way frees yourself from these problems
-
-
-### Unreliable, fast way <a name="unreliable-install"></a>
-
-1.  Copy [marinette_installer.src](scripts/marinette_installer.src) into the Code Editor, compile and run the binary. It will create the project structure neccessary for successfull compilation
-2.  Copy every source file from [src](src) into the in-game **/home/guest/Sources/Marinette/src**
-3.  (Optionally) Change the stuff in **marilib.src**
-    1.  Change the **Constants.identificator** to some 32 characters long string
-    2.  Change the **Constants.language** to something defined in [localization.src](src/localization.src)
-    3.  Change the **Constants.theme** to something defined in [themeing.src](src/themeing.src)
-4.  Compile **marinette.src**. Launch Marinette with `--password marinette` parameters. Congratulations!
-
-
-### Reliable, (kinda?)slow way <a name="reliable-install"></a>
-
-1.  Download the repository to your computer
-2.  From the root of the project, run **scripts/marinette_installer.py**. It'll create **marinette_installer.src**
-3.  Repeat steps 1-2 from [Unreliable way](#unreliable-install)
-4.  (Optionally) Change the stuff in **marilib.src**
-    1.  From the root of the project, launch **scripts/hash_password.py** with the desired password. You'll get a hashed password you can set in **Constants.password**
-    2.  From the root of the project, launch **scripts/identifying_signal.py**. You'll get random identificator you can set in **Constants.identificator**
-    3.  Change the **Constants.language** to something defined in [localization.src](src/localization.src)
-    4.  Change the **Constants.theme** to something defined in [themeing.src](src/themeing.src)
+1.  Clone the repository
+2.  From the root of the project, run **scripts/install_marinette.py**. It'll create **install_marinette.src**. Copy it to the Code Editor, compile it, run the binary
+3.  Go to **/home/guest/Sources/Marinette/src** and copy everything from [src](src) to here
+4.  Change the stuff in **marilib.src**
+    1.  From the root of the project, run **scripts/config_password.py** with the desired password. Set the value in **Config.password**
+    2.  From the root of the project, run **scripts/config_identificator.py**. Set the value in **Config.identificator**
+    3.  (Optionally) From the root of the project, run **scripts/config_available_languages.py**. Set the desired language in **Config.language**
+    4.  (Optionally) From the root of the project, run **scripts/config_available_thenes.py**. Set the desired theme in **Config.theme**
 5.  Compile **marinette.src**. Launch Marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
 
 
@@ -126,12 +96,12 @@ There are several ways you can contribute to Marinette
 
 ### Themes <a name="contrib-themes">
 
-Fork, put your theme inside of [themeing.src](src/themeing.src), commit and open the pull request
+Fork, put your theme inside of [themes](themes), [src_make_themeing.py](src/src_make_themeing.py) run commit and open the pull request
 
 
 ### Translations <a name="contrib-lang">
 
-Want to translate 220+ locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
+Want to translate a lot locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [localization.src](src/localization.src). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
 -   You're prohibited to translate anything in curly brackets caps. For example, you can't translate `{SESSION}`, `{HOST}`, `{SHELLS}`, etc
 -   If you feel your language doesn't have an English terminology counterpart, just transliterate it. Examples of such terminology: "LocalHost", "Service", "Hash", "Crack", etc
@@ -146,32 +116,10 @@ Once you're done, scroll to the bottom of the [localization.src](src/localizatio
 Open up an issue and wait for my response
 
 
-### Features/Commands/Bug fixes/etc <a name="contrib-code">
-
-If you want to contribute to the code, then look at it first. Still want to contribute? Then you should also know there is absolutely no documentation(lazy me) and you have to guess what and how to change things so they doesn't break! STILL want to contribute? Okie, great! There are conventions you need to follow:
-
--   No Object Programming:
-    -   No classes - `map` object is either a [Namespace](https://en.wikipedia.org/wiki/Namespace) or a [Structure](https://en.wikipedia.org/wiki/Record_(computer_science))
-    -   No classes means no class instances. `new` keyword is prohibited
-    -   `.classID` is an indicator of a Grey Hack object and therefore is prohibited
-    -   Use `typeof()` for Grey Hack objects, `isa` for built-in primitive types
-    -   No `super` and `self`
--   CamelCase for namespaces and structures, camelCase for routines and variables, _camelCase for something not meant to be available
--   If you want your routine to have default arguments, make them `null` by default and in routine body do neccessary check to default it. Example:
-```javascript 
-routine = function(nonDefaultArg, defaultArg=null)
-    if defaultArg == null then defaultArg = ... //Something you need
-end function
-```
--   Define global constants in `Constants`
--   PLEASE AVOID global variables. If you REALLY need them, define in `Vars`
-
-Follow these and you should be fine! Fork, make source changes, commit, write what exactly you've changed and open the pull request
-
-
 
 
 ## Frequently Asked Questions <a name="faq"></a>
+
 
 **Q: Why on earth would you call a computer program with a human name?**
 
@@ -190,33 +138,11 @@ Seriously, though, because everything made with love should be named as a human 
 **A**: When I have time and will to do that
 
 
-**Q: Why the code quality is so bad?**
-
-**A**: I don't know. Maybe because I'm insane and stupid? =D
-
-
-**Q: Why you left every address unchanged on the screenshots?**
-
-**A**: Because I reset every so often and target has been randomly generated with `raddr` command anyway
-
-
-**Q: Will you create user manual?**
-
-**A**: Maybe in the future
-
-
 **Q: Why did you choose MIT-0 as a License?**
 
 **A**: TL;DR: Best for the players' and developers' freedom
 
 I've figured no one cares about license of your application in Grey Hack, so I've decided I want to give users complete freedom over Marinette. You've got her from github? You're free to do whatever you want with her. You've hacked another player and stealen the sources? You're free to do whatever you want. You've got the sources by exploiting a game? Yes, you guessed it, you're still free to do whatever you want. Full source availability also means I'll try my best so that it's leakage doesn't mean a game over for the user
-
-
-**Q: Why the Reliable way is so tedious?**
-
-**A**: TL;DR: For your own security
-
-As mentioned in the previous question, I want it to be so that the source code leakage doesn't mean full compromise of the user. That's why the password is hashed and all of the future credentials baked in at the compile time will also be encrypted/hashed/etc
 
 
 **Q: Why the hell you're using custom sorting algorithms?**
@@ -226,9 +152,14 @@ As mentioned in the previous question, I want it to be so that the source code l
 
 
 
-## Similar projects <a name="similar-projects"></a>
+## Other interesting projects <a name="similar-projects"></a>
 
-Another cute shell projects:
+Another interesting projects that you should know about
+
+If you want me to add your project, then open an issue and I'll add you as fast as I can! The exception is proprietary software
+
+
+### Shells <a name="similar-projects-shells"></a>
 
 -   [5hell](https://github.com/jhook777/5hell-for-Grey-Hack-the-Game) by Plu70. Keep in mind the github updates less frequently than the in-game site, so look for most up-to-date version in the game(As of 31 Jan 2024 the official in-game website is www.5hell.org)
 -   [SeaShell](https://github.com/Tuna-Terps/SeaShell-greyhack-game) by Tuna Terps
@@ -238,9 +169,11 @@ Another cute shell projects:
 -   [Project p1an0Xshell](https://github.com/wh0wfg/greyscripts-p1an0) by Irtalhmu
 -   [Project Vexxed](https://github.com/WizeWizard42/GreyHack-Vexxed) by WizeWizard
 -   [OpenViper](https://github.com/cantemizyurek/viper-3.0) by SkidMall
--   [MTX Framework](https://github.com/tuonux/mtx) by tuonux. Not a shell, just an interesting project that I've decided to include anyway
 
-If you want me to add your shell, then open an issue and I'll add you as fast as I can! The exception is proprietary software
+
+### Other <a name="similar-projects-other"></a>
+
+-   [MTX Framework](https://github.com/tuonux/mtx) by tuonux
 
 
 
@@ -248,8 +181,6 @@ If you want me to add your shell, then open an issue and I'll add you as fast as
 ## License <a name="license"></a>
 
 Marinette is licensed under MIT No Attribution. See [here](LICENSE) for full details
-
-[Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack) is licensed under MIT License. See [here](LICENSE-Simple-Text-Editor-for-Grey-Hack) for full details
 
 
 
@@ -265,7 +196,6 @@ Special thanks and credits goes to:
 -   [Roupi](https://www.greyrepo.xyz/users/roupi) - for [Scan class module](https://www.greyrepo.xyz/posts/scan-class)
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
--   [rocketorbit](https://github.com/rocketorbit) - for [Simple Text Editor](https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack)
 -   [Guest](https://github.com/fmmaks666) - for Ukrainian translation and plugins implementation
 -   [Simonize](https://github.com/Simoniko) - for color scheme(see `NoAuthV3Ocean` theme) and Polish translation
 

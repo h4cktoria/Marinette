@@ -1,6 +1,10 @@
-Helps["help"] = Messages.HelpEntryHelp
-Aliases["help"] = ["h", "?"]
-Commands["help"] = function(arguments)
+// 
+// Marinette's commands
+
+
+
+
+command "help", ["h", "?"], Const.any, Messages.HelpEntryHelp, function(arguments)
     commands = Helps.indexes
     if arguments.len != 0 then commands = arguments
 
@@ -56,9 +60,9 @@ Commands["help"] = function(arguments)
     end for
 
     printCategories = function(categories)
-        print("<color="+Theme.miscPrimary+"><b><--"+categories+"-->")
+        print(primary("<b><--"+categories+"--></b>"))
         for help in foundHelps[categories]
-            print("<color="+Theme.miscPrimary+">"+help.commands+"<color="+Theme.miscSecondary+"> - "+help.args+" - "+help.description)
+            print(primary(help.commands)+secondary(" - "+help.args+" - "+help.description))
         end for
     end function
 
@@ -91,36 +95,23 @@ Commands["help"] = function(arguments)
 end function
 
 
-Helps["license"] = Messages.HelpEntryLicense
-Aliases["license"] = ["lic", "legal"]
-Commands["license"] = function(arguments)
+command "credits", [], Const.any, Messages.HelpEntryLicense, function(arguments)
     Conditions.arguments(arguments, 0)
 
-    licenses = [
-        {"SOFTWARE": "Marinette", "LICENSE": "MIT No Attribution", "REPO": "https://github.com/h4cktoria/Marinette"},
-        {"SOFTWARE": "Simple text editor", "LICENSE": "MIT License", "REPO": "https://github.com/rocketorbit/Simple-Text-Editor-for-Grey-Hack"},
+    contributors = [
+        "Kurouzu", "Joe Strout", "Clover", "Roupi",
+        "Finko42", "Ariavne", "Guest", "Simonize",
     ]
 
-    licenseOne = function(license)
-        print("<color="+Theme.miscPrimary+">"+replaceF(Messages.SoftwareIsLicensedUnder, license))
-    end function
-    
-    if licenses.len == 1 then
-        licenseOne(licenses[0])
-    else
-        last = licenses.pop
-        for license in licenses
-            licenseOne(license)
-            print(" ")
-        end for
-        licenseOne(last)
-    end if
+    print(primary(Messages.SpecialThanksAndCredits))
+    print(" ")
+    print(primary(contributors.join(", ")))
+    print(" ")
+    print(primary(Messages.YouAreAllAwesome+" <3"))
 end function
 
 
-Helps["quit"] = Messages.HelpEntryQuit
-Aliases["quit"] = ["q", "exit"]
-Commands["quit"] = function(arguments)
+command "quit", ["q", "exit"], Const.any, Messages.HelpEntryQuit, function(arguments)
     Conditions.arguments(arguments, 0)
 
     Console.log(Messages.LogThanksAndQuit)
@@ -128,29 +119,26 @@ Commands["quit"] = function(arguments)
 end function
 
 
-Helps["clear"] = Messages.HelpEntryClear
-Aliases["clear"] = ["cls"]
-Commands["clear"] = function(arguments)
+command "clear", ["cls"], Const.any, Messages.HelpEntryClear, function(arguments)
     Conditions.arguments(arguments, 0)
 
     clear_screen
 end function
 
 
-Helps["sm"] = Messages.HelpEntrySm
-Commands["sm"] = function(arguments)
+command "sessions", [], Const.any, Messages.HelpEntrySm, function(arguments)
     Conditions.argumentsMoreThan(arguments, 0)
     
     command = arguments.pull
-    if ["n", "new"].indexOf(command) != null and arguments.len != 0 then return Conditions.arguments(arguments, 1)
-    if ["d", "del"].indexOf(command) != null and arguments.len == 0 then return Conditions.argumentsMoreThan(arguments, 1)
-    if ["ld", "load"].indexOf(command) != null and arguments.len != 1 then return Conditions.arguments(arguments, 2)
-    if ["l", "look"].indexOf(command) != null and arguments.len != 0 then return Conditions.argumentsMoreThan(arguments, 1)
+    if "add".indexOf(command) == 0  and arguments.len != 0 then return Conditions.arguments(arguments, 1)
+    if "delete".indexOf(command) == 0 and arguments.len == 0 then return Conditions.argumentsMoreThan(arguments, 1)
+    if "use".indexOf(command) == 0 and arguments.len != 1 then return Conditions.arguments(arguments, 2)
+    if "look".indexOf(command) == 0 and arguments.len != 0 then return Conditions.argumentsMoreThan(arguments, 1)
 
-    if ["n", "new"].indexOf(command) != null then
+    if "add".indexOf(command) == 0 then
         SessionsHelpers.add(Intrinsics)
         Console.log(Messages.LogSuccessfullSessionsUpdate)
-    else if ["d", "del"].indexOf(command) != null then
+    else if "delete".indexOf(command) == 0 then
         i = 0; while i < arguments.len; i = i + 1
             id = arguments[i-1]
             if id isa string or not SessionsHelpers.delete(id) then
@@ -159,16 +147,16 @@ Commands["sm"] = function(arguments)
                 j = i-1; while j < arguments.len; j = j + 1
                     arguments[j-1] = arguments[j-1] - 1
                 end while
-                Console.log(replaceF(Messages.LogSuccessfullSessionDeletion, {"ID": id}))
+                Console.log(Messages.LogSuccessfullSessionDeletion, {"ID": id})
             end if
         end while
-    else if ["ld", "load"].indexOf(command) != null then
+    else if "use".indexOf(command) == 0 then
         id = arguments[0]
         if id isa string or not SessionsHelpers.get(id) then return Console.error(Messages.ErrorIncorrectSessionId)
         session = SessionsHelpers.get(id)
         globals.Intrinsics = session.Intrinsics
         Console.log(Messages.LogSuccessfullSessionLoad)
-    else if ["l", "look"].indexOf(command) != null then
+    else if "look".indexOf(command) == 0 then
         output = Messages.SmHeader
         i = 1
         while SessionsHelpers.get(i) != null
@@ -183,131 +171,37 @@ Commands["sm"] = function(arguments)
 end function
 
 
-Helps["hashcrack"] = Messages.HelpEntryHashcrack
-Aliases["hashcrack"] = ["hc"]
-Commands["hashcrack"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.crypto
-
-    crypto = Libs.crypto
+command "theme", [], Const.any, Messages.HelpEntryTheme, function(arguments)
+    Conditions.arguments(arguments, 0)
     
-    Console.log(Messages.LogHashCracking)
-    for md5hash in fmap(@str, arguments)
-        name = md5hash
-        toCrack = md5hash
-        if md5hash.indexOf(":") != null then
-            parts = md5hash.split(":")
-            name = parts[0]
-            toCrack = parts[1]
-        end if
-        
-        // 
-        // This is a desync fix
-        wait(0.01)
+    asciiArt = [
+        "  __  __          _          _   _       ",
+        " |  \/  |__ _ _ _(_)_ _  ___| |_| |_ ___ ",
+        " | |\/| / _` | '_| | ' \/ -_)  _|  _/ -_)",
+        " |_|  |_\__,_|_| |_|_||_\___|\__|\__\___|",
+    ]
+    Console.asciiArt(asciiArt)
 
-        result = crypto.decipher(toCrack)
-        if not result then
-            Console.error(replaceF(Messages.ErrorUncrackableHash, {"HASH": name}))
-        else
-            Console.log(replaceF(Messages.LogSuccessfullHashCracking, {"HASH": name, "PASSWORD": result}))
-        end if
-    end for
+    print(" ")
+
+    Console.log(randomString(40))
+    Console.warning(randomString(40))
+    Console.error(randomString(40))
+
+    print(" ")
+    table = [
+        randomString(10)+" "+randomString(10)+" "+randomString(10)+" "+randomString(10),
+        "---------- ---------- ---------- ----------",
+        randomString(11)+" "+randomString(11)+" "+randomString(11)+" "+randomString(11),
+        randomString(12)+" "+randomString(12)+" "+randomString(12)+" "+randomString(12),
+    ].join(char(10))
+    print(formatColumnsColored(table, Theme.miscPrimary, Theme.miscSecondary))
 end function
 
 
-Helps["raddr"] = Messages.HelpEntryRaddr
-Aliases["raddr"] = ["rip"]
-Commands["raddr"] = function(arguments)
-    Conditions.argumentsFewerThan(arguments, 2)
-    Conditions.network
-
-    count = arguments.pull
-    if count == null then count = 1
-    if not count isa number then return Console.error(Messages.ErrorUnknownArguments)
-    if count < 1 then return
-
-    Console.log(Messages.LogGeneratingRandomAddresses)
-    i = 0; while i < count; i = i + 1
-        print("<color="+Theme.miscPrimary+">"+randomNetworkAddress+"</color>")
-    end while
-    Console.log(Messages.LogDoneGeneratingRandomAddresses)
-end function
 
 
-Helps["svcfind"] = Messages.HelpEntrySvcfind
-Aliases["svcfind"] = ["sf"]
-Commands["svcfind"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.argumentsFewerThan(arguments, 3)
-    Conditions.host
-    Conditions.network
-
-    service = str(arguments[0])
-    serviceVersion = null
-    if arguments.len == 2 then serviceVersion = str(arguments[1])
-
-    while true
-        ip = randomNetworkAddress
-        router = getNetworkNode(ip)
-        for port in router.used_ports
-            info = router.port_info(port)
-            if info.indexOf(service) != null then
-                if not serviceVersion or (serviceVersion and info.indexOf(serviceVersion) != null) then
-                    return Console.log(replaceF(Messages.LogServiceFound, {"SERVICE": info, "ADDRESS":ip, "PORT": port.port_number}))
-                end if
-            end if
-            version = ""
-            if serviceVersion then version = " "+serviceVersion
-        end for
-        Console.error(replaceF(Messages.ErrorServiceNotFound, {"SERVICE": service+version, "ADDRESS": ip}))
-    end while
-end function
-
-
-Helps["whois"] = Messages.HelpEntryWhois
-Commands["whois"] = function(arguments)
-    Conditions.network
-
-    whoisOne = function(addr)
-        router = getNetworkNode(addr)
-        if not router then return Console.error(Messages.ErrorIncorrectNetworkAddress)
-        addr = router.public_ip
-
-        output = whois(addr)
-        lines = output.split(char(10))
-
-        domain = getDomainName(addr)
-        email = getDomainEmailAddress(addr)
-        phone = getDomainPhoneNumber(addr)
-        admin = getAdministrativeContact(addr)
-        if not domain or not admin or not email or not phone then return Console.error(Messages.ErrorFailedWhoisLookup)
-        Console.log(replaceF(Messages.LogWhoisLookup, {"ADDRESS": addr}))
-        lines = [
-            "<color="+Theme.miscPrimary+">"+Messages.WhoisDomain+" - <color="+Theme.miscSecondary+">"+domain,
-            "<color="+Theme.miscPrimary+">"+Messages.WhoisEmail+" - <color="+Theme.miscSecondary+">"+email,
-            "<color="+Theme.miscPrimary+">"+Messages.WhoisPhoneNumber+" - <color="+Theme.miscSecondary+">"+phone,
-            "<color="+Theme.miscPrimary+">"+Messages.WhoisAdministrator+" - <color="+Theme.miscSecondary+">"+admin,
-        ]
-        print(lines.join(char(10)))
-    end function
-
-    if arguments.len == 0 then
-        whoisOne(getNetworkNode.public_ip)
-    else
-        arguments = fmap(@str, arguments)
-        last = arguments.pop
-        for path in arguments
-            whoisOne(path)
-            print(" ")
-        end for
-        whoisOne(last)
-    end if
-end function
-
-
-Helps["sysinf"] = Messages.HelpEntrySysinf
-Aliases["sysinf"] = ["si"]
-Commands["sysinf"] = function(arguments)
+command "systeminfo", ["sysinf", "si"], Const.host, Messages.HelpEntrySysinf, function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.host
 
@@ -369,9 +263,7 @@ Commands["sysinf"] = function(arguments)
 end function
 
 
-Helps["reload"] = Messages.HelpEntryReload
-Aliases["reload"] = ["rl"]
-Commands["reload"] = function(arguments)
+command "reload", ["rl"], Const.host, Messages.HelpEntryReload, function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.host
 
@@ -380,52 +272,7 @@ Commands["reload"] = function(arguments)
 end function
 
 
-Helps["inspect"] = Messages.HelpEntryInspect
-Commands["inspect"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.host
-    Conditions.metaxploit
-
-    metaxploit = Libs.metaxploit
-
-    inspectOne = function(path)
-        fd = iterateToPath(Intrinsics.file, path)
-
-        metalib = null
-        if fd then metalib = metaxploit.load(fd.path)
-        if not metalib then return Console.error(Messages.ErrorIncorrectLibraryPath)
-
-        object = null
-        if fd then object = include_lib(fd.path)
-
-        if not object then
-            objectType = "library"
-        else
-            objectType = typeof(object).lower
-            for removal in ["lib", "client"]
-                objectType = objectType.replace(removal, "")
-            end for
-        end if
-
-        Console.log(replaceF(Messages.LogLibraryAt, {"PATH": fd.path}))
-        print("<color="+Theme.miscPrimary+">"+Messages.InspectLibraryType+" - <color="+Theme.miscSecondary+">"+objectType)
-        print("<color="+Theme.miscPrimary+">"+Messages.InspectLibraryName+" - <color="+Theme.miscSecondary+">"+metalib.lib_name)
-        print("<color="+Theme.miscPrimary+">"+Messages.InspectLibraryVersion+" - <color="+Theme.miscSecondary+">"+metalib.version)
-    end function
-
-    arguments = fmap(@str, arguments)
-    last = arguments.pop
-    for path in arguments
-        inspectOne(path)
-        print(" ")
-    end for
-    inspectOne(last)
-end function
-
-
-Helps["subuser"] = Messages.HelpEntryUserchange
-Aliases["subuser"] = ["subu"]
-Commands["subuser"] = function(arguments)
+command "subuser", ["subu"], Const.host, Messages.HelpEntryUserchange, function(arguments)
     Conditions.arguments(arguments, 2)
     Conditions.host
 
@@ -438,7 +285,7 @@ Commands["subuser"] = function(arguments)
     else
         Console.log(Messages.LogLookingForMyself)
         // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
-        fd = findMyself(get_shell, Constants.identificator, "--identify-marinette --password "+Vars.password)
+        fd = findMyself(get_shell, Config.identificator, "--identify-marinette --password "+Var.password)
         if not fd then return Console.error(Messages.ErrorCouldNotFindMyself)
 
         Intrinsics.shell = shell
@@ -446,20 +293,18 @@ Commands["subuser"] = function(arguments)
         Intrinsics.file = Intrinsics.computer.File("/")
         
         shared = get_custom_object
-        shared.Vars = deepCopy(Vars)
+        shared.Var = deepCopy(Var)
         shared.Intrinsics = deepCopy(Intrinsics)
         shared.Libs = deepCopy(Libs)
         shared.Sessions = deepCopy(Sessions)
 
-        shell.launch(fd.path, "--no-ascii-art --password "+Vars.password)
+        shell.launch(fd.path, "--no-ascii-art --password "+Var.password)
         exit
     end if
 end function
 
 
-Helps["svcon"] = Messages.HelpEntrySvcon
-Aliases["svcon"] = ["sc"]
-Commands["svcon"] = function(arguments)
+command "svcon", ["sc"], Const.host, Messages.HelpEntrySvcon, function(arguments)
     Conditions.arguments(arguments, 6)
     Conditions.host
     Conditions.network
@@ -501,331 +346,9 @@ Commands["svcon"] = function(arguments)
 end function
 
 
-Helps["netcrack"] = Messages.HelpEntryNetcrack
-Commands["netcrack"] = function(arguments)
-    Conditions.arguments(arguments, 2)
-    Conditions.host
-    Conditions.crypto
-
-    crypto = Libs.crypto
-    iface = str(arguments[0])
-    id = arguments[1]
-
-    lines = Intrinsics.computer.network_devices.split(char(10))
-    i = 0; while i < lines.len; i = i + 1
-        parts = lines[i-1].split(" ")
-        lines[i-1] = parts[0]
-    end while
-    ifaces = lines
-    eth = ifaces.indexOf("eth")
-    if eth != null then ifaces.remove(eth)
-    if ifaces.indexOf(iface) == null then return Console.error(Messages.ErrorIncorrectNetworkInterface)
-
-    networks = Intrinsics.computer.wifi_networks(iface)
-    if not networks then return Console.error(Messages.ErrorCouldNotGetNetworksList)
-    if not id isa number or id > networks.len then return Console.error(Messages.ErrorIncorrectNetworkId)
-    
-    Console.log(Messages.LookingForTheNetwork)
-    powerPredicate = function(iItem, jItem)
-        iPwr = iItem.split(" ")[1].replace("%", "").to_int
-        jPwr = jItem.split(" ")[1].replace("%", "").to_int
-        return iPwr > jPwr
-    end function
-    mergeSort(networks, @powerPredicate)
-
-    network = networks[id-1].split(" ")
-    bssid = network[0]
-    pwr = network[1].replace("%", "").to_int
-    essid = network[2]
-    acks = ceil(300000 / pwr)
-
-    Console.log(Messages.LogStartingMonitorMode)
-    result = crypto.airmon("start", iface)
-    if result isa string then
-        crypto.airmon("stop", iface)
-        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "airmon", "ERROR": result}))
-    end if
-
-    Console.log(replaceF(Messages.LogAireplayingOn, {"ESSID": essid, "ACKS": acks}))
-    result = crypto.aireplay(bssid, essid, acks)
-    if result isa string then
-        crypto.airmon("stop", iface)
-        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "aireplay", "ERROR": result}))
-    end if
-
-    Console.log(Messages.LogAircrackingTheHandshake)
-    password = crypto.aircrack(current_path+"/file.cap")
-
-    cap = get_shell.host_computer.File(current_path+"/file.cap")
-    if cap then cap.delete
-
-    Console.log(Messages.LogStoppingMonitorMode)
-    crypto.airmon("stop", iface)
-
-    if not password then
-        return Console.error(Messages.ErrorFailedPasswordCrack)
-    else
-        return Console.log(replaceF(Messages.LogSuccessfullPasswordCrack, {"ESSID": essid, "ID": id, "PASSWORD": password}))
-    end if
-end function
-
-
-Helps["meow"] = Messages.HelpEntryMeow
-Aliases["meow"] = ["mpm"]
-Commands["meow"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 1)
-    Conditions.host
-    Conditions.network
-    Conditions.apt
-    
-    fd = Intrinsics.file
-    apt = Libs.apt
-    command = str(arguments.pull)
-
-    if command == "add" then
-        for repo in fmap(@str, arguments)
-            parts = repo.split(":")
-            if parts.len > 2 then return Console.error(Messages.ErrorIncorrectRepositoryAddress)
-            
-            address = parts[0]
-            port = 1542
-            if parts.len == 2 then port = parts[1].to_int
-            
-            router = getNetworkNode(address)
-            if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
-            address = router.public_ip
-
-            if not port isa number then return Console.error(Messages.ErrorCouldNotAccessSuchPort)
-
-            result = apt.add_repo(address, port)
-            if result and result isa string then
-                Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "add_repo", "ERROR": result}))
-            else
-                Console.log(replaceF(Messages.LogSuccessfullRepositoryAddition, {"ADDRESS": address, "PORT": port}))
-            end if
-        end for
-    else if command == "del" then
-        for address in fmap(@str, arguments)
-            router = getNetworkNode(address)
-            if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
-            address = router.public_ip
-
-            result = apt.del_repo(address)
-            if result and result isa string then 
-                Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "del_repo", "ERROR": result}))
-            else
-                Console.log(replaceF(Messages.LogSuccessfullRepositoryDeletion, {"ADDRESS": address}))
-            end if
-        end for
-    else if command == "dl" then
-        apt.update
-        for package in fmap(@str, arguments)
-            result = apt.install(package, fd.path)
-            if result and result isa string then
-                Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "install", "ERROR": result}))
-            else
-                Console.log(replaceF(Messages.LogSuccessfullPackageInstallation, {"PACKAGE": package}))
-            end if
-        end for
-    else if ["l", "look"].indexOf(command) != null then
-        apt.update
-        for address in fmap(@str, arguments)
-            router = getNetworkNode(address)
-            if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
-            address = router.public_ip
-
-            result = apt.show(address)
-            if result.indexOf(" repository not found") then 
-                Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "show", "ERROR": result}))
-            else
-                Console.log(replaceF(Messages.LogContentsOfRepository, {"ADDRESS": address}))
-                lines = result.split(char(10))
-                lines.pop
-                for line in lines
-                    print("<color="+Theme.miscPrimary+">"+line)
-                end for
-            end if
-        end for
-    else
-        return Console.error(Messages.ErrorUnknownArguments)
-    end if
-end function
-
-
-Helps["nesca"] = Messages.HelpEntryNesca
-Aliases["nesca"] = ["netscan"]
-Commands["nesca"] = function(arguments)
-    Conditions.host
-    Conditions.network
-
-    nescaOne = function(address)
-        nodes = []
-
-        router = getNetworkNode(address)
-        if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
-        nodes.push(router)
-
-        domain = getDomainName(address)
-        Console.log(replaceF(Messages.LogNescaOn, {"DOMAIN": domain, "PUBADDR": router.public_ip, "LOCADDR": router.local_ip}))
-        
-        output = Messages.NescaHeader
-        if not isNodeLocallyAccessible(router) then output = output+char(10)+"0 "+Messages.PortStateOpened+" "+Messages.PortStateOpened+" "+Messages.ServiceNode+" "+router.kernel_version+" "+router.local_ip
-        for publicPort in router.used_ports
-            localAddr = publicPort.get_lan_ip
-            port = publicPort.port_number
-            pubState = Messages.PortStateClosed
-            locState = Messages.PortStateClosed
-            info = router.port_info(publicPort)
-            if not publicPort.is_closed then pubState = Messages.PortStateOpened
-            for localPort in getPublicPortsWithLocalStates(address)
-                if localPort.get_lan_ip != localAddr then continue
-                if localPort.port_number != port then continue
-                if not localPort.is_closed then
-                    locState = Messages.PortStateOpened
-                    break
-                end if
-            end for
-            output = output+char(10)+[port,pubState,locState,info,localAddr].join(" ")
-        end for
-
-        for localPort in getLocalPorts(address)
-            localAddr = localPort.get_lan_ip
-            port = localPort.port_number
-            pubState = Messages.PortStateClosed
-            locState = Messages.PortStateClosed
-            info = router.port_info(localPort)
-            if not localPort.is_closed then locState = Messages.PortStateOpened
-            output = output+char(10)+[port,pubState,locState,info,localAddr].join(" ")
-        end for
-
-        for localAddr in router.devices_lan_ip
-            node = null
-            if isNodeLocallyAccessible(router) then node = getNetworkNode(localAddr)
-            if not node then continue
-            nodes.push(node)
-
-            localAddr = node.local_ip
-            port = "0"
-            pubState = Messages.PortStateOpened
-            locState = Messages.PortStateOpened
-            info = Messages.ServiceNode+" "+node.kernel_version
-            output = output+char(10)+[port,pubState,locState,info,localAddr].join(" ")
-        end for
-
-        for portlessAddr in getPortlessNodes(address)
-            output = output+char(10)+"- - - "+Messages.ServiceComputer+" - "+portlessAddr
-        end for
-
-        lines = output.split(char(10))
-        addrPredicate = function(iItem, jItem)
-            iAddr = iItem.split(" ")[5]
-            jAddr = jItem.split(" ")[5]
-            return iAddr > jAddr
-        end function
-        compPredicate = function(iItem, jItem)
-            iSvc = iItem.split(" ")[3]
-            jSvc = jItem.split(" ")[3]
-            return iSvc != jSvc and jSvc == Messages.ServiceComputer
-        end function
-        nodePredicate = function(iItem, jItem)
-            iSvc = iItem.split(" ")[3]
-            jSvc = jItem.split(" ")[3]
-            return iSvc != jSvc and jSvc == Messages.ServiceNode
-        end function
-        mergeSort(lines, @addrPredicate, 1)
-        mergeSort(lines, @compPredicate, 1)
-        mergeSort(lines, @nodePredicate, 1)
-
-        output = lines.join(char(10))
-        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
-
-        output = Messages.NescaFirewallHeader
-        for node in nodes
-            for rule in node.firewall_rules
-                parts = rule.split(" ")
-                action = parts[0]
-                port = parts[1]
-                source = parts[2]
-                dest = parts[3]
-                addr = node.local_ip
-                output = output+char(10)+[port,action,source,dest,addr].join(" ")
-            end for
-        end for
-
-        if output == Messages.NescaFirewallHeader then return
-        Console.log(replaceF(Messages.LogNescaFirewallOn, {"DOMAIN": domain, "PUBADDR": router.public_ip, "LOCADDR": router.local_ip}))
-
-        lines = output.split(char(10))
-        addrPredicate = function(iItem, jItem)
-            iAddr = iItem.split(" ")[4]
-            jAddr = jItem.split(" ")[4]
-            return iAddr > jAddr
-        end function
-        mergeSort(lines, @addrPredicate, 1)
-        
-        output = lines.join(char(10))
-        print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
-    end function
-
-    if arguments.len == 0 then
-        nescaOne(Intrinsics.publicAddress)
-    else
-        arguments = fmap(@str, arguments)
-        last = arguments.pop
-        for address in arguments
-            nescaOne(str(address))
-            print(" ")
-        end for
-        nescaOne(last)
-    end if
-end function
-
-
-Helps["maildump"] = Messages.HelpEntryMaildump
-Aliases["maildump"] = ["md"]
-Commands["maildump"] = function(arguments)
-    Conditions.arguments(arguments, 3)
-    Conditions.host
-    Conditions.network
-    Conditions.crypto
-
-    crypto = Libs.crypto
-
-    addr = str(arguments[0])
-    locAddr = str(arguments[1])
-    port = arguments[2]
-
-    router = getNetworkNode(addr)
-    if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
-    addr = router.public_ip
-    if isNodeLocallyAccessible(router) then addr = router.local_ip
-
-    smtpPort = getExactPort(addr, locAddr, port)
-    if not smtpPort then return Console.error(Messages.ErrorCouldNotAccessSuchPort)
-    if router.port_info(smtpPort).indexOf("smtp") == null then return Console.error(replaceF(Messages.ErrorNoServiceOnPort, {"SERVICE": "smtp", "PORT": port}))
-
-    target = addr
-    if isNodeLocallyAccessible(router) then target = locAddr
-    result = crypto.smtp_user_list(target, port)
-    if result isa string then
-        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "smtp_user_list", "ERROR": result}))
-    else if not result then 
-        return Console.error(replaceF(Messages.ErrorInvulnerableService, {"SERVICE": "smtp"}))
-    end if
-
-    Console.log(replaceF(Messages.LogRegisteredUsersOn, {"DOMAIN": getDomainName(addr), "PUBADDR": router.public_ip, "LOCADDR": locAddr}))
-    output = result.join(char(10))
-    output = output.replace("email not found", "-")
-    output = Messages.MaildumpHeader+char(10)+output
-    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
-end function
-
-
 // 
 // Thanks Ariavne for allowing me to use their nickname as a tool name :D
-Helps["ariadne"] = Messages.HelpEntryAriadne
-Aliases["ariadne"] = ["aria"]
-Commands["ariadne"] = function(arguments)
+command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arguments)
     Conditions.host
     Conditions.metaxploit
 
@@ -859,7 +382,7 @@ Commands["ariadne"] = function(arguments)
         if not isAlreadyFound then metalibs.push(metalib)
     end while
     
-    Console.log(replaceF(Messages.LogScanningLocalLibraries, {"AMOUNT": metalibs.len}))
+    Console.log(Messages.LogScanningLocalLibraries, {"AMOUNT": metalibs.len})
     exploits = []
     for metalib in metalibs
         memory = metaxploit.scan(metalib)
@@ -961,7 +484,7 @@ Commands["ariadne"] = function(arguments)
     Console.log(Messages.LogUsefullExploits)
     counter = 0
     for kv in outputs
-        Console.log(replaceF(Messages.LogVulnerabilitesIn, {"LIBRARY": kv.key}))
+        Console.log(Messages.LogVulnerabilitesIn, {"LIBRARY": kv.key})
         output = Messages.ExploitsHeader+char(10)+kv.value
 
         lines = output.split(char(10))
@@ -990,9 +513,7 @@ Commands["ariadne"] = function(arguments)
 end function
 
 
-Helps["nemesis"] = Messages.HelpEntryNemesis
-Aliases["nemesis"] = ["nsis", "ns"]
-Commands["nemesis"] = function(arguments)
+command "nemesis", ["ns"], Const.host, Messages.HelpEntryNemesis, function(arguments)
     Conditions.argumentsMoreThan(arguments, 2)
     Conditions.host
     Conditions.network
@@ -1064,8 +585,8 @@ Commands["nemesis"] = function(arguments)
 
     libraries = []
     for target in targets
-        if ["a", "all"].indexOf(argLocAddr) == null and target.localAddr != argLocAddr then continue
-        if ["a", "all"].indexOf(argPort) == null and target.port != argPort then continue
+        if "all".indexOf(argLocAddr) != 0 and target.localAddr != argLocAddr then continue
+        if "all".indexOf(argPort) != 0 and target.port != argPort then continue
         netSession = metaxploit.net_use(target.ip, target.port)
         if not netSession then continue
         metalib = netSession.dump_lib
@@ -1078,7 +599,7 @@ Commands["nemesis"] = function(arguments)
         libraries.push(library)
     end for
 
-    Console.log(replaceF(Messages.LogScanningRemoteLibraries, {"AMOUNT": libraries.len}))
+    Console.log(Messages.LogScanningRemoteLibraries, {"AMOUNT": libraries.len})
     exploits = []
     for library in libraries
         memory = metaxploit.scan(library.metalib)
@@ -1192,7 +713,7 @@ Commands["nemesis"] = function(arguments)
     Console.log(Messages.LogUsefullExploits)
     counter = 0
     for kv in outputs
-        Console.log(replaceF(Messages.LogVulnerabilitesIn, {"LIBRARY": kv.key}))
+        Console.log(Messages.LogVulnerabilitesIn, {"LIBRARY": kv.key})
         output = Messages.ExploitsHeader+char(10)+kv.value
 
         lines = output.split(char(10))
@@ -1221,9 +742,9 @@ Commands["nemesis"] = function(arguments)
 end function
 
 
-Helps["hostify"] = Messages.HelpEntryHostify
-Aliases["hostify"] = ["deploy"]
-Commands["hostify"] = function(arguments)
+
+
+command "hostify", [], Const.shell, Messages.HelpEntryHostify, function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.remote
     Conditions.shell(["shell"])
@@ -1234,19 +755,19 @@ Commands["hostify"] = function(arguments)
     if not fdPermissive then return Console.error(Messages.ErrorCouldNotFindPermissivePathToUploadInto)
 
     marinettePath = null
-    fdMarinette = findMyself(Intrinsics.shell, Constants.identificator, "--identify-marinette --password "+Vars.password, true)
+    fdMarinette = findMyself(Intrinsics.shell, Config.identificator, "--identify-marinette --password "+Var.password, true)
     if fdMarinette and fdMarinette.has_permission("x") then marinettePath = fdMarinette.path
     if not marinettePath then
         Console.log(Messages.LogLookingForMyself)
         // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
-        fdMarinette = findMyself(get_shell, Constants.identificator, "--identify-marinette --password "+Vars.password)
+        fdMarinette = findMyself(get_shell, Config.identificator, "--identify-marinette --password "+Var.password)
         if not fdMarinette then return Console.error(Messages.ErrorCouldNotFindMyself)
         
         Console.log(Messages.LogUploadingNeccessary)
         fdBin = get_shell.host_computer.File(fdMarinette.path)
         result = get_shell.scp(fdMarinette.path, fdPermissive.path, Intrinsics.shell)
         if result isa string then
-            return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "scp", "ERROR": result}))
+            return Console.error(Messages.ErrorStringGeneral, {"FUNC": "scp", "ERROR": result})
         else if not result then
             return Console.error(Messages.ErrorUnknown)
         end if
@@ -1257,21 +778,19 @@ Commands["hostify"] = function(arguments)
     Intrinsics.isConnectionRemote = false
 
     shared = get_custom_object
-    shared.Vars = deepCopy(Vars)
+    shared.Var = deepCopy(Var)
     shared.Intrinsics = deepCopy(Intrinsics)
     shared.Libs = deepCopy(Libs)
     shared.Sessions = deepCopy(Sessions)
 
     Console.log(Messages.LogSessionHostifiedSuccessfully)
 
-    Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Vars.password)
+    Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Var.password)
     exit
 end function
 
 
-Helps["console"] = Messages.HelpEntryConsole
-Aliases["console"] = ["con", "terminal", "term"]
-Commands["console"] = function(arguments)
+command "console", ["con"], Const.shell, Messages.HelpEntryConsole, function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.shell(["shell"])
 
@@ -1281,204 +800,9 @@ Commands["console"] = function(arguments)
 end function
 
 
-Helps["netint"] = Messages.HelpEntryNetint
-Aliases["netint"] = ["ni"]
-Commands["netint"] = function(arguments)
-    Conditions.arguments(arguments, 0)
-    Conditions.computer
-
-    netdevices = Intrinsics.computer.network_devices.trim
-    if netdevices == "" then netdevices = "- - -"
-
-    Console.log(Messages.LogGettingNetworkInterfaces)
-    output = Messages.NetintHeader+char(10)+netdevices
-    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
-end function
 
 
-Helps["netlook"] = Messages.HelpEntryNetlook
-Aliases["netlook"] = ["nl"]
-Commands["netlook"] = function(arguments)
-    Conditions.arguments(arguments, 1)
-    Conditions.computer
-
-    iface = str(arguments[0])
-
-    lines = Intrinsics.computer.network_devices.split(char(10))
-    i = 0; while i < lines.len; i = i + 1
-        parts = lines[i-1].split(" ")
-        lines[i-1] = parts[0]
-    end while
-    ifaces = lines
-    eth = ifaces.indexOf("eth")
-    if eth != null then ifaces.remove(eth)
-    if ifaces.indexOf(iface) == null then return Console.error(Messages.ErrorIncorrectNetworkInterface)
-
-    networks = Intrinsics.computer.wifi_networks(iface)
-    if not networks then return Console.error(Messages.ErrorCouldNotGetNetworksList)
-    
-    powerPredicate = function(iItem, jItem)
-        iPwr = iItem.split(" ")[1].replace("%", "").to_int
-        jPwr = jItem.split(" ")[1].replace("%", "").to_int
-        return iPwr > jPwr
-    end function
-    mergeSort(networks, @powerPredicate)
-
-    Console.log(Messages.LogSurroundingNetworks)
-    output = Messages.NetlookHeader
-    i = 0; for network in networks; i = i + 1
-        pwr = network.split(" ")[1].replace("%", "").to_int
-        acks = ceil(300000 / pwr)
-        output = output+char(10)+i+" "+network+" "+acks
-    end for
-    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
-end function
-
-
-Helps["netcon"] = Messages.HelpEntryNetcon
-Commands["netcon"] = function(arguments)
-    Conditions.arguments(arguments, 3)
-    Conditions.computer
-
-    iface = str(arguments[0])
-    id = arguments[1]
-    password = str(arguments[2])
-
-    lines = Intrinsics.computer.network_devices.split(char(10))
-    i = 0; while i < lines.len; i = i + 1
-        parts = lines[i-1].split(" ")
-        lines[i-1] = parts[0]
-    end while
-    ifaces = lines
-    eth = ifaces.indexOf("eth")
-    if eth != null then ifaces.remove(eth)
-    if ifaces.indexOf(iface) == null then return Console.error(Messages.ErrorIncorrectNetworkInterface)
-
-    networks = Intrinsics.computer.wifi_networks(iface)
-    if not networks then return Console.error(Messages.ErrorCouldNotGetNetworksList)
-    if not id isa number or id > networks.len then return Console.error(Messages.ErrorIncorrectNetworkId)
-    id = id - 1
-    
-    Console.log(Messages.LookingForTheNetwork)
-    powerPredicate = function(iItem, jItem)
-        iPwr = iItem.split(" ")[1].replace("%", "").to_int
-        jPwr = jItem.split(" ")[1].replace("%", "").to_int
-        return iPwr > jPwr
-    end function
-    mergeSort(networks, @powerPredicate)
-
-    network = networks[id].split(" ")
-    bssid = network[0]
-    essid = network[2]
-
-    result = Intrinsics.computer.connect_wifi(iface, bssid, essid, password)
-    if result isa string then
-        return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "connect_wifi", "ERROR": result}))
-    else
-        Console.log(replaceF(Messages.LogConnectedToEssidSuccessfully, {"ESSID": essid}))
-    end if
-
-    performRuntimeLoading
-    performSystemChecks
-end function
-
-
-Helps["tasklist"] = Messages.HelpEntryTasklist
-Aliases["tasklist"] = ["tl"]
-Commands["tasklist"] = function(arguments)
-    Conditions.arguments(arguments, 0)
-    Conditions.computer
-
-    lines = Intrinsics.computer.show_procs.split(char(10))
-    tasks = lines[1:]
-    if tasks.len == 0 then tasks = ["- - - - -"]
-    
-    Console.log(Messages.LogAllRunningTasks)
-    output = Messages.TasklistHeader+char(10)+tasks.join(char(10))
-    print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
-end function
-
-
-Helps["taskill"] = Messages.HelpEntryTaskill
-Aliases["taskill"] = ["tk"]
-Commands["taskill"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.computer
-
-    for pid in removeDuplicates(arguments)
-        result = Intrinsics.computer.close_program(pid)
-        if result isa string then
-            Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "close_program", "ERROR": result}))
-        else if not result then
-            Console.error(Messages.ErrorUnknown)
-        else
-            Console.log(Messages.LogSuccessfullyKilledTask)
-        end if
-    end for
-end function
-
-
-Helps["textfile"] = Messages.HelpEntryTextfile
-Aliases["textfile"] = ["tf"]
-Commands["textfile"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.computer
-
-    textfileOne = function(path)
-        fd = Intrinsics.file
-        parts = path.split("/")
-        fileName = parts.pop
-        path = parts.join("/")
-        if path != "" then fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
-        result = Intrinsics.computer.touch(fd.path, fileName)
-        if result isa string then
-            Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "touch", "ERROR": result}))
-        else if not result then
-            Console.error(Messages.ErrorUnknown)
-        else
-            Console.log(Messages.LogFileHasBeenCreatedSuccessfully)
-        end if
-    end function
-
-    for path in fmap(@str, arguments)
-        textfileOne(path)
-    end for
-end function
-
-
-Helps["directory"] = Messages.HelpEntryDirectory
-Aliases["directory"] = ["dir"]
-Commands["directory"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.computer
-
-    directoryOne = function(path)
-        fd = Intrinsics.file
-        parts = path.split("/")
-        fileName = parts.pop
-        path = parts.join("/")
-        if path != "" then fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
-        result = Intrinsics.computer.create_folder(fd.path, fileName)
-        if result isa string then
-            Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "create_folder", "ERROR": result}))
-        else if not result then
-            Console.error(Messages.ErrorUnknown)
-        else
-            Console.log(Messages.LogDirectoryHasBeenCreatedSuccessfully)
-        end if
-    end function
-
-    for path in fmap(@str, arguments)
-        directoryOne(path)
-    end for
-end function
-
-
-Helps["walk"] = Messages.HelpEntryWalk
-Aliases["walk"] = ["w", "cd"]
-Commands["walk"] = function(arguments)
+command "walk", ["w", "cd"], Const.file, Messages.HelpEntryWalk, function(arguments)
     Conditions.arguments(arguments, 2)
 
     command = str(arguments[0])
@@ -1487,13 +811,13 @@ Commands["walk"] = function(arguments)
 
     fd = Intrinsics.file
 
-    if ["b", "back"].indexOf(command) != null then
+    if "back".indexOf(command) == 0 then
         if not s isa number then return Console.error(Messages.ErrorUnknownArguments)
         i = 0; while i < s; i = i + 1
             if fd.parent then fd = fd.parent
         end while
         Intrinsics.file = fd
-    else if ["i", "into"].indexOf(command) != null then
+    else if "into".indexOf(command) == 0 then
         fd = iterateToPath(fd, path)
         if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
         Intrinsics.file = fd
@@ -1503,203 +827,7 @@ Commands["walk"] = function(arguments)
 end function
 
 
-Helps["look"] = Messages.HelpEntryLook
-Aliases["look"] = ["l"]
-Commands["look"] = function(arguments)
-    lookOne = function(path)
-        fd = Intrinsics.file
-        fd = iterateToPath(fd, path)
-        if not fd or not fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotDirectory)
-
-        Console.log(replaceF(Messages.LogContentsOfPath, {"PATH": fd.path}))
-        output = Messages.LookHeader
-        contents = fd.get_folders + fd.get_files
-        for f in contents
-            if f.is_folder then 
-                type = Messages.Folder
-            else if f.is_binary then 
-                type = Messages.Binary
-            else
-                type = Messages.Text
-            end if
-            permissions = f.permissions
-            output = output+char(10)+[permissions[1:],f.owner,f.group,f.size,type,f.name].join(" ")
-        end for
-        if contents.len == 0 then output = output+char(10)+"- - - - - -"
-        
-        lines = output.split(char(10))
-        namePredicate = function(iItem, jItem)
-            iName = iItem.split(" ")[5]
-            jName = jItem.split(" ")[5]
-            return iName > jName
-        end function
-        ftPredicate = function(iItem, jItem)
-            priority = {
-                Messages.Folder: 2,
-                Messages.Binary: 1,
-                Messages.Text: 0,
-            }
-            iType = iItem.split(" ")[4]
-            jType = jItem.split(" ")[4]
-            return priority[iType] < priority[jType]
-        end function
-        mergeSort(lines, @namePredicate, 1)
-        mergeSort(lines, @ftPredicate, 1)
-        output = lines.join(char(10))
-
-        output = formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary)
-        print(output)
-    end function
-    
-    if arguments.len == 0 then
-        lookOne(Intrinsics.file.path)
-    else
-        arguments = fmap(@str, arguments)
-        last = arguments.pop
-        for path in arguments
-            lookOne(path)
-            print(" ")
-        end for
-        lookOne(last)
-    end if
-end function
-
-
-Helps["read"] = Messages.HelpEntryRead
-Aliases["read"] = ["r"]
-Commands["read"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-
-    readOne = function(path)
-        fd = Intrinsics.file
-        fd = iterateToPath(fd, path)
-        if not fd or fd.is_binary or fd.is_folder then return Console.error(Messages.ErrorPathDoesntExistOrNotTextFile)
-        content = fd.get_content
-        if content == null then return Console.error(Messages.ErrorCouldReadFile)
-        Console.log(replaceF(Messages.LogContentsOfPath, {"PATH": fd.path}))
-        lines = content.split(char(10))
-        i = 0; while i < lines.len; i = i + 1
-            line = escape(lines[i-1])
-            print("<color="+Theme.miscSecondary+">"+str(i-1 + 1)+"<color="+Theme.miscPrimary+">:</color> "+line)
-        end while
-    end function
-
-    if arguments.len == 1 then
-        readOne(str(arguments[0]))
-    else
-        arguments = fmap(@str, arguments)
-        last = arguments.pop
-        for path in arguments
-            readOne(path)
-            print(" ")
-        end for
-        readOne(last)
-    end if
-end function
-
-
-Helps["delete"] = Messages.HelpEntryDelete
-Aliases["delete"] = ["del"]
-Commands["delete"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-
-    deleteOne = function(path)
-        fd = Intrinsics.file
-        fd = iterateToPath(fd, path)
-        if not fd then return Console.error(Messages.ErrorPathDoesNotExist)
-        result = fd.delete
-        if result != "" then return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "delete", "ERROR": result}))
-        Console.log(replaceF(Messages.LogFileDeletedSuccessfully, {"PATH": fd.path}))
-    end function
-
-    for path in fmap(@str, arguments)
-        deleteOne(path)
-    end for
-end function
-
-
-Helps["copy"] = Messages.HelpEntryCopy
-Aliases["copy"] = ["cp"]
-Commands["copy"] = function(arguments)
-    Conditions.arguments(arguments, 2)
-    
-    fd = Intrinsics.file
-    path = str(arguments[0])
-    dest = str(arguments[1])
-
-    fdSource = iterateToPath(fd, path)
-    if not fdSource then return Console.error(Messages.ErrorSourcePathDoesNotExist)
-    fileName = fdSource.name
-
-    fdDest = iterateToPath(fd, dest)
-    if fdDest and not fdDest.is_folder then
-        fileName = fdDest.name
-        fdDest = fdDest.parent
-    end if
-    if not fdDest then
-        parts = dest.split("/")
-        fileName = parts.pop
-        fdDest = iterateToPath(fd, parts.join("/"))
-        if not fdDest and parts.len == 0 then fdDest = fd
-        if not fdDest then return Console.error(Messages.ErrorDesinationPathDoesNotExist)
-    end if
-
-    result = fdSource.copy(fdDest.path, fileName)
-    if result isa string then
-        Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "copy", "ERROR": result}))
-    else if not result then
-        Console.error(Messages.ErrorUnknown)
-    else
-        Console.log(Messages.LogCopiedFileSuccessfully)
-    end if
-end function
-
-
-Helps["tree"] = Messages.HelpEntryTree
-Aliases["tree"] = ["fs"]
-Commands["tree"] = function(arguments)
-    Conditions.arguments(arguments, 0)
-
-    recursefd = function(fd, tab=2)
-        print((" "*(tab-2))+"<color="+Theme.miscPrimary+">"+fd.permissions+"</color> "+"<color="+Theme.miscSecondary+">"+fd.path)
-        for file in fd.get_files
-            print((" "*tab)+"<color="+Theme.miscPrimary+">"+file.permissions+"</color> "+"<color="+Theme.miscSecondary+">"+file.path)
-        end for
-        for folder in fd.get_folders
-            recursefd(folder, tab + 2)
-        end for
-    end function
-
-    Console.log(Messages.LogFileSystemTree)
-    fd = iterateToPath(Intrinsics.file, "/")
-    recursefd(fd)
-end function
-
-
-Helps["ste"] = Messages.HelpEntrySte
-Commands["ste"] = function(arguments)
-    Conditions.arguments(arguments, 1)
-
-    path = str(arguments[0])
-    fd = iterateToPath(Intrinsics.file, path)
-
-    if not fd then return Console.error(Messages.ErrorPathDoesntExistOrNotTextFile)
-
-    steTheme = {
-        "steLine": Theme.miscSecondary,
-        "steDelimiter": Theme.miscPrimary,
-        "steInputMessage": Theme.inputMessage,
-        "steInput": Theme.input,
-        "steInfo": Theme.miscSecondary,
-        "steError": Theme.error,
-    }
-    simpleTextEditor(fd, steTheme)
-end function
-
-
-Helps["ocleaner"] = Messages.HelpEntryOpenCleaner
-Aliases["ocleaner"] = ["oc"]
-Commands["ocleaner"] = function(arguments)
+command "ocleaner", ["oc"], Const.file, Messages.HelpEntryOpenCleaner, function(arguments)
     Conditions.argumentsMoreThan(arguments, 0)
 
     command = fmap(@str, arguments).join(" ")
@@ -1707,69 +835,6 @@ Commands["ocleaner"] = function(arguments)
     object = Intrinsics.file
     if Intrinsics.computer then object = Intrinsics.computer
 
+    if arguments.len == 1 and command == "interactive" then command = null
     openCleaner(object, Theme, Messages, command)
-end function
-
-
-Helps["run"] = Messages.HelpEntryRun
-Aliases["run"] = ["exe"]
-Commands["run"] = function(arguments)
-    Conditions.argumentsMoreThan(arguments, 0)
-    Conditions.shell(["shell"])
-
-    binaryPath = str(arguments.pull)
-    binaryArgs = null
-    if arguments.len > 0 then binaryArgs = fmap(@str, arguments).join(" ")
-
-    fd = iterateToPath(Intrinsics.file, binaryPath)
-    if not fd or not fd.is_binary then return Console.error(Messages.ErrorPathDoesntExistOrNotBinary)
-
-    Console.log(Messages.LogRunningBinary)
-    if not binaryArgs then
-        result = Intrinsics.shell.launch(fd.path)
-    else
-        result = Intrinsics.shell.launch(fd.path, binaryArgs)
-    end if
-
-    if result isa string then
-        Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "launch", "ERROR": result}))
-    else if not result then
-        Console.error(Messages.ErrorCouldNotLaunchBinary)
-    end if
-end function
-
-
-Helps["theme"] = Messages.HelpEntryTheme
-Commands["theme"] = function(arguments)
-    Conditions.arguments(arguments, 0)
-    
-    asciiArt = [
-        "  __  __          _          _   _       ",
-        " |  \/  |__ _ _ _(_)_ _  ___| |_| |_ ___ ",
-        " | |\/| / _` | '_| | ' \/ -_)  _|  _/ -_)",
-        " |_|  |_\__,_|_| |_|_||_\___|\__|\__\___|",
-    ]
-    Console.asciiArt(asciiArt)
-
-    print(" ")
-
-    asciiLen = asciiArt[-1].len - 8
-
-    logMessage = "Log:     "
-    Console.log(logMessage+randomString(asciiLen - logMessage.len))
-
-    warningMessage = "Warning: "
-    Console.warning(warningMessage+randomString(asciiLen - warningMessage.len))
-
-    errorMessage = "Error:   "
-    Console.error(errorMessage+randomString(asciiLen - errorMessage.len))
-
-    print(" ")
-    table = [
-        "This Is An Example Table",
-        "------ ---- ---- --------- -------",
-        "this is table example element",
-        "this is another example element",
-    ].join(char(10))
-    print(formatColumnsColored(table, Theme.miscPrimary, Theme.miscSecondary))
 end function

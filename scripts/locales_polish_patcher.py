@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-with open("src/localization.src", "r") as fd:
+with open("locales/polish.src", "r") as fd:
     content = fd.read()
 
 dictionary = (

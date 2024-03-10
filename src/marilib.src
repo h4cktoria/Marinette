@@ -1,34 +1,18 @@
-Constants = {}
-Vars = {}
-
-Intrinsics = {}
-IntrinsicsHelpers = {}
-Libs = {}
-
-Theme = {}
-Messages = {}
-Console = {}
-Conditions = {}
-
-Sessions = []
-SessionsHelpers = {}
-
-Helps = {}
-Aliases = {}
-Commands = {}
+// 
+// Marinette's library. All of the shell internals are here
 
 
-Constants = {
+
+
+// 
+// Config is something end user changeable
+Config = {
     // 
-    // Password is sha256() iterated 25 times
-    // This represents the "marinette" string
-    // You are free to change this. And don't reveal it that easily :)
-    "password": "27d518c314eec63e57fab0dc420c70d2d4657b3419cda980e7cdb827cc500be5",
+    // Password is a string iterated with sha256() 25 times
+    "password": null,
     // 
-    // Identificator is a signal that lets Marinette find itself in path
-    // You might want to change that if you are PVPing against another player
-    // with Marinette, or if you and another player are hacking the same server.
-    "identificator": "GFUOWPDWWVYMNSNWRRBXEFVENFSXQGQF",
+    // Identificator is a 32 characters 
+    "identificator": null,
     // 
     // Literally a language which Marinette will be speaking with you in
     // See localization.src to see all available languages
@@ -41,11 +25,43 @@ Constants = {
 
 
 // 
-// Vars are something that is set at runtime and used globally
+// Defaulting to fallback and map appending the chosen theme if exists
+Theme = Themes["Violet"]
+if Themes.indexes.indexOf(Config.theme) != null then Theme = Theme + Themes[Config.theme]
+
+
+// 
+// Compiling the locale with a specific language code for it to be usable
+// Missing entries will still be usable, but with an error message indicating that instead
+Messages = localesCompile(Config.language, Locales)
+
+
+// 
+// Const is something persistent and used globally
+Const = {
+    "any": Messages.SessionTypeAny,
+    "host": Messages.SessionTypeHost,
+    "shell": Messages.SessionTypeShell,
+    "computer": Messages.SessionTypeComputer,
+    "file": Messages.SessionTypeFile,
+}
+
+
+// 
+// Var is something that is set at runtime and used globally
 // Don't touch unless you know what you are doing
-Vars = {
+Var = {
     "password": null,
     "hostSession": null,
+    "parameters": parseParameters(params),
+}
+
+
+Libs = {
+    "apt": null,
+    "crypto": null,
+    "metaxploit": null,
+    "blockchain": null,
 }
 
 
@@ -61,6 +77,8 @@ Intrinsics = {
     "isConnectionRemote": false,
 }
 
+
+IntrinsicsHelpers = {}
 
 IntrinsicsHelpers.getSessionType = function(intrinsics)
     object = Messages.SessionTypeHost
@@ -92,17 +110,15 @@ IntrinsicsHelpers.tryToFixFdIfCorrupted = function
 end function
 
 
-// 
-// Defaulting to fallback and map appending the chosen theme if exists
-Theme = Themes["Violet"]
-if Themes.indexes.indexOf(Constants.theme) != null then Theme = Theme + Themes[Constants.theme]
+Console = {}
 
+primary = function(str)
+    return "<color="+Theme.miscPrimary+">"+str+"</color>"
+end function
 
-// 
-// Compiling the locale with a specific language code for it to be usable
-// Missing entries will still be usable, but with an error message indicating that instead
-Messages = localesCompile(Constants.language, Locales)
-
+secondary = function(str)
+    return "<color="+Theme.miscSecondary+">"+str+"</color>"
+end function
 
 Console.asciiArt = function(art)
     i = 0; while i < art.len; i = i + 1
@@ -114,24 +130,26 @@ Console.asciiArt = function(art)
     end while
 end function
 
-Console._printWithColorAndTime = function(color, message=" ")
+Console._printWithColorAndTime = function(color, message=" ", toReplaceFormat=null)
+    if toReplaceFormat then message = replaceF(message, toReplaceFormat)
     currentTime = current_date.split(" - ")[1]
     print("<color="+Theme.prefix+">-"+currentTime+"- <color="+color+">"+message)
 end function
 
-Console.log = function(message=" ")
-    Console._printWithColorAndTime(Theme.log, message)
+Console.log = function(message=" ", toReplaceFormat=null)
+    Console._printWithColorAndTime(Theme.log, message, toReplaceFormat)
 end function
 
-Console.warning = function(message=" ")
-    Console._printWithColorAndTime(Theme.warning, message)
+Console.warning = function(message=" ", toReplaceFormat=null)
+    Console._printWithColorAndTime(Theme.warning, message, toReplaceFormat)
 end function
 
-Console.error = function(message=" ")
-    Console._printWithColorAndTime(Theme.error, message)
+Console.error = function(message=" ", toReplaceFormat=null)
+    Console._printWithColorAndTime(Theme.error, message, toReplaceFormat)
 end function
 
-Console.input = function(message=" ")
+Console.input = function(message=" ", toReplaceFormat=null)
+    if toReplaceFormat then message = replaceF(message, toReplaceFormat)
     input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">")
     if isInputValid(input) then return input
     return ""
@@ -191,33 +209,35 @@ Console.cmdloop = function
 end function
 
 
+Conditions = {}
+
 Conditions.arguments = function(arguments, count)
     if arguments.len == count then return
-    Console.error(replaceF(Messages.ErrorIncorrectAmountOfArguments, {"AMOUNT": count}))
+    Console.error(Messages.ErrorIncorrectAmountOfArguments, {"AMOUNT": count})
     Console.cmdloop
 end function
 
 Conditions.argumentsMoreThan = function(arguments, count)
     if arguments.len > count then return
-    Console.error(replaceF(Messages.ErrorAmountOfArgumentsTooFew, {"AMOUNT": count}))
+    Console.error(Messages.ErrorAmountOfArgumentsTooFew, {"AMOUNT": count})
     Console.cmdloop
 end function
 
 Conditions.argumentsFewerThan = function(arguments, count)
     if arguments.len < count then return
-    Console.error(replaceF(Messages.ErrorAmountOfArgumentsTooMuch, {"AMOUNT": count}))
+    Console.error(Messages.ErrorAmountOfArgumentsTooMuch, {"AMOUNT": count})
     Console.cmdloop
 end function
 
 Conditions.host = function
     if not Intrinsics.isConnectionRemote then return
-    Console.error(replaceF(Messages.ErrorIncorrectSessionType, {"SESSION": Messages.SessionTypeHost}))
+    Console.error(Messages.ErrorIncorrectSessionType, {"SESSION": Messages.SessionTypeHost})
     Console.cmdloop
 end function
 
 Conditions.remote = function
     if Intrinsics.isConnectionRemote then return
-    Console.error(replaceF(Messages.ErrorSessionNotRemote, {"HOST": Messages.SessionTypeHost}))
+    Console.error(Messages.ErrorSessionNotRemote, {"HOST": Messages.SessionTypeHost})
     Console.cmdloop
 end function
 
@@ -227,13 +247,13 @@ Conditions.shell = function(preciseTypes=null)
         if preciseTypes.indexOf(typeof(Intrinsics.shell)) != null then return
     end if
     if not preciseTypes then preciseTypes = ["shell", "ftpshell"]
-    Console.error(replaceF(Messages.ErrorSessionNotShell, {"SHELLS": str(preciseTypes)}))
+    Console.error(Messages.ErrorSessionNotShell, {"SHELLS": str(preciseTypes)})
     Console.cmdloop
 end function
 
 Conditions.computer = function
     if Intrinsics.computer then return
-    Console.error(replaceF(Messages.ErrorIncorrectSessionType, {"SESSION": Messages.SessionTypeComputer}))
+    Console.error(Messages.ErrorIncorrectSessionType, {"SESSION": Messages.SessionTypeComputer})
     Console.cmdloop
 end function
 
@@ -245,28 +265,32 @@ end function
 
 Conditions.crypto = function
     if Libs.indexes.indexOf("crypto") != null then return
-    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "crypto"}))
+    Console.error(Messages.ErrorNoNeededLibrary, {"LIBRARY": "crypto"})
     Console.cmdloop
 end function
 
 Conditions.apt = function
     if Libs.indexes.indexOf("apt") != null then return
-    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "apt"}))
+    Console.error(Messages.ErrorNoNeededLibrary, {"LIBRARY": "apt"})
     Console.cmdloop
 end function
 
 Conditions.metaxploit = function
     if Libs.indexes.indexOf("metaxploit") != null then return
-    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "metaxploit"}))
+    Console.error(Messages.ErrorNoNeededLibrary, {"LIBRARY": "metaxploit"})
     Console.cmdloop
 end function
 
 Conditions.blockchain = function
     if Libs.indexes.indexOf("blockchain") != null then return
-    Console.error(replaceF(Messages.ErrorNoNeededLibrary, {"LIBRARY": "blockchain"}))
+    Console.error(Messages.ErrorNoNeededLibrary, {"LIBRARY": "blockchain"})
     Console.cmdloop
 end function
 
+
+Sessions = []
+
+SessionsHelpers = {}
 
 // 
 // Add session to the Sessions[]
@@ -278,20 +302,20 @@ SessionsHelpers.add = function(intrinsics)
     // 
     // No idea what this code does :P
     if not session.Intrinsics.isConnectionRemote then
-        if not Vars.hostSession then
-            Vars.hostSession = SessionsHelpers.createSession(Intrinsics)
+        if not Var.hostSession then
+            Var.hostSession = SessionsHelpers.createSession(Intrinsics)
             return
         end if
         
-        hostSession = deepCopy(Vars.hostSession)
+        hostSession = deepCopy(Var.hostSession)
         if hostSession.name.split(" ")[1:] == session.name.split(" ")[1:] then
-            Vars.hostSession = deepCopy(session)
+            Var.hostSession = deepCopy(session)
             return
         end if
         
         hostSession.Intrinsics.isConnectionRemote = true
         SessionsHelpers.add(hostSession.Intrinsics)
-        Vars.hostSession = deepCopy(session)
+        Var.hostSession = deepCopy(session)
         return
     end if
 
@@ -311,14 +335,14 @@ SessionsHelpers.add = function(intrinsics)
 end function
 
 SessionsHelpers.delete = function(id)
-    sessions = [Vars.hostSession] + Sessions
+    sessions = [Var.hostSession] + Sessions
     if id < 2 or id > sessions.len then return false
     Sessions.remove(id-1 - 1)
     return true
 end function
 
 SessionsHelpers.get = function(id)
-    sessions = [Vars.hostSession] + deepCopy(Sessions)
+    sessions = [Var.hostSession] + deepCopy(Sessions)
     if id < 1 or id > sessions.len then return
     return deepCopy(sessions[id-1])
 end function
@@ -358,4 +382,15 @@ SessionsHelpers.getSessionsNames = function
         names.push(session.name)
     end for
     return names
+end function
+
+
+Helps = {}
+Aliases = {}
+Commands = {}
+
+command = function(name, aliases, category, help, func)
+    Helps[name] = category+" - "+help
+    Aliases[name] = aliases
+    Commands[name] = @func
 end function

@@ -1,0 +1,21 @@
+Themes["Forest"] = {
+    "asciiArt": [
+        "  __  __               _               _    _        ",
+        " |  \/  |             (_)             | |  | |       ",
+        " | \  / |  __ _  _ __  _  _ __    ___ | |_ | |_  ___ ",
+        " | |\/| | / _` || '__|| || '_ \  / _ \| __|| __|/ _ \",
+        " | |  | || (_| || |   | || | | ||  __/| |_ | |_|  __/",
+        " |_|  |_| \__,_||_|   |_||_| |_| \___| \__| \__|\___|",
+        " ",
+    ],
+    "ascii": "#AAD7D9",
+    "asciiShadow": "#92C7CF",
+    "prefix": "#E5E1DA",
+    "log": "#92C7CF",
+    "warning": "#FFE9AE",
+    "error": "#FFB3B3",
+    "inputMessage": "#92C7CF",
+    "input": "#AAD7D9",
+    "miscPrimary": "#92C7CF",
+    "miscSecondary": "#AAD7D9",
+}

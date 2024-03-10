@@ -1,6 +1,13 @@
+// 
+// Marinette's main file. Compile this to make Marinette a binary
+
+
+
+
 import_code("/home/guest/Sources/Marinette/src/localization.src")
 import_code("/home/guest/Sources/Marinette/src/themeing.src")
 import_code("/home/guest/Sources/Marinette/src/portable.src")
+import_code("/home/guest/Sources/Marinette/src/integrated.src")
 import_code("/home/guest/Sources/Marinette/src/marilib.src")
 import_code("/home/guest/Sources/Marinette/src/commands.src")
 
@@ -8,30 +15,45 @@ import_code("/home/guest/Sources/Marinette/src/commands.src")
 
 
 // 
-// Takes the password from params, iterates it with sha256 25 times and
-// compares with the hashed password in Constants
+// Checks if all the neccessary Config{} options are set
+performConfigChecking = function
+    isConfigMalformed = false
+    
+    configIsMalformedError = function(message, format)
+        if not isConfigMalformed then Console.error(Messages.ErrorConfigIsMalformed)
+        Console.error("- "+message, format)
+        outer.isConfigMalformed = true
+    end function
+    
+    if not Config.password isa string or Config.password.len != 64 then configIsMalformedError(Messages.ErrorIsIncorrectlySet, {"VALUE": "password"})
+    if not Config.identificator isa string or Config.identificator.len != 32 then configIsMalformedError(Messages.ErrorIsIncorrectlySet, {"VALUE": "identificator"})
+    
+    if isConfigMalformed then exit(Console.error(Messages.ErrorGenerateAtCompileTime))
+end function
+
+// 
+// Takes the password from params(), iterates it with sha256 25 times and
+// compares with the hashed password in Const{}
 performPasswordChecking = function
-    userPassword = getParamValue("--password")
-    if userPassword != null then
-        passwordHash = userPassword
-        i = 0; while i < 25; i = i + 1
-            passwordHash = sha256(passwordHash)
-        end while
-        correctHash = Constants.password
-        if passwordHash == correctHash then
-            Vars.password = userPassword
-            return
-        end if
+    userPassword = Var.parameters["--password"][0]
+    passwordHash = userPassword
+    i = 0; while i < 25; i = i + 1
+        passwordHash = sha256(passwordHash)
+    end while
+    correctHash = Config.password
+    if passwordHash == correctHash then
+        Var.password = userPassword
+        return
     end if
     exit(Console.error(Messages.ErrorIncorrectPassword))
 end function
 
 // 
-// Throws identificator with get_custom_object and exits
+// Throws identificator with get_custom_object() and exits
 // Needed so that we could find it among other executables on system
 throwIdentifyingSignal = function
     shared = get_custom_object
-    shared.identificator = Constants.identificator
+    shared.identificator = Config.identificator
     exit
 end function
 
@@ -55,9 +77,9 @@ performRuntimeLoading = function
     // Loads the most recent versions if metaxploit has been found
     globals.Libs = loadLibraries
 
-    if shared.indexes.indexOf("Vars") != null then 
-        globals.Vars = deepCopy(shared.Vars)
-        shared.remove("Vars")
+    if shared.indexes.indexOf("Var") != null then 
+        globals.Var = deepCopy(shared.Var)
+        shared.remove("Var")
     end if
 
     if shared.indexes.indexOf("Intrinsics") != null then
@@ -102,10 +124,18 @@ end function
 
 
 main = function
-    if params.indexOf("--password") == null then exit(Console.error(Messages.ErrorNoPassword))
-    performPasswordChecking
+    performConfigChecking
+
+    // 
+    // Commenting this breaks hostify and subuser
+    if params.indexOf("--password") == null then
+        exit(Console.error(Messages.ErrorNoPassword))
+    else
+        performPasswordChecking
+    end if
 
     if params.indexOf("--identify-marinette") != null then throwIdentifyingSignal
+
     if params.indexOf("--no-ascii-art") == null then Console.asciiArt(Theme.asciiArt)
     if params.indexOf("--no-runtime-loading") == null then performRuntimeLoading
     if params.indexOf("--no-system-checks") == null then performSystemChecks

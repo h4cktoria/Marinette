@@ -1,0 +1,23 @@
+Themes["Violet"] = {
+    "asciiArt": [
+        "Oo      oO                                                 ",
+        "O O    o o               o                                 ",
+        "o  o  O  O                                 O     O         ",
+        "O   Oo   O                                oOo   oOo        ",
+        "O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. ",
+        "o        O O   o   o     o   o   O OooO'   O     O   OooO' ",
+        "o        O o   O   O     O   O   o O       o     o   O     ",
+        "O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' ",
+        "==========================================================",
+    ],
+    "ascii": "#DCBFFF",
+    "asciiShadow": "#D0A2F7",
+    "prefix": "#E5D4FF",
+    "log": "#D0A2F7",
+    "warning": "#FFECEC",
+    "error": "#FF78C4",
+    "inputMessage": "#D0A2F7",
+    "input": "#DCBFFF",
+    "miscPrimary": "#D0A2F7",
+    "miscSecondary": "#DCBFFF",
+}
