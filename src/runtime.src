@@ -27,8 +27,8 @@ end function
 // Asks user for password if it's not specified in parameters
 // or checks the password from parameters
 RuntimeHelpers.runPasswordProtectionDialogIfNeeded = function
-    if Var.parameters.indexes.indexOf("--password") == null then
-        userPassword = Console.input("% ", true)
+    if Var.parameters.indexes.indexOf("--password") == null or not Var.parameters["--password"] then
+        userPassword = Console.input("# ", true)
         if not userPassword then exit(Console.error(Messages.ErrorNoPassword))
     else
         userPassword = Var.parameters["--password"][0]
@@ -58,7 +58,8 @@ end function
 // Loads stuff that could be loaded only at runtime
 RuntimeHelpers.makeNeccessaryRuntimeAssigns = function
     Console.log(Messages.LogRuntimeLoading)
-    
+
+
     computer = get_shell.host_computer
     shared = get_custom_object
     
@@ -69,10 +70,14 @@ RuntimeHelpers.makeNeccessaryRuntimeAssigns = function
         Intrinsics.localAddress = computer.local_ip
     end if
 
+
     // 
     // Loads every library it can find on the system
     // Loads the most recent versions if metaxploit has been found
-    globals.Libs = loadLibraries
+    for kv in loadLibraries
+        Libs[kv["key"]] = kv["value"]
+    end for
+
 
     if shared.indexes.indexOf("Var") != null then 
         globals.Var = deepCopy(shared.Var)
@@ -98,6 +103,7 @@ RuntimeHelpers.makeNeccessaryRuntimeAssigns = function
         shared.remove("Sessions")
     end if
 
+
     SessionsHelpers.add(Intrinsics)
 end function
 
@@ -115,4 +121,14 @@ RuntimeHelpers.checkIfEverythingIsAssigned = function
     else
         Console.log(Messages.LogSuccessfullSystemChecks)
     end if
+end function
+
+// 
+// Writes everything neccessary to get_custom_object()
+RuntimeHelpers.prepareStateForSharing = function
+    shared = get_custom_object
+    shared.Var = deepCopy(Var)
+    shared.Intrinsics = deepCopy(Intrinsics)
+    shared.Libs = deepCopy(Libs)
+    shared.Sessions = deepCopy(Sessions)
 end function

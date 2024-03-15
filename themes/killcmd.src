@@ -1,0 +1,19 @@
+Themes["KillCMD"] = {
+    "asciiArt": [
+        " _______              __               __   __         ",
+        "|   |   |.---.-.----.|__|.-----.-----.|  |_|  |_.-----.",
+        "|       ||  _  |   _||  ||     |  -__||   _|   _|  -__|",
+        "|__|_|__||___._|__|  |__||__|__|_____||____|____|_____|",
+        "                                                       ",
+    ],
+    "ascii": "#E6E6FA",
+    "asciiShadow": "#DE3163",
+    "prefix": "#DE3163",
+    "log": "#E6E6FA",
+    "warning": "#FFEED9",
+    "error": "#DE3163",
+    "inputMessage": "#E6E6FA",
+    "input": "#E6E6FA",
+    "miscPrimary": "#E6E6FA",
+    "miscSecondary": "#E6E6FA",
+}

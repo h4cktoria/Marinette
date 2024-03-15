@@ -37,12 +37,9 @@ Var = {
 }
 
 
-Libs = {
-    "apt": null,
-    "crypto": null,
-    "metaxploit": null,
-    "blockchain": null,
-}
+// 
+// Libraries are loaded incrementally at runtime
+Libs = {}
 
 
 // 
@@ -102,7 +99,7 @@ end function
 
 Console.asciiArt = function(art)
     i = 0; while i < art.len; i = i + 1
-        if i < round(art.len * (3/4)) then
+        if i-1 < round(art.len * 3 / 4 - 1) then
             print("<color="+Theme.ascii+">"+art[i-1])
         else
             print("<color="+Theme.asciiShadow+">"+art[i-1])
@@ -131,6 +128,13 @@ end function
 Console.input = function(message=" ", isPassword=false, toReplaceFormat=null)
     if toReplaceFormat then message = replaceF(message, toReplaceFormat)
     input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", isPassword)
+    if isInputValid(input) then return input
+    return ""
+end function
+
+Console.boolInput = function(message=" ", toReplaceFormat=null)
+    if toReplaceFormat then message = replaceF(message, toReplaceFormat)
+    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", false, true)
     if isInputValid(input) then return input
     return ""
 end function
@@ -277,25 +281,24 @@ SessionsHelpers = {}
 // Overwrites session if it already exists
 SessionsHelpers.add = function(intrinsics)
     intrinsics = deepCopy(intrinsics)
-    session = SessionsHelpers.createSession(intrinsics)
 
     // 
     // No idea what this code does :P
-    if not session.Intrinsics.isConnectionRemote then
+    if not intrinsics.isConnectionRemote then
         if not Var.hostSession then
-            Var.hostSession = SessionsHelpers.createSession(Intrinsics)
+            Var.hostSession = deepCopy(Intrinsics)
             return
         end if
         
         hostSession = deepCopy(Var.hostSession)
-        if hostSession.name.split(" ")[1:] == session.name.split(" ")[1:] then
-            Var.hostSession = deepCopy(session)
+        if SessionsHelpers.generateSessionName(hostSession).split(" ")[1:] == SessionsHelpers.generateSessionName(intrinsics).split(" ")[1:] then
+            Var.hostSession = deepCopy(intrinsics)
             return
         end if
         
-        hostSession.Intrinsics.isConnectionRemote = true
-        SessionsHelpers.add(hostSession.Intrinsics)
-        Var.hostSession = deepCopy(session)
+        hostSession.isConnectionRemote = true
+        SessionsHelpers.add(hostSession)
+        Var.hostSession = deepCopy(intrinsics)
         return
     end if
 
@@ -303,14 +306,14 @@ SessionsHelpers.add = function(intrinsics)
     lookup = -1
     for oldSession in Sessions
         lookup = lookup + 1
-        if oldSession.name != session.name then continue
+        if SessionsHelpers.generateSessionName(oldSession) != SessionsHelpers.generateSessionName(intrinsics) then continue
         index = lookup
         break
     end for
     if index == null then
-        Sessions.push(session)
+        Sessions.push(intrinsics)
     else
-        Sessions[index] = session
+        Sessions[index] = intrinsics
     end if
 end function
 
@@ -327,14 +330,7 @@ SessionsHelpers.get = function(id)
     return deepCopy(sessions[id-1])
 end function
 
-// 
-// Creates session object
-// Returns following:
-// session = [
-//     "name": string,
-//     "Intrinsics": map,
-// ]
-SessionsHelpers.createSession = function(intrinsics)
+SessionsHelpers.generateSessionName = function(intrinsics)
     intrinsics = deepCopy(intrinsics)
 
     object = IntrinsicsHelpers.getSessionType(intrinsics)
@@ -348,20 +344,7 @@ SessionsHelpers.createSession = function(intrinsics)
     if port == null then port = "-"
     if not user then user = "-"
 
-    session = {
-        "name": [object,pubAddr,locAddr,port,user].join(" "),
-        "Intrinsics": deepCopy(intrinsics),
-    }
-
-    return session
-end function
-
-SessionsHelpers.getSessionsNames = function
-    names = []
-    for session in deepCopy(Sessions)
-        names.push(session.name)
-    end for
-    return names
+    return [object,pubAddr,locAddr,port,user].join(" ")
 end function
 
 

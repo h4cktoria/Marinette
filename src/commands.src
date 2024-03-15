@@ -160,15 +160,14 @@ command "sessions", [], Const.any, Messages.HelpEntrySm, function(arguments)
     else if "use".indexOf(command) == 0 then
         id = arguments[0]
         if id isa string or not SessionsHelpers.get(id) then return Console.error(Messages.ErrorIncorrectSessionId)
-        session = SessionsHelpers.get(id)
-        globals.Intrinsics = session.Intrinsics
+        globals.Intrinsics = SessionsHelpers.get(id)
         Console.log(Messages.LogSuccessfullSessionLoad)
     else if "look".indexOf(command) == 0 then
         output = Messages.SmHeader
         i = 1
         while SessionsHelpers.get(i) != null
-            session = SessionsHelpers.get(i)
-            output = output+char(10)+(i)+" "+session.name
+            intrinsics = SessionsHelpers.get(i)
+            output = output+char(10)+(i)+" "+SessionsHelpers.generateSessionName(intrinsics)
             i = i + 1
         end while
         print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
@@ -373,12 +372,7 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
         Intrinsics.computer = Intrinsics.shell.host_computer
         Intrinsics.file = Intrinsics.computer.File("/")
         
-        shared = get_custom_object
-        shared.Var = deepCopy(Var)
-        shared.Intrinsics = deepCopy(Intrinsics)
-        shared.Libs = deepCopy(Libs)
-        shared.Sessions = deepCopy(Sessions)
-
+        RuntimeHelpers.prepareStateForSharing
         shell.launch(fd.path, "--no-ascii-art --password "+Var.password)
         exit
     end if
@@ -483,6 +477,9 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
             if arguments.len > 0 then ofArgs = ofArgs + fmap(@str, arguments)
             ofArgs = removeDuplicates(ofArgs)
             for ofArg in ofArgs
+                // 
+                // This is a desync fix
+                wait(0.01)
                 if ofArg == null then
                     result = exploit.metalib.overflow(exploit.address, vulner.value)
                 else
@@ -708,6 +705,9 @@ command "nemesis", ["ns"], Const.host, Messages.HelpEntryNemesis, function(argum
             if arguments.len > 0 then ofArgs = ofArgs + arguments
             ofArgs = removeDuplicates(ofArgs)
             for ofArg in ofArgs
+                // 
+                // This is a desync fix
+                wait(0.01)
                 if ofArg == null then
                     result = exploit.metalib.overflow(exploit.address, vulner.value)
                 else
@@ -1263,14 +1263,9 @@ command "hostify", [], Const.shell, Messages.HelpEntryHostify, function(argument
 
     Intrinsics.isConnectionRemote = false
 
-    shared = get_custom_object
-    shared.Var = deepCopy(Var)
-    shared.Intrinsics = deepCopy(Intrinsics)
-    shared.Libs = deepCopy(Libs)
-    shared.Sessions = deepCopy(Sessions)
-
     Console.log(Messages.LogSessionHostifiedSuccessfully)
 
+    RuntimeHelpers.prepareStateForSharing
     Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Var.password)
     exit
 end function
