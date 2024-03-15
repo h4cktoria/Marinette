@@ -95,10 +95,10 @@ PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE
 -   Follow locale entries naming conventions described below
 
 Locale naming conventions:
--   Prefix **Log** if entry is used in `Console.log()`: `Locales.LogExampleEntry[_language]`
--   Prefix **Warning** if entry is used in `Console.warning()`: `Locales.WarningExampleEntry[_language]`
--   Prefix **Error** if entry is used in `Console.error()`: `Locales.ErrorExampleEntry[_language]`
--   Prefix command name and postfix **Header** if entry is used in table headers(`format_columns()` or `formatColumnsColored()`): `Locales.CommandNameExampleEntryHeader[_language]`
+-   Prefix **Log** if entry is used in `Console.log()`: `Locales.LogExampleEntry[_language] = "Example translation"`
+-   Prefix **Warning** if entry is used in `Console.warning()`: `Locales.WarningExampleEntry[_language] = "Example translation"`
+-   Prefix **Error** if entry is used in `Console.error()`: `Locales.ErrorExampleEntry[_language] = "Example translation"`
+-   Prefix command name and postfix **Header** if entry is used in table headers(`format_columns()` or `formatColumnsColored()`): `Locales.CommandNameExampleEntryHeader[_language] = "Example translation"`
 -   For any other situation, prefix with command name IF the entry is specific to that command. If it's not, then prefix whatever you feel neccessary
 
 
