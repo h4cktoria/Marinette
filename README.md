@@ -89,7 +89,7 @@ PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE
 
 -   Zero OOP: Maps are structures or namespaces AND NOTHING MORE. No `self`, `super`, `.classID`, `new` and any other OOP mechanic
 -   Compare built-in types with `isa`, Grey Hack objects with `typeof()`
--   Name everything with camelCase, structures, namespaces and locale entries with PascalCase
+-   Name everything with camelCase; structures, namespaces and locale entries with PascalCase
 -   After each locales or themes change, run [install_marinette.py](scripts/install_marinette.py)
 -   Define locales in [english.src](locales/english.src) first, then in your locale file
 -   Follow locale entries naming conventions described below
