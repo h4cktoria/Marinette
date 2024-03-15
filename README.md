@@ -19,6 +19,7 @@ This repository is the only place where you can get Marinette without any risks.
     -   [Themes](#themes)
     -   [Translations](#translations)
     -   [Bug report](#bug-report)
+    -   [Code contribution](#code-contribution)
 4.  [Frequently Asked Questions](#frequently-asked-questions)
 5.  [Other interesting projects](#other-interesting-projects)
     -   [Shells](#shells)
@@ -62,7 +63,7 @@ There are several ways you can contribute to Marinette
 
 ### Themes
 
-Fork, put your theme inside of [themes](themes), run [src_make_themeing.py](scripts/src_make_themeing.py), commit and open the pull request
+Fork, put your theme inside of [themes](themes), run [install_marinette.py](scripts/install_marinette.py), commit and open the pull request
 
 
 ### Translations
@@ -74,12 +75,31 @@ Want to translate a lot locale entries for Marinette to be able to speak in your
 -   Marinette's pronouns are she/her, so if your language has them, translate accordingly
 -   Glued words CAN'T be translated as separate! For example, "PublicAddress" can't be translated as "Public Address" in your language
 
-Once you're done, put your locale file into [locales](locales), run [src_make_localization.py](scripts/src_make_localization.py), commit and open the pull request
+Once you're done, put your locale file into [locales](locales), run [install_marinette.py](scripts/install_marinette.py), commit and open the pull request
 
 
 ### Bug report
 
 Open up an issue and wait for my response
+
+
+### Code contribution
+
+PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE COMMITING! if you do, follow these ~simple~ coding conventions:
+
+-   Zero OOP: Maps are structures or namespaces AND NOTHING MORE. No `self`, `super`, `.classID`, `new` and any other OOP mechanic
+-   Compare built-in types with `isa`, Grey Hack objects with `typeof()`
+-   Name everything with camelCase, structures, namespaces and locale entries with PascalCase
+-   After each locales or themes change, run [install_marinette.py](scripts/install_marinette.py)
+-   Define locales in [english.src](locales/english.src) first, then in your locale file
+-   Follow locale entries naming conventions described below
+
+Locale naming conventions:
+-   Prefix **Log** if entry is used in `Console.log()`: `Locales.LogExampleEntry[_language]`
+-   Prefix **Warning** if entry is used in `Console.warning()`: `Locales.WarningExampleEntry[_language]`
+-   Prefix **Error** if entry is used in `Console.error()`: `Locales.ErrorExampleEntry[_language]`
+-   Prefix command name and postfix **Header** if entry is used in table headers(`format_columns()` or `formatColumnsColored()`): `Locales.CommandNameExampleEntryHeader[_language]`
+-   For any other situation, prefix with command name IF the entry is specific to that command. If it's not, then prefix whatever you feel neccessary
 
 
 
@@ -118,7 +138,7 @@ I've figured no one cares about license of your application in Grey Hack, so I'v
 
 
 
-## Other interesting projects <a name="similar-projects"></a>
+## Other interesting projects
 
 Another interesting projects that you should know about
 
