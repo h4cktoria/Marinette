@@ -140,32 +140,18 @@ Console.input = function(message=" ", isPassword=false, toReplaceFormat=null, an
     return ""
 end function
 
-<<<<<<< HEAD
-Console.boolInput = function(message=" ", toReplaceFormat=null)
+Console.boolInput = function(message=" ", default=true,  toReplaceFormat=null)
 	accept = ["y", ""]
 	refuse = ["escape", "n", "backspace"]
 
 	response = Console.input(message, false, toReplaceFormat, true).lower
 	for key in accept
-		if response == key then return true
+		if response == key then return default
 	end for
 	for key in refuse
-		if response == key then return false
+		if response == key then return not default
 	end for
-	return true;
-=======
-Console.boolInput = function(message=" ", default=true, toReplaceFormat=null)
-    if toReplaceFormat then message = replaceF(message, toReplaceFormat)
-    input = ""
-    while not input
-        input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", false, true).trim
-        if isInputValid(input) then
-            if not input then return default
-            if input.lower == "y" then return true
-            if input.lower == "n" or input.lower == "backspace" then return false
-        end if
-    end while
->>>>>>> parent of e1fb710 (Revert "Update marilib.src")
+	return default;
 end function
 
 Console.prompt = function
