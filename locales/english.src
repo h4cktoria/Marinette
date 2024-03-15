@@ -197,3 +197,13 @@ Locales.ErrorGenerateAtCompileTime[_language] = "Generate all of the above at co
 Locales.SpecialThanksAndCredits[_language] = "Special thanks and credits goes to:"
 Locales.YouAreAllAwesome[_language] = "You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people!"
 Locales.HelpEntryReload[_language] = "Load and check various systems"
+
+Locales.HelpCategoryPlugins[_language] = "Plugins"
+Locales.PluginsUndocumentedCommand[_language] = "Documentation isn't available"
+Locales.ErrorPluginsImportFailed[_language] = "Failed to import {PATH}"
+Locales.ErrorPluginsInvalidDefinition[_language] = "Plugin '{PATH}' has invalid definition"
+Locales.ErrorPluginsUsePluger[_language] = "Use pluger to import plugin"
+Locales.ErrorPluginsCommandNotSupported[_language] = "{COMMAND} is not supported"
+Locales.ErrorPluginsAlreadyImported[_language] = "Plugin '{PLUGIN}' is imported already"
+Locales.ErrorPluginsInvalidSpec[_language] = "Load spec '{SPEC}' is invalid"
+Locales.PluginsImporting[_language] = "Importing plugin from {PATH}"

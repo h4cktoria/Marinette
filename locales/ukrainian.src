@@ -190,3 +190,13 @@ Locales.HelpEntryDelete[_language] = "(абсШляхи/шляхи) - Видал
 Locales.HelpEntryCopy[_language] = "(абсШлях/шлях) (призначення) - Скопіювати файл"
 Locales.HelpEntryTree[_language] = "Отримати файлову систему у вигляді дерева"
 Locales.HelpEntryRun[_language] = "(абсШлях/шлях) [аргументи] - Запустити сторонній бінарний файл"
+
+Locales.HelpCategoryPlugins[_language] = "Розширення"
+Locales.PluginsUndocumentedCommand[_language] = "Інформація не доступна"
+Locales.ErrorPluginsImportFailed[_language] = "Не вдалося завантажити {PATH}"
+Locales.ErrorPluginsInvalidDefinition[_language] = "Розширення має не вірне назначення"
+Locales.ErrorPluginsUsePluger[_language] = "Використовуйте pluger щоб завантажити розширення"
+Locales.ErrorPluginsCommandNotSupported[_language] = "{COMMAND} не підтримується"
+Locales.ErrorPluginsAlreadyImported[_language] = "Розширення '{PLUGIN}' вже завантажене"
+Locales.ErrorPluginsInvalidSpec[_language] = "Інструкція завантаження '{SPEC}' не є вірною"
+Locales.PluginsImporting[_language] = "Завантажую розширення з {PATH}"
