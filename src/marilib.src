@@ -5,26 +5,6 @@
 
 
 // 
-// Config is something end user changeable
-Config = {
-    // 
-    // Password is a string iterated with sha256() 25 times
-    "password": null,
-    // 
-    // Identificator is a 32 characters 
-    "identificator": null,
-    // 
-    // Literally a language which Marinette will be speaking with you in
-    // See localization.src to see all available languages
-    "language": "English",
-    // 
-    // Colors which Marinette will use
-    // See themeing.src to see all available themes
-    "theme": "Violet",
-}
-
-
-// 
 // Defaulting to fallback and map appending the chosen theme if exists
 Theme = Themes["Violet"]
 if Themes.indexes.indexOf(Config.theme) != null then Theme = Theme + Themes[Config.theme]
@@ -122,7 +102,7 @@ end function
 
 Console.asciiArt = function(art)
     i = 0; while i < art.len; i = i + 1
-        if i < round(art.len / 1.8) then
+        if i < round(art.len * (3/4)) then
             print("<color="+Theme.ascii+">"+art[i-1])
         else
             print("<color="+Theme.asciiShadow+">"+art[i-1])
@@ -148,9 +128,9 @@ Console.error = function(message=" ", toReplaceFormat=null)
     Console._printWithColorAndTime(Theme.error, message, toReplaceFormat)
 end function
 
-Console.input = function(message=" ", toReplaceFormat=null)
+Console.input = function(message=" ", isPassword=false, toReplaceFormat=null)
     if toReplaceFormat then message = replaceF(message, toReplaceFormat)
-    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">")
+    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", isPassword)
     if isInputValid(input) then return input
     return ""
 end function

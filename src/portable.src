@@ -1075,17 +1075,17 @@ end function
 
 // // 
 // // Escapes print formatting
-// escape = function(str)
-//     sequences = {
-//         "<": "< ",
-//         ">": " >",
-//         "\n": "\\n",
-//     }
-//     for kv in sequences
-//         str = str.replace(kv["key"], kv["value"])
-//     end for
-//     return str
-// end function
+escape = function(str)
+    sequences = {
+        "<noparse>": "<nоparse>",
+        "</noparse>": "</nоparse>",
+        "\\n": "\</noparse>n<noparse>",
+    }
+    for kv in sequences
+        str = str.replace(kv["key"], kv["value"])
+    end for
+    return "<noparse>"+str+"</noparse>"
+end function
 
 randomString = function(length)
     ascii = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".values

@@ -4,141 +4,46 @@
 
 
 
+// 
+// Configuration that you can and must change
+Config = {
+    // 
+    // Password is a string iterated with sha256() 25 times
+    "password": null,
+    // 
+    // Identificator is a 32 characters long string
+    "identificator": null,
+    // 
+    // Literally a language which Marinette will be speaking with you in
+    // See localization.src to see all available languages
+    "language": "English",
+    // 
+    // Colors which Marinette will use
+    // See themeing.src to see all available themes
+    "theme": "Violet",
+}
+
+
+
+
 import_code("/home/guest/Sources/Marinette/src/localization.src")
 import_code("/home/guest/Sources/Marinette/src/themeing.src")
 import_code("/home/guest/Sources/Marinette/src/portable.src")
-import_code("/home/guest/Sources/Marinette/src/integrated.src")
 import_code("/home/guest/Sources/Marinette/src/marilib.src")
+import_code("/home/guest/Sources/Marinette/src/runtime.src")
 import_code("/home/guest/Sources/Marinette/src/commands.src")
 
 
 
 
-// 
-// Checks if all the neccessary Config{} options are set
-performConfigChecking = function
-    isConfigMalformed = false
-    
-    configIsMalformedError = function(message, format)
-        if not isConfigMalformed then Console.error(Messages.ErrorConfigIsMalformed)
-        Console.error("- "+message, format)
-        outer.isConfigMalformed = true
-    end function
-    
-    if not Config.password isa string or Config.password.len != 64 then configIsMalformedError(Messages.ErrorIsIncorrectlySet, {"VALUE": "password"})
-    if not Config.identificator isa string or Config.identificator.len != 32 then configIsMalformedError(Messages.ErrorIsIncorrectlySet, {"VALUE": "identificator"})
-    
-    if isConfigMalformed then exit(Console.error(Messages.ErrorGenerateAtCompileTime))
-end function
-
-// 
-// Takes the password from params(), iterates it with sha256 25 times and
-// compares with the hashed password in Const{}
-performPasswordChecking = function
-    userPassword = Var.parameters["--password"][0]
-    passwordHash = userPassword
-    i = 0; while i < 25; i = i + 1
-        passwordHash = sha256(passwordHash)
-    end while
-    correctHash = Config.password
-    if passwordHash == correctHash then
-        Var.password = userPassword
-        return
-    end if
-    exit(Console.error(Messages.ErrorIncorrectPassword))
-end function
-
-// 
-// Throws identificator with get_custom_object() and exits
-// Needed so that we could find it among other executables on system
-throwIdentifyingSignal = function
-    shared = get_custom_object
-    shared.identificator = Config.identificator
-    exit
-end function
-
-// 
-// Loads stuff that could be loaded only at runtime
-performRuntimeLoading = function
-    Console.log(Messages.LogRuntimeLoading)
-    
-    computer = get_shell.host_computer
-    shared = get_custom_object
-    
-    Intrinsics.publicAddress = null
-    Intrinsics.localAddress = null
-    if computer.is_network_active then
-        Intrinsics.publicAddress = computer.public_ip
-        Intrinsics.localAddress = computer.local_ip
-    end if
-
-    // 
-    // Loads every library it can find on the system
-    // Loads the most recent versions if metaxploit has been found
-    globals.Libs = loadLibraries
-
-    if shared.indexes.indexOf("Var") != null then 
-        globals.Var = deepCopy(shared.Var)
-        shared.remove("Var")
-    end if
-
-    if shared.indexes.indexOf("Intrinsics") != null then
-        globals.Intrinsics = deepCopy(shared.Intrinsics)
-        shared.remove("Intrinsics")
-    end if
-
-    if shared.indexes.indexOf("Libs") != null then
-        for kv in deepCopy(shared.Libs)
-            libName = kv["key"]
-            library = kv["value"]
-            if Libs.indexes.indexOf(libName) == null then Libs[libName] = library
-        end for
-        shared.remove("Libs")
-    end if
-
-    if shared.indexes.indexOf("Sessions") != null then
-        globals.Sessions = deepCopy(shared.Sessions)
-        shared.remove("Sessions")
-    end if
-
-    SessionsHelpers.add(Intrinsics)
-end function
-
-// 
-// Checks if full Marinette's functionality can be used
-performSystemChecks = function
-    Console.log(Messages.LogSystemChecks)
-    
-    haveAllPassed = true
-    if not (Intrinsics.publicAddress and Intrinsics.localAddress) then haveAllPassed = false
-    if Libs.len < 4 then haveAllPassed = false
-
-    if not haveAllPassed then
-        Console.warning(Messages.WarningFailedSystemChecks)
-    else
-        Console.log(Messages.LogSuccessfullSystemChecks)
-    end if
-end function
-
-
-
-
 main = function
-    performConfigChecking
+    RuntimeHelpers.partiallyValidateConfiguration
+    RuntimeHelpers.runPasswordProtectionDialogIfNeeded
 
-    // 
-    // Commenting this breaks hostify and subuser
-    if params.indexOf("--password") == null then
-        exit(Console.error(Messages.ErrorNoPassword))
-    else
-        performPasswordChecking
-    end if
-
-    if params.indexOf("--identify-marinette") != null then throwIdentifyingSignal
-
-    if params.indexOf("--no-ascii-art") == null then Console.asciiArt(Theme.asciiArt)
-    if params.indexOf("--no-runtime-loading") == null then performRuntimeLoading
-    if params.indexOf("--no-system-checks") == null then performSystemChecks
+    if Var.parameters.indexes.indexOf("--identify-marinette") != null then RuntimeHelpers.throwIdentificatorAndQuit 
+    if Var.parameters.indexes.indexOf("--no-ascii-art") == null then Console.asciiArt(Theme.asciiArt)
+    if Var.parameters.indexes.indexOf("--no-runtime-loading") == null then RuntimeHelpers.makeNeccessaryRuntimeAssigns
+    if Var.parameters.indexes.indexOf("--no-system-checks") == null then RuntimeHelpers.checkIfEverythingIsAssigned
     
     Console.cmdloop
 end function; main

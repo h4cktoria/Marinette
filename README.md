@@ -2,30 +2,11 @@
 
 Cute, simple and open source shell
 
-```text
-Oo      oO                                                 
-O O    o o               o                                 
-o  o  O  O                                 O     O         
-O   Oo   O                                oOo   oOo        
-O        o .oOoO' `OoOo. O  'OoOo. .oOo.   o     o   .oOo. 
-o        O O   o   o     o   o   O OooO'   O     O   OooO' 
-o        O o   O   O     O   O   o O       o     o   O     
-O        o `OoO'o  o     o'  o   O `OoO'   `oO   `oO `OoO' 
-==========================================================
--16:17- Loading various systems...
--16:17- Checking various systems...
--16:17- Everything is loaded successfully
-  Username as Host on 192.168.1.2 in /
-% 
-```
-
-(Yes, I'm lazy to make screenshots)
+Screenshots TODO
 
 Important note: this is **NOT A REAL HACKING TOOLKIT**! This has been made, works and will work only in the game called Grey Hack!
 
 This repository is the only place where you can get Marinette without any risks. DON'T trust in-game websites!!!
-
-Back to MVP state
 
 
 
@@ -33,23 +14,22 @@ Back to MVP state
 ## Table of contents
 
 1.  [Description](#description)
-2.  [Roadmap](#roadmap)
-3.  [How to install?](#installation-guide)
-4.  [How to contribute?](#contribution)
-    -   [Themes](#contrib-themes)
-    -   [Translations](#contrib-lang)
-    -   [Bug report](#contrib-bugreport)
-5.  [Frequently Asked Questions](#faq)
-6.  [Other interesting projects](#similar-projects)
-    -   [Shells](#similar-projects-shells)
-    -   [Other](#similar-projects-other)
-7.  [License](#license)
-8.  [Thanks and Credits](#thanks-and-credits)
+2.  [How to install?](#how-to-install)
+3.  [How to contribute?](#how-to-contribute)
+    -   [Themes](#themes)
+    -   [Translations](#translations)
+    -   [Bug report](#bug-report)
+4.  [Frequently Asked Questions](#frequently-asked-questions)
+5.  [Other interesting projects](#other-interesting-projects)
+    -   [Shells](#shells)
+    -   [Other](#other)
+6.  [License](#license)
+7.  [Thanks and Credits](#thanks-and-credits)
 
 
 
 
-## Description <a name="description"></a>
+## Description
 
 Marinette is a [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) without any fancy features like [Shell Expansions](https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html), [Shell Scripting](https://en.wikipedia.org/wiki/Shell_script), [Pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)) and so on. I've tried to make it as simple as I could, using few to no abstractions, allowing both the end users and myself to change it programmatically if needed. And I wouldn't say I've succeeded. =D
 
@@ -58,28 +38,12 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 
 
 
-## Roadmap <a name="roadmap"></a>
-
-These are what I plan to implement, in no particular order, as integratable programs(So that they are trivial to port into any other script):
-
--   Antivirus
--   Text editor
--   File manager
--   Task manager
--   Package manager
--   Network scanner
--   Users & Groups manager
--   Network cracker and manager
-
-
-
-
-## How to install? <a name="installation-guide"></a>
+## How to install?
 
 1.  Clone the repository
 2.  From the root of the project, run **scripts/install_marinette.py**. It'll create **install_marinette.src**. Copy it to the Code Editor, compile it, run the binary
 3.  Go to **/home/guest/Sources/Marinette/src** and copy everything from [src](src) to here
-4.  Change the stuff in **marilib.src**
+4.  Change the stuff in **marinette.src**
     1.  From the root of the project, run **scripts/config_password.py** with the desired password. Set the value in **Config.password**
     2.  From the root of the project, run **scripts/config_identificator.py**. Set the value in **Config.identificator**
     3.  (Optionally) From the root of the project, run **scripts/config_available_languages.py**. Set the desired language in **Config.language**
@@ -89,19 +53,19 @@ These are what I plan to implement, in no particular order, as integratable prog
 
 
 
-## How to contribute? <a name="contribution"></a>
+## How to contribute?
 
 In the current state, I REALLY don't recommend you to contribute to Marinette because it's far from being complete. Anyway...
 
 There are several ways you can contribute to Marinette
 
 
-### Themes <a name="contrib-themes">
+### Themes
 
 Fork, put your theme inside of [themes](themes), run [src_make_themeing.py](scripts/src_make_themeing.py), commit and open the pull request
 
 
-### Translations <a name="contrib-lang">
+### Translations
 
 Want to translate a lot locale entries for Marinette to be able to speak in your language for absolutely no reason and without getting paid? Nice! Fork the repository. You're looking for [locales](locales). Copy the English locale from here to any text editor, change the **_language** variable from English to the language of your choice and start translating! The rules are the following:
 
@@ -113,14 +77,14 @@ Want to translate a lot locale entries for Marinette to be able to speak in your
 Once you're done, put your locale file into [locales](locales), run [src_make_localization.py](scripts/src_make_localization.py), commit and open the pull request
 
 
-### Bug report <a name="contrib-bugreport">
+### Bug report
 
 Open up an issue and wait for my response
 
 
 
 
-## Frequently Asked Questions <a name="faq"></a>
+## Frequently Asked Questions
 
 
 **Q: Why on earth would you call a computer program with a human name?**
@@ -161,7 +125,7 @@ Another interesting projects that you should know about
 If you want me to add your project, then open an issue and I'll add you as fast as I can! The exception is proprietary software
 
 
-### Shells <a name="similar-projects-shells"></a>
+### Shells
 
 -   [5hell](https://github.com/jhook777/5hell-for-Grey-Hack-the-Game) by Plu70. Keep in mind the github updates less frequently than the in-game site, so look for most up-to-date version in the game(As of 31 Jan 2024 the official in-game website is www.5hell.org)
 -   [SeaShell](https://github.com/Tuna-Terps/SeaShell-greyhack-game) by Tuna Terps
@@ -173,21 +137,21 @@ If you want me to add your project, then open an issue and I'll add you as fast 
 -   [OpenViper](https://github.com/cantemizyurek/viper-3.0) by SkidMall
 
 
-### Other <a name="similar-projects-other"></a>
+### Other
 
 -   [MTX Framework](https://github.com/tuonux/mtx) by tuonux
 
 
 
 
-## License <a name="license"></a>
+## License
 
 Marinette is licensed under MIT No Attribution. See [here](LICENSE) for full details
 
 
 
 
-## Thanks and Credits <a name="thanks-and-credits"></a>
+## Thanks and Credits
 
 Special thanks and credits goes to:
 

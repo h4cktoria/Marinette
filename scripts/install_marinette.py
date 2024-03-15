@@ -71,7 +71,6 @@ def write_text_files(project_fd, installer_fd, game_path):
 
 import src_make_localization
 import src_make_themeing
-import src_make_integrated
 
 
 filename = Path(__file__).name.replace(".py", ".src")

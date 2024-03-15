@@ -1,0 +1,118 @@
+// 
+// Marinette's routines to make loading stuff at runtime easier
+
+
+
+
+RuntimeHelpers = {}
+
+// 
+// Checks if config entries that are null by default are specified
+RuntimeHelpers.partiallyValidateConfiguration = function
+    isConfigMalformed = false
+    
+    configIsMalformedError = function(message, format)
+        if not isConfigMalformed then Console.error(Messages.ErrorConfigIsMalformed)
+        Console.error("- "+message, format)
+        outer.isConfigMalformed = true
+    end function
+    
+    if not Config.password isa string or Config.password.len != 64 then configIsMalformedError(Messages.ErrorIsIncorrectlySet, {"VALUE": "password"})
+    if not Config.identificator isa string or Config.identificator.len != 32 then configIsMalformedError(Messages.ErrorIsIncorrectlySet, {"VALUE": "identificator"})
+
+    if isConfigMalformed then exit(Console.error(Messages.ErrorGenerateAtCompileTime))
+end function
+
+// 
+// Asks user for password if it's not specified in parameters
+// or checks the password from parameters
+RuntimeHelpers.runPasswordProtectionDialogIfNeeded = function
+    if Var.parameters.indexes.indexOf("--password") == null then
+        userPassword = Console.input("% ", true)
+        if not userPassword then exit(Console.error(Messages.ErrorNoPassword))
+    else
+        userPassword = Var.parameters["--password"][0]
+    end if
+    passwordHash = userPassword
+    i = 0; while i < 25; i = i + 1
+        passwordHash = sha256(passwordHash)
+    end while
+    correctHash = Config.password
+    if passwordHash == correctHash then
+        Var.password = userPassword
+        return
+    end if
+    exit(Console.error(Messages.ErrorIncorrectPassword))
+end function
+
+// 
+// Throws identificator with get_custom_object() and exits
+// Needed so that we could find it among other executables on system
+RuntimeHelpers.throwIdentificatorAndQuit = function
+    shared = get_custom_object
+    shared.identificator = Config.identificator
+    exit
+end function
+
+// 
+// Loads stuff that could be loaded only at runtime
+RuntimeHelpers.makeNeccessaryRuntimeAssigns = function
+    Console.log(Messages.LogRuntimeLoading)
+    
+    computer = get_shell.host_computer
+    shared = get_custom_object
+    
+    Intrinsics.publicAddress = null
+    Intrinsics.localAddress = null
+    if computer.is_network_active then
+        Intrinsics.publicAddress = computer.public_ip
+        Intrinsics.localAddress = computer.local_ip
+    end if
+
+    // 
+    // Loads every library it can find on the system
+    // Loads the most recent versions if metaxploit has been found
+    globals.Libs = loadLibraries
+
+    if shared.indexes.indexOf("Var") != null then 
+        globals.Var = deepCopy(shared.Var)
+        shared.remove("Var")
+    end if
+
+    if shared.indexes.indexOf("Intrinsics") != null then
+        globals.Intrinsics = deepCopy(shared.Intrinsics)
+        shared.remove("Intrinsics")
+    end if
+
+    if shared.indexes.indexOf("Libs") != null then
+        for kv in deepCopy(shared.Libs)
+            libName = kv["key"]
+            library = kv["value"]
+            if Libs.indexes.indexOf(libName) == null then Libs[libName] = library
+        end for
+        shared.remove("Libs")
+    end if
+
+    if shared.indexes.indexOf("Sessions") != null then
+        globals.Sessions = deepCopy(shared.Sessions)
+        shared.remove("Sessions")
+    end if
+
+    SessionsHelpers.add(Intrinsics)
+end function
+
+// 
+// Checks if all stuff that loads at runtime is loaded
+RuntimeHelpers.checkIfEverythingIsAssigned = function
+    Console.log(Messages.LogSystemChecks)
+    
+    haveAllPassed = true
+    if not (Intrinsics.publicAddress and Intrinsics.localAddress) then haveAllPassed = false
+    if Libs.len < 4 then haveAllPassed = false
+
+    if not haveAllPassed then
+        Console.warning(Messages.WarningFailedSystemChecks)
+    else
+        Console.log(Messages.LogSuccessfullSystemChecks)
+    end if
+end function
