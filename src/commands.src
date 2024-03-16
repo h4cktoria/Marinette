@@ -1060,7 +1060,7 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
     end if
 end function
 
-command "pluger", [".", "plunger", "pm"], Const.host, "TODO: Translate", function(arguments) // TODO: Translate
+command "pluger", [".", "plunger", "pm"], Const.host, Messages.HelpEntryPluger, function(arguments)
 	Conditions.host
 	Conditions.argumentsMoreThan(arguments, 0)
 	action = arguments.pull
