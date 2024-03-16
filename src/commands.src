@@ -198,7 +198,6 @@ command "theme", [], Const.any, Messages.HelpEntryTheme, function(arguments)
     print(" ")
     table = [
         randomString(10)+" "+randomString(10)+" "+randomString(10)+" "+randomString(10),
-        "---------- ---------- ---------- ----------",
         randomString(11)+" "+randomString(11)+" "+randomString(11)+" "+randomString(11),
         randomString(12)+" "+randomString(12)+" "+randomString(12)+" "+randomString(12),
     ].join(char(10))
@@ -853,20 +852,26 @@ command "findservice", ["findsvc"], Const.host, Messages.HelpEntrySvcfind, funct
     serviceVersion = null
     if arguments.len == 2 then serviceVersion = str(arguments[1])
 
+    if "gateway".indexOf(service.lower) == 0 then service = Messages.ServiceNode
+
     while true
         ip = randomNetworkAddress
         router = getNetworkNode(ip)
-        for port in router.used_ports
-            info = router.port_info(port)
-            if info.indexOf(service) != null then
-                if not serviceVersion or (serviceVersion and info.indexOf(serviceVersion) != null) then
-                    return Console.log(replaceF(Messages.LogServiceFound, {"SERVICE": info, "ADDRESS":ip, "PORT": port.port_number}))
-                end if
+        if service == Messages.ServiceNode then
+            if not serviceVersion or (router.kernel_version == serviceVersion) then
+                return Console.log(Messages.LogServiceFound, {"SERVICE": Messages.ServiceNode+" "+router.kernel_version, "ADDRESS":ip, "PORT": 0})
             end if
-            version = ""
-            if serviceVersion then version = " "+serviceVersion
-        end for
-        Console.error(replaceF(Messages.ErrorServiceNotFound, {"SERVICE": service+version, "ADDRESS": ip}))
+        else
+            for port in router.used_ports
+                info = router.port_info(port)
+                if info.indexOf(service) != null then
+                    if not serviceVersion or (serviceVersion and info.indexOf(serviceVersion) != null) then
+                        return Console.log(Messages.LogServiceFound, {"SERVICE": info, "ADDRESS":ip, "PORT": port.port_number})
+                    end if
+                end if
+            end for
+        end if
+        Console.error(Messages.ErrorServiceNotFound, {"SERVICE": service+" "+serviceVersion, "ADDRESS": ip})
     end while
 end function
 
