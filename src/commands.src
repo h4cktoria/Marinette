@@ -280,7 +280,7 @@ end function
 // Host session type
 ////////////////////////////////////////////////////////////
 
-command "systeminfo", [], Const.host, Messages.HelpEntrySysinf, function(arguments)
+command "systeminfo", ["si"], Const.host, Messages.HelpEntrySysinf, function(arguments)
     Conditions.arguments(arguments, 0)
     Conditions.host
 
@@ -288,8 +288,8 @@ command "systeminfo", [], Const.host, Messages.HelpEntrySysinf, function(argumen
     computer = shell.host_computer
 
     print("<color="+Theme.miscPrimary+"><b><--"+Messages.SysInfLocalSystem+"-->")
-    if user_bank_number then bank = user_bank_number else bank = Messages.SysInfUnavailable
-    if user_mail_address then mail = user_mail_address else mail = Messages.SysInfUnavailable
+    if user_bank_number then bank = user_bank_number else bank = error(Messages.SysInfUnavailable)
+    if user_mail_address then mail = user_mail_address else mail = error(Messages.SysInfUnavailable)
     print("<color="+Theme.miscPrimary+">"+Messages.SysInfUserName+" <color="+Theme.miscSecondary+">- "+active_user)
     print("<color="+Theme.miscPrimary+">"+Messages.SysInfHostName+" <color="+Theme.miscSecondary+">- "+computer.get_name)
     print("<color="+Theme.miscPrimary+">"+Messages.SysInfHomePath+" <color="+Theme.miscSecondary+">- "+home_dir)
@@ -299,12 +299,12 @@ command "systeminfo", [], Const.host, Messages.HelpEntrySysinf, function(argumen
     print("")
 
     print("<color="+Theme.miscPrimary+"><b><--"+Messages.SysInfNetwork+"-->")
-    bssid = Messages.SysInfUnavailable
-    essid = Messages.SysInfUnavailable
-    kernel = Messages.SysInfUnavailable
-    localIp = Messages.SysInfUnavailable
-    publicIp = Messages.SysInfUnavailable
-    deviceIp = Messages.SysInfUnavailable
+    bssid = error(Messages.SysInfUnavailable)
+    essid = error(Messages.SysInfUnavailable)
+    kernel = error(Messages.SysInfUnavailable)
+    localIp = error(Messages.SysInfUnavailable)
+    publicIp = error(Messages.SysInfUnavailable)
+    deviceIp = error(Messages.SysInfUnavailable)
     if computer.is_network_active then
         router = getNetworkNode
         bssid = router.bssid_name
@@ -323,10 +323,10 @@ command "systeminfo", [], Const.host, Messages.HelpEntrySysinf, function(argumen
     print(" ")
 
     print("<color="+Theme.miscPrimary+"><b><--"+Messages.SysInfLibraries+"-->")
-    crypto = Messages.SysInfNotLoaded
-    apt = Messages.SysInfNotLoaded
-    metaxploit = Messages.SysInfNotLoaded
-    blockchain = Messages.SysInfNotLoaded
+    crypto = error(Messages.SysInfNotLoaded)
+    apt = error(Messages.SysInfNotLoaded)
+    metaxploit = error(Messages.SysInfNotLoaded)
+    blockchain = error(Messages.SysInfNotLoaded)
     if Libs.indexes.indexOf("crypto") != null then crypto = Messages.SysInfLoaded
     if Libs.indexes.indexOf("apt") != null then apt = Messages.SysInfLoaded
     if Libs.indexes.indexOf("metaxploit") != null then metaxploit = Messages.SysInfLoaded
@@ -371,9 +371,7 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
         Intrinsics.computer = Intrinsics.shell.host_computer
         Intrinsics.file = Intrinsics.computer.File("/")
         
-        RuntimeHelpers.prepareStateForSharing
-        shell.launch(fd.path, "--no-ascii-art --password "+Var.password)
-        exit
+        RuntimeHelpers.startMarinette(shell, fd.path)
     end if
 end function
 
@@ -869,7 +867,9 @@ command "findservice", ["findsvc"], Const.host, Messages.HelpEntrySvcfind, funct
                 end if
             end for
         end if
-        Console.error(Messages.ErrorServiceNotFound, {"SERVICE": service+" "+serviceVersion, "ADDRESS": ip})
+        version = ""
+        if serviceVersion then version = " "+serviceVersion
+        Console.error(Messages.ErrorServiceNotFound, {"SERVICE": service+version, "ADDRESS": ip})
     end while
 end function
 
@@ -1268,11 +1268,7 @@ command "hostify", [], Const.shell, Messages.HelpEntryHostify, function(argument
 
     Intrinsics.isConnectionRemote = false
 
-    Console.log(Messages.LogSessionHostifiedSuccessfully)
-
-    RuntimeHelpers.prepareStateForSharing
-    Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Var.password)
-    exit
+    RuntimeHelpers.startMarinette(Intrinsics.shell, marinettePath)
 end function
 
 

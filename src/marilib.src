@@ -97,6 +97,10 @@ secondary = function(str)
     return "<color="+Theme.miscSecondary+">"+str+"</color>"
 end function
 
+error = function(str)
+    return "<color="+Theme.error+">"+str+"</color>"
+end function
+
 Console.asciiArt = function(art)
     i = 0; while i < art.len; i = i + 1
         if i-1 < round(art.len * 3 / 4 - 1) then
