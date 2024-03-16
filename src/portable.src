@@ -1070,6 +1070,9 @@ formatColumnsColored = function(columns, headerColor, columnsColor)
     i = 1; while i < lines.len; i = i + 1
         lines[i-1] = "<color="+columnsColor+">"+lines[i-1]
     end while
+    if lines.hasIndex(0) then
+        lines.insert(1, "<color="+headerColor+">"+("="*((lines[0].len) - ("<color>="+headerColor+">").len)))
+    end if
     return lines.join(char(10))
 end function
 
