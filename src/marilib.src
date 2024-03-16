@@ -149,7 +149,7 @@ Console.boolInput = function(message=" ", default=true,  toReplaceFormat=null)
 		if response == key then return true
 	end for
 	for key in refuse
-		if response == key then return not false
+		if response == key then return false
 	end for
 	return default;
 end function

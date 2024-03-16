@@ -138,7 +138,7 @@ end function
 loadPlugin = function(shell, path)
         pluginsLoaded = Var.loadedPlugins.len
         Var.importPlugin = true
-		Console.log(Messages.PluginsImporting, {"PATH": path}) // TODO: Translate
+		Console.log(Messages.LogPluginsImporting, {"PATH": path})
         success = shell.launch(path)
         if not success then
                 return Console.error(Messages.ErrorPluginsImportFailed, {"PATH": path})
@@ -151,11 +151,8 @@ loadPlugin = function(shell, path)
 end function
 
 permissionApproval = function(meta)
-
-	Console.log("{NAME} ({INTERNAL}) requires {PERMISSIONS}", {"NAME": meta.name, "INTERNAL": meta.internal, "PERMISSIONS": meta.permissions.join(", ")})
-	 return Console.boolInput("Grant these permissions [Y/n]")
-
-
+	Console.log(Messages.LogPluginsRequires, {"NAME": meta.name, "INTERNAL": meta.internal, "PERMISSIONS": meta.permissions.join(", ")})
+	 return Console.boolInput(Messages.LogPluginsGrantPermissions)
 end function
 
 plugins.registerPlugin = function(meta)
@@ -170,9 +167,9 @@ plugins.registerPlugin = function(meta)
         if meta.permissions.indexOf("State") != null then
                 pluginDef["State"] = {}
         end if
-		if not Var.requirePermissionApproval then
+		if Var.requirePermissionApproval then
 			approved = permissionApproval(meta)
-			if not approved then exit
+			if not approved then return exit
 		end if
 
         Var.loadedPlugins[meta.internal] = pluginDef
@@ -185,21 +182,22 @@ plugins.createMeta = function(internal, name, author, permissions=null)
 end function
 
 parsePluginLoadSpec = function(spec)
-	// TODO: Using shell from Instrincts (It may be a FtpShell1)
 	spec = spec.split(";")
 	if typeof(spec) == "string" or not spec then
 		return
 	end if
 	source = spec.pull
 	if source == "l" then
+		Conditions.shell(["shell"])
 		if spec.len < 1 then
 			return null
 		end if
 		path = spec.pull
-		shell = get_shell
+		shell = Intrinsics.shell
 		if not shell then return
 		return [shell, path]
 	else if source == "s" then
+		Conditions.shell(["shell"])
 		if spec.len < 5 then
 			return null
 		end if
@@ -209,11 +207,12 @@ parsePluginLoadSpec = function(spec)
 		if typeof(port) != "number" then return
 		user = spec.pull
 		password = spec.pull
-		shell = get_shell.connect_service(ip, port, user, password, "ssh")
+		shell =  Intrinsics.shell.connect_service(ip, port, user, password, "ssh")
 		if not shell then return
 		return [shell, path]
 	else if source == "m" then
 		if not Libs.metaxploit then
+			Console.error(ErrorNoNeededLibrary, {"LIBRARY": "metaxploit"}) // Since Conditions.metaxploit starts cmdloop, imports will stop
 			return
 		end if
 		if spec.len < 5 then
@@ -237,23 +236,26 @@ parsePluginLoadSpec = function(spec)
 
 end function
 
+loadPluginFromSpec = function(spec)
+	parsed = parsePluginLoadSpec(spec)
+	if not parsed then
+		Console.error(Messages.ErrorPluginsInvalidSpec, {"SPEC": spec})
+		return
+	end if
+	if typeof(parsed[0]) != "shell" then
+		Console.error(Messages.ErrorSessionNotShell, {"SHELLS": "shell"})
+		return
+	end if
+	if typeof(parsed[1]) != "string" then
+		Console.error(Messages.ErrorPathDoesNotExist)
+		return
+	end if
+	loadPlugin(parsed[0], parsed[1])
+end function
+
 initPlugins = function
 	for spec in Config.pluginsOnStart
-		parsed = parsePluginLoadSpec(spec)
-		if not parsed then
-			Console.error(Messages.ErrorPluginsInvalidSpec, {"SPEC": spec}) // TODO: Translate
-			continue
-		end if
-		if typeof(parsed[0]) != "shell" then
-			Console.error(Messages.ErrorSessionNotShell, {"SHELLS": "shell"})
-			continue
-		end if
-		if typeof(parsed[1]) != "string" then
-			Console.error(Messages.ErrorPathDoesNotExist)
-			continue
-		end if
-		loadPlugin(parsed[0], parsed[1])
+		loadPluginFromSpec(spec)
 	end for
-	Console.log("Loaded {AMOUNT} plugins", {"AMOUNT": Var.loadedPlugins.len}) // TODO: Translate
-	Var.requirePermissionApproval = true
+	Console.log(Messages.LogPluginsLoaded, {"AMOUNT": Var.loadedPlugins.len})
 end function
