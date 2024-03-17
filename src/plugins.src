@@ -5,7 +5,7 @@ permissions = [
         "Libs",           // access to Libs
         "Commands",       // registering commands and aliases, access to Conditions
         "Var",            // access to Vars (Dangerous)
-		"Const",          // access to Const
+	"Const",          // access to Const
         "Sessions",		  // access to sessions
         "CommandsDirect", // direct access to Commands && Aliases
         "Config",         // accesss to Config (Dangerous)
@@ -13,8 +13,8 @@ permissions = [
         "Theme",          // access to theme name and data
         "State",          // access to states
         "Tools",          // access to tools, e.g. replaceF
-		"Plugins",        // Get info about loaded plugins
-		"PluginsDirect",  // Use internal APIs to manage plugins
+	"Plugins",        // Get info about loaded plugins
+	"PluginsDirect",  // Use internal APIs to manage plugins
         "Root",           // acccess to many things (Extremely dangerous!)
 ]
 plugins.basicPermissions = ["Console", "Commands", "Locale", "Theme", "State"]
