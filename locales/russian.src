@@ -124,7 +124,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Сканирую удалённ
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Ищу незащищённую директорию в которую можно загрузится..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Нет незащищённых директории в которые я могла бы загрузиться!"
 Locales.LogUploadingNeccessary[_language] = "Загружаю всё необходимое..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "Сессия успешно хостифицирована"
 Locales.ErrorUnknown[_language] = "Произошла неизвестная ошибка!"
 Locales.LogStartingInGameConsole[_language] = "Запускаю внутриигровую консоль..."
 Locales.NetintHeader[_language] = "Ифейс Чип Мон"

@@ -124,7 +124,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Scanning the remote libraries({
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Looking for permissive directories to upload into..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Could not find any permissive directories to upload into!"
 Locales.LogUploadingNeccessary[_language] = "Uploading everything neccessary..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "The session is successfully hostified"
 Locales.ErrorUnknown[_language] = "Unknown error has occured!"
 Locales.LogStartingInGameConsole[_language] = "Starting the in-game console..."
 Locales.NetintHeader[_language] = "Iface Chip Mon"
@@ -197,7 +196,6 @@ Locales.ErrorGenerateAtCompileTime[_language] = "Generate all of the above at co
 Locales.SpecialThanksAndCredits[_language] = "Special thanks and credits goes to:"
 Locales.YouAreAllAwesome[_language] = "You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people!"
 Locales.HelpEntryReload[_language] = "Load and check various systems"
-
 Locales.HelpCategoryPlugins[_language] = "Plugins"
 Locales.PluginsUndocumentedCommand[_language] = "Documentation isn't available"
 Locales.ErrorPluginsImportFailed[_language] = "Failed to import {PATH}"

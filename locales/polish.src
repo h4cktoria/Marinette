@@ -124,7 +124,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Skanowanie zdalnych bibliotek({
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Szukanie katalogow, do ktorych mozna przeslac..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Nie znaleziono zadnych katalogow, do ktorych mozna przeslac!"
 Locales.LogUploadingNeccessary[_language] = "Przeyslanie wszystkiego niezbednego..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "Sesja zostala pomyslnie zhostowana"
 Locales.ErrorUnknown[_language] = "Wystapil nieznany blad!"
 Locales.LogStartingInGameConsole[_language] = "Rozpoczynanie konsoli w grze..."
 Locales.NetintHeader[_language] = "Iface Chip Mon"

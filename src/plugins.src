@@ -159,7 +159,7 @@ plugins.registerPlugin = function(meta)
         // A way to ask whether user wants to import plugin @runtime + Required permissions, and not ask when it's through Compile-time list
         // IDEA: Manually granting/revoking permissions for plugins
         if not Var.importPlugin then return exit(Console.error(Messages.ErrorPluginsUsePluger))
-        if not verifyMeta(meta) then return exit(Console.error(Messages.ErrorPluginInvalidDefinition))
+        if not verifyMeta(meta) then return exit(Console.error(Messages.ErrorPluginsInvalidDefinition))
 
         if Var.loadedPlugins.hasIndex(meta.internal) then return exit(Console.error(Messages.ErrorPluginsAlreadyImported, {"PLUGIN": meta.internal}))
         api = generateAPI(meta.permissions, meta.internal)

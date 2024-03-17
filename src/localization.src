@@ -131,7 +131,6 @@ Locales.LogScanningRemoteLibraries = {}
 Locales.LogLookingForPermissivePathToUploadInto = {}
 Locales.ErrorCouldNotFindPermissivePathToUploadInto = {}
 Locales.LogUploadingNeccessary = {}
-Locales.LogSessionHostifiedSuccessfully = {}
 Locales.ErrorUnknown = {}
 Locales.LogStartingInGameConsole = {}
 Locales.NetintHeader = {}
@@ -348,7 +347,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Scanning the remote libraries({
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Looking for permissive directories to upload into..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Could not find any permissive directories to upload into!"
 Locales.LogUploadingNeccessary[_language] = "Uploading everything neccessary..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "The session is successfully hostified"
 Locales.ErrorUnknown[_language] = "Unknown error has occured!"
 Locales.LogStartingInGameConsole[_language] = "Starting the in-game console..."
 Locales.NetintHeader[_language] = "Iface Chip Mon"
@@ -421,7 +419,6 @@ Locales.ErrorGenerateAtCompileTime[_language] = "Generate all of the above at co
 Locales.SpecialThanksAndCredits[_language] = "Special thanks and credits goes to:"
 Locales.YouAreAllAwesome[_language] = "You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people!"
 Locales.HelpEntryReload[_language] = "Load and check various systems"
-
 Locales.HelpCategoryPlugins[_language] = "Plugins"
 Locales.PluginsUndocumentedCommand[_language] = "Documentation isn't available"
 Locales.ErrorPluginsImportFailed[_language] = "Failed to import {PATH}"
@@ -436,7 +433,6 @@ Locales.LogPluginsGeneralInfo[_language] = "{NAME} ({INTERNAL}) by {AUTHOR}"
 Locales.LogPluginsGrantedPermissions[_language] = "| Granted permissions: {PERMISSIONS}"
 Locales.LogPluginsRequires[_language] = "{NAME} ({INTERNAL}) requires {PERMISSIONS}"
 Locales.LogPluginsGrantPermissions[_language] = "Grant these permissions [Y/n] "
-
 
 
 
@@ -566,7 +562,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Skanowanie zdalnych bibliotek({
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Szukanie katalogow, do ktorych mozna przeslac..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Nie znaleziono zadnych katalogow, do ktorych mozna przeslac!"
 Locales.LogUploadingNeccessary[_language] = "Przeyslanie wszystkiego niezbednego..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "Sesja zostala pomyslnie zhostowana"
 Locales.ErrorUnknown[_language] = "Wystapil nieznany blad!"
 Locales.LogStartingInGameConsole[_language] = "Rozpoczynanie konsoli w grze..."
 Locales.NetintHeader[_language] = "Iface Chip Mon"
@@ -757,7 +752,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Сканирую удалённ
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Ищу незащищённую директорию в которую можно загрузится..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Нет незащищённых директории в которые я могла бы загрузиться!"
 Locales.LogUploadingNeccessary[_language] = "Загружаю всё необходимое..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "Сессия успешно хостифицирована"
 Locales.ErrorUnknown[_language] = "Произошла неизвестная ошибка!"
 Locales.LogStartingInGameConsole[_language] = "Запускаю внутриигровую консоль..."
 Locales.NetintHeader[_language] = "Ифейс Чип Мон"
@@ -959,7 +953,6 @@ Locales.LogScanningRemoteLibraries[_language] = "Сканую віддалені
 Locales.LogLookingForPermissivePathToUploadInto[_language] = "Шукаю незахищену директорію в яку можливо завантажитися..."
 Locales.ErrorCouldNotFindPermissivePathToUploadInto[_language] = "Немає незахищених директорій в які я б могла завантажитися!"
 Locales.LogUploadingNeccessary[_language] = "Завантажую все необхідне..."
-Locales.LogSessionHostifiedSuccessfully[_language] = "Сесія успішно ініціалізована"
 Locales.ErrorUnknown[_language] = "Відбулася невідома помилка!"
 Locales.LogStartingInGameConsole[_language] = "Запускаю локальну консоль..."
 Locales.NetintHeader[_language] = "Інтерфейс Чіп Моніторинг"
@@ -1032,7 +1025,6 @@ Locales.ErrorIsIncorrectlySet[_language] = "<i>{VALUE}</i> має не вірн�
 Locales.ErrorGenerateAtCompileTime[_language] = "Зазначте все вище сказане під час компиляції! Вимикаюся"
 Locales.SpecialThanksAndCredits[_language] = "Подяки і авторство: "
 Locales.YouAreAllAwesome[_language] = "Ви всі прекрасні! Щиро дякую, Marinette не була би тим чим вона є, якщо вона не була б для вас!"
-
 Locales.HelpCategoryPlugins[_language] = "Розширення"
 Locales.PluginsUndocumentedCommand[_language] = "Інформація не доступна"
 Locales.ErrorPluginsImportFailed[_language] = "Не вдалося завантажити {PATH}"
