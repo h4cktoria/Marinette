@@ -94,7 +94,7 @@ Open up an issue and wait for my response
 PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE MAKING A PULL REQUEST! This includes, but not limits, to understanding of:
 
 -    Behaviour of `range()`
--    How base class and it's instance behave
+-    How base class and it's instances behave
 -    Functions, list items and map items references
 -    How different default routine arguments behave
 
