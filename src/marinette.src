@@ -21,6 +21,14 @@ Config = {
     // Colors which Marinette will use
     // See themeing.src to see all available themes
     "theme": "Violet",
+    // List of plugins to be loaded at start
+	// Do not add plugins from untrusted sources
+	// since this skips permission approval
+	// Examples
+	// l;/root/plugin -- loads plugin from path on host shell
+	// s;/root/plugin;1.2.3.4;22;root;pass -- loads plugin from ssh server
+	// m;/root/plugin;1.2.3.4;22;0xFFEEA9;_string -- Uses exploit to load plugin
+	"pluginsOnStart": [],
 }
 
 
@@ -32,6 +40,7 @@ import_code("/home/guest/Sources/Marinette/src/portable.src")
 import_code("/home/guest/Sources/Marinette/src/marilib.src")
 import_code("/home/guest/Sources/Marinette/src/runtime.src")
 import_code("/home/guest/Sources/Marinette/src/commands.src")
+import_code("/home/guest/Sources/Marinette/src/plugins.src")
 
 
 
@@ -44,6 +53,8 @@ main = function
     if Var.parameters.indexes.indexOf("--no-ascii-art") == null then Console.asciiArt(Theme.asciiArt)
     if Var.parameters.indexes.indexOf("--no-runtime-loading") == null then RuntimeHelpers.makeNeccessaryRuntimeAssigns
     if Var.parameters.indexes.indexOf("--no-system-checks") == null then RuntimeHelpers.checkIfEverythingIsAssigned
-    
+    if Var.parameters.indexes.indexOf("--skip-plugin-load") == null then initPlugins
+	Var.requirePermissionApproval = true
+
     Console.cmdloop
 end function; main

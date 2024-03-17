@@ -204,6 +204,20 @@ Locales.ErrorGenerateAtCompileTime = {}
 Locales.SpecialThanksAndCredits = {}
 Locales.YouAreAllAwesome = {}
 Locales.HelpEntryReload = {}
+Locales.HelpCategoryPlugins = {}
+Locales.PluginsUndocumentedCommand = {}
+Locales.ErrorPluginsImportFailed = {}
+Locales.ErrorPluginsInvalidDefinition = {}
+Locales.ErrorPluginsUsePluger = {}
+Locales.ErrorPluginsCommandNotSupported = {}
+Locales.ErrorPluginsAlreadyImported = {}
+Locales.ErrorPluginsInvalidSpec = {}
+Locales.LogPluginsImporting = {}
+Locales.LogPluginsLoaded = {}
+Locales.LogPluginsGeneralInfo = {}
+Locales.LogPluginsGrantedPermissions = {}
+Locales.LogPluginsRequires = {}
+Locales.LogPluginsGrantPermissions = {}
 
 
 
@@ -407,6 +421,22 @@ Locales.ErrorGenerateAtCompileTime[_language] = "Generate all of the above at co
 Locales.SpecialThanksAndCredits[_language] = "Special thanks and credits goes to:"
 Locales.YouAreAllAwesome[_language] = "You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people!"
 Locales.HelpEntryReload[_language] = "Load and check various systems"
+
+Locales.HelpCategoryPlugins[_language] = "Plugins"
+Locales.PluginsUndocumentedCommand[_language] = "Documentation isn't available"
+Locales.ErrorPluginsImportFailed[_language] = "Failed to import {PATH}"
+Locales.ErrorPluginsInvalidDefinition[_language] = "Plugin '{PATH}' has invalid definition"
+Locales.ErrorPluginsUsePluger[_language] = "Use pluger to import plugin"
+Locales.ErrorPluginsCommandNotSupported[_language] = "{COMMAND} is not supported"
+Locales.ErrorPluginsAlreadyImported[_language] = "Plugin '{PLUGIN}' is imported already"
+Locales.ErrorPluginsInvalidSpec[_language] = "Load spec '{SPEC}' is invalid"
+Locales.LogPluginsImporting[_language] = "Importing plugin from {PATH}"
+Locales.LogPluginsLoaded[_language] = "Loaded {AMOUNT} plugins"
+Locales.LogPluginsGeneralInfo[_language] = "{NAME} ({INTERNAL}) by {AUTHOR}"
+Locales.LogPluginsGrantedPermissions[_language] = "| Granted permissions: {PERMISSIONS}"
+Locales.LogPluginsRequires[_language] = "{NAME} ({INTERNAL}) requires {PERMISSIONS}"
+Locales.LogPluginsGrantPermissions[_language] = "Grant these permissions [Y/n] "
+
 
 
 
@@ -995,3 +1025,25 @@ Locales.HelpEntryDelete[_language] = "(абсШляхи/шляхи) - Видал
 Locales.HelpEntryCopy[_language] = "(абсШлях/шлях) (призначення) - Скопіювати файл"
 Locales.HelpEntryTree[_language] = "Отримати файлову систему у вигляді дерева"
 Locales.HelpEntryRun[_language] = "(абсШлях/шлях) [аргументи] - Запустити сторонній бінарний файл"
+Locales.HelpEntryPluger[_language] = "loaded | load (абсШлях/шлях) | load-spec (Інструкція) - Простий інструмент для керування розширеннями"
+Locales.HelpEntryTheme[_language] = "Переглянути використану тему"
+Locales.ErrorConfigIsMalformed[_language] = "Конфігурація не правильна: "
+Locales.ErrorIsIncorrectlySet[_language] = "<i>{VALUE}</i> має не вірне значення!"
+Locales.ErrorGenerateAtCompileTime[_language] = "Зазначте все вище сказане під час компиляції! Вимикаюся"
+Locales.SpecialThanksAndCredits[_language] = "Подяки і авторство: "
+Locales.YouAreAllAwesome[_language] = "Ви всі прекрасні! Щиро дякую, Marinette не була би тим чим вона є, якщо вона не була б для вас!"
+
+Locales.HelpCategoryPlugins[_language] = "Розширення"
+Locales.PluginsUndocumentedCommand[_language] = "Інформація не доступна"
+Locales.ErrorPluginsImportFailed[_language] = "Не вдалося завантажити {PATH}"
+Locales.ErrorPluginsInvalidDefinition[_language] = "Розширення має не вірне визначення"
+Locales.ErrorPluginsUsePluger[_language] = "Використовуйте pluger для завантаження розширень"
+Locales.ErrorPluginsCommandNotSupported[_language] = "{COMMAND} не підтримується"
+Locales.ErrorPluginsAlreadyImported[_language] = "Розширення '{PLUGIN}' вже завантажене"
+Locales.ErrorPluginsInvalidSpec[_language] = "Інструкція завантаження '{SPEC}' не є вірною"
+Locales.LogPluginsImporting[_language] = "Завантажую розширення з {PATH}"
+Locales.LogPluginsLoaded[_language] = "Завантажено {AMOUNT} розширень"
+Locales.LogPluginsGeneralInfo[_language] = "{NAME} ({INTERNAL}) створив {AUTHOR}"
+Locales.LogPluginsGrantedPermissions[_language] = "| Надані права: {PERMISSIONS}"
+Locales.LogPluginsRequires[_language] = "{NAME} ({INTERNAL}) потребує {PERMISSIONS}"
+Locales.LogPluginsGrantPermissions[_language] = "Надати ці права [Y/n] "

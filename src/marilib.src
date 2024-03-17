@@ -24,6 +24,8 @@ Const = {
     "shell": Messages.SessionTypeShell,
     "computer": Messages.SessionTypeComputer,
     "file": Messages.SessionTypeFile,
+    "plugin": Messages.HelpCategoryPlugins,
+
 }
 
 
@@ -34,6 +36,10 @@ Var = {
     "password": null,
     "hostSession": null,
     "parameters": parseParameters(params),
+	"importPlugin": false,
+	"requirePermissionApproval": false,
+	"loadedPlugins": {},
+	"pluginSharedState": {},
 }
 
 
@@ -136,17 +142,18 @@ Console.input = function(message=" ", isPassword=false, toReplaceFormat=null)
     return ""
 end function
 
-Console.boolInput = function(message=" ", default=true, toReplaceFormat=null)
-    if toReplaceFormat then message = replaceF(message, toReplaceFormat)
-    input = ""
-    while not input
-        input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", false, true).trim
-        if isInputValid(input) then
-            if not input then return default
-            if input.lower == "y" then return true
-            if input.lower == "n" or input.lower == "backspace" then return false
-        end if
-    end while
+Console.boolInput = function(message=" ", default=true,  toReplaceFormat=null)
+	accept = ["y", ""]
+	refuse = ["escape", "n", "backspace"]
+
+	response = Console.input(message, false, toReplaceFormat, true).lower
+	for key in accept
+		if response == key then return true
+	end for
+	for key in refuse
+		if response == key then return false
+	end for
+	return default;
 end function
 
 Console.prompt = function
