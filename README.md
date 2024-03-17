@@ -38,6 +38,7 @@ Core(but not only!) features of Marinette:
 
 -   Simple and source-leak secure compile-time configuration
 -   [Defensive programmed](https://en.wikipedia.org/wiki/Defensive_programming) and won't crash if you misuse any command in any way
+-   Fully translatable except for built-ins errors
 
 Please read! If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING TOOL! Hack by hand first, get a grip on the game mechanics, try to code something by yourself and have fun in general!
 
