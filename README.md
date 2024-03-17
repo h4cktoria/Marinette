@@ -91,7 +91,7 @@ Open up an issue and wait for my response
 
 ### Code contribution
 
-PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE MAKING A PULL REQUEST! This includes, but not limits, to understanding of:
+PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE MAKING A PULL REQUEST! This includes, but not limits to, the understanding of:
 
 -    Behaviour of `range()`
 -    How base class and it's instances behave
@@ -108,7 +108,7 @@ Now that you're sure you know anything needed, have a look at these ~simple~ con
 -   After each source change, run [install_marinette.py](scripts/install_marinette.py)
 -   Don't reinvent the wheel! If the algorithm you want to use is already defined in [portable.src](src/portable.src), you MUST use it!
 -   Before making a pull request, pull origin
--   Define locales in [english.src](locales/english.src) first, then in your locale file
+-   Define locales in [english.src](locales/english.src) first, then in your locale file AND PLEASE DON'T TOUCH [localization.src](src/localization.src)!!!
 -   Follow locale entries naming conventions described below
 
 Locale naming conventions:
@@ -200,7 +200,9 @@ Special thanks and credits goes to:
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
 -   [Guest](https://github.com/fmmaks666) - for Ukrainian translation and plugins implementation
--   [Simonize](https://github.com/Simoniko) - for color scheme(see `NoAuthV3Ocean` theme) and Polish translation
+-   [Simonize](https://github.com/Simoniko) - for color scheme(see [`NoAuthV3Ocean` theme](themes/nav3ocean.src) and Polish translation
+-   [Olipro](https://github.com/Olipro) - for making Omni, from leaked version of which I've ~stealen~ borrowed a color scheme(see [`Omni` theme](themes/omni.src))
+-   [Volk](https://github.com/EntitySeaker) - for making Viper, from leaked version of which I've ~stealen~ borrowed a color scheme(see [`Viper` theme](themes/viper.src))
 
 You are all awesome! Thank you a lot, Marinette wouldn't be what it is if it weren't for you people! <3
 
