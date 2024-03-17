@@ -132,3 +132,15 @@ RuntimeHelpers.prepareStateForSharing = function
     shared.Libs = deepCopy(Libs)
     shared.Sessions = deepCopy(Sessions)
 end function
+
+RuntimeHelpers.startMarinette = function(shell, marinettePath)
+    RuntimeHelpers.prepareStateForSharing
+    result = shell.launch(marinettePath, "--no-ascii-art --password "+Var.password)
+    if result isa string then
+        Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "launch", "ERROR": result}))
+    else if not result then
+        Console.error(Messages.ErrorUnknown)
+    else
+        exit
+    end if
+end function
