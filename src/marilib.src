@@ -135,9 +135,9 @@ Console.error = function(message=" ", toReplaceFormat=null)
     Console._printWithColorAndTime(Theme.error, message, toReplaceFormat)
 end function
 
-Console.input = function(message=" ", isPassword=false, toReplaceFormat=null)
+Console.input = function(message=" ", isPassword=false, anyKey=false, toReplaceFormat=null)
     if toReplaceFormat then message = replaceF(message, toReplaceFormat)
-    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", isPassword)
+    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", isPassword, anyKey)
     if isInputValid(input) then return input
     return ""
 end function
