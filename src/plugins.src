@@ -1,0 +1,262 @@
+plugins = get_custom_object
+
+permissions = [
+        "Console",        // access to Marinette Console (pretty printing)
+        "Libs",           // access to Libs
+        "Commands",       // registering commands and aliases, access to Conditions
+        "Var",            // access to Vars (Dangerous)
+	"Const",          // access to Const
+        "Sessions",		  // access to sessions
+        "CommandsDirect", // direct access to Commands && Aliases
+        "Config",         // accesss to Config (Dangerous)
+        "Locale",         // access to Translation ( && language name :D )
+        "Theme",          // access to theme name and data
+        "State",          // access to states
+        "Tools",          // access to tools, e.g. replaceF
+	"Plugins",        // Get info about loaded plugins
+	"PluginsDirect",  // Use internal APIs to manage plugins
+        "Root",           // acccess to many things (Extremely dangerous!)
+]
+plugins.basicPermissions = ["Console", "Commands", "Locale", "Theme", "State"]
+
+verifyMeta = function(meta)
+        if typeof(@meta) != "map" then return false
+        if not meta.hasIndex("internal") then return false
+        if not meta.hasIndex("name") then return false
+        if not meta.hasIndex("author") then return false
+        if not meta.hasIndex("permissions") then return false
+
+        if not meta["internal"] then return false
+        if not meta["name"] then return false
+        if not meta["author"] then return false
+        // if meta["permissions"].len < 0 or meta["permission"].len > permissions.len then return false
+        for permission in meta["permissions"]
+                if permissions.indexOf(permission) == null then return false
+        end for
+
+        meta["internal"] = meta["internal"].replace(" ", "")
+
+        return true
+end function
+
+getObjects = function(permission, internal)
+        if permission == "Commands" then
+                return {"Commands": {}, "Help": {}, "Aliases": {}, "command": @command, "Conditions": deepCopy(Conditions)}
+        else if permission == "CommandsDirect" then
+                return {"Commands": Commands, "Help": Help, "Aliases": Aliases, "command": @command, "Conditions": Conditions}
+        else if permission == "Libs" then
+                return deepCopy(Libs)
+        else if permission == "Console" then
+                return deepCopy(Console)
+        else if permission == "State" then
+                return {"getState": @getState(internal), "setState": @setState(internal), "getSharedState": @getSharedState, "setSharedState": @setSharedState}
+        else if permission == "Config" then
+			return Config
+        else if permission == "Theme" then
+			return {"Data": deepCopy(Theme), "name": Config.theme}
+        else if permission == "Var" then
+			return Var
+        else if permission == "Const" then
+			return deepCopy(Const)
+        else if permission == "Locale" then
+			return {"Messages": deepCopy(Messages), "language": Config.language}
+		else if permission == "Sessions" then
+			return {"sessions": Sessions, "Helpers": deepCopy(SessionHelpers)}
+		else
+			return null
+        end if
+end function
+
+getState = function(name)
+        vars = Var
+        _getState = function()
+                // Error handling?
+                return vars.loadedPlugins[name]["State"]
+        end function
+        return @_getState
+end function
+
+setState = function(name)
+        vars = Var
+        _setState = function(value)
+                // Error handling?
+                vars.loadedPlugins[name]["State"] = value
+        end function
+        return @_setState
+end function
+
+getSharedState = function()
+        // Error handling?
+        return Var.pluginSharedState
+end function
+
+// DO NOT USE THIS!!!
+setSharedState = function(value)
+        // Error handling?
+        Var.pluginSharedState = value
+end function
+
+generateAPI = function(permissions, internal)
+        api = {}
+        for permission in permissions
+                if ["Commands", "State", "Const", "Var"].indexOf(permission) != null then
+                        structs = getObjects(permission, internal)
+                        api = api + structs
+                        continue
+                end if
+                api[permission] = getObjects(permission, internal)
+        end for
+        return api
+end function
+
+setupCommands = function(plugin)
+        for commandDef in plugin.Def.Commands
+                if not str(@commandDef.value).matches("FUNCTION\(\w+\)") then // FIXME: Some valid names are considered invalid with this pattern
+                        Console.error(Messages.ErrorPluginsCommandNotSupported, {"COMMAND": commandDef.key})
+                        continue
+                end if
+                if plugin.Def.Help.hasIndex(commandDef.key) then
+                        help = plugin.Def.Help[commandDef.key]
+                else
+                        help = Messages.PluginsUndocumentedCommand
+                end if
+                if plugin.Def.Aliases.hasIndex(commandDef.key) then
+                        aliases = plugin.Def.Aliases[commandDef.key]
+                else
+                        aliases = []
+                end if
+                command commandDef.key, aliases, Const.plugin, help, @commandDef.value
+        end for
+end function
+
+setupPlugin = function(plugin)
+        if plugin.Meta.permissions.indexOf("Commands") != null then
+                setupCommands(plugin)
+        end if
+end function
+
+loadPlugin = function(shell, path)
+        pluginsLoaded = Var.loadedPlugins.len
+        Var.importPlugin = true
+		Console.log(Messages.LogPluginsImporting, {"PATH": path})
+        success = shell.launch(path)
+        if not success then
+                return Console.error(Messages.ErrorPluginsImportFailed, {"PATH": path})
+        end if
+        if pluginsLoaded != Var.loadedPlugins.len then
+                toSetup = Var.loadedPlugins[Var.loadedPlugins.indexes[-1]]
+                setupPlugin(toSetup)
+        end if
+        Var.importPlugin = false
+end function
+
+permissionApproval = function(meta)
+	Console.log(Messages.LogPluginsRequires, {"NAME": meta.name, "INTERNAL": meta.internal, "PERMISSIONS": meta.permissions.join(", ")})
+	 return Console.boolInput(Messages.LogPluginsGrantPermissions)
+end function
+
+plugins.registerPlugin = function(meta)
+        // A way to ask whether user wants to import plugin @runtime + Required permissions, and not ask when it's through Compile-time list
+        // IDEA: Manually granting/revoking permissions for plugins
+        if not Var.importPlugin then return exit(Console.error(Messages.ErrorPluginsUsePluger))
+        if not verifyMeta(meta) then return exit(Console.error(Messages.ErrorPluginInvalidDefinition))
+
+        if Var.loadedPlugins.hasIndex(meta.internal) then return exit(Console.error(Messages.ErrorPluginsAlreadyImported, {"PLUGIN": meta.internal}))
+        api = generateAPI(meta.permissions, meta.internal)
+        pluginDef = {"Meta": meta, "Def": api}
+        if meta.permissions.indexOf("State") != null then
+                pluginDef["State"] = {}
+        end if
+		if Var.requirePermissionApproval then
+			approved = permissionApproval(meta)
+			if not approved then return exit
+		end if
+
+        Var.loadedPlugins[meta.internal] = pluginDef
+        return api
+end function
+
+plugins.createMeta = function(internal, name, author, permissions=null)
+        if not permissions then permissions = plugins.basicPermissions
+        return {"internal": internal, "name": name, "author": author, "permissions": permissions}
+end function
+
+parsePluginLoadSpec = function(spec)
+	spec = spec.split(";")
+	if typeof(spec) == "string" or not spec then
+		return
+	end if
+	source = spec.pull
+	if source == "l" then
+		Conditions.shell(["shell"])
+		if spec.len < 1 then
+			return null
+		end if
+		path = spec.pull
+		shell = Intrinsics.shell
+		if not shell then return
+		return [shell, path]
+	else if source == "s" then
+		Conditions.shell(["shell"])
+		if spec.len < 5 then
+			return null
+		end if
+		path = spec.pull
+		ip = spec.pull
+		port = (spec.pull).to_int
+		if typeof(port) != "number" then return
+		user = spec.pull
+		password = spec.pull
+		shell =  Intrinsics.shell.connect_service(ip, port, user, password, "ssh")
+		if not shell then return
+		return [shell, path]
+	else if source == "m" then
+		// if not Libs.metaxploit then
+		if Libs.indexes.indexOf("metaxploit") == null then
+			Console.error(ErrorNoNeededLibrary, {"LIBRARY": "metaxploit"}) // Since Conditions.metaxploit starts cmdloop, imports will stop
+			return
+		end if
+		if spec.len < 5 then
+			return null
+		end if
+		path = spec.pull
+		ip = spec.pull
+		port = (spec.pull).to_int
+		if typeof(port) != "number" then return
+		address = spec.pull
+		vulnerability = spec.pull
+		net = Libs.metaxploit.net_use(ip, port)
+		if not net then return
+		lib = net.dump_lib
+		shell = lib.overflow(address, vulnerability)
+		if typeof(shell) != "shell" then return
+		return [shell, path]
+	else
+		return
+	end if
+
+end function
+
+loadPluginFromSpec = function(spec)
+	parsed = parsePluginLoadSpec(spec)
+	if not parsed then
+		Console.error(Messages.ErrorPluginsInvalidSpec, {"SPEC": spec})
+		return
+	end if
+	if typeof(parsed[0]) != "shell" then
+		Console.error(Messages.ErrorSessionNotShell, {"SHELLS": "shell"})
+		return
+	end if
+	if typeof(parsed[1]) != "string" then
+		Console.error(Messages.ErrorPathDoesNotExist)
+		return
+	end if
+	loadPlugin(parsed[0], parsed[1])
+end function
+
+initPlugins = function
+	for spec in Config.pluginsOnStart
+		loadPluginFromSpec(spec)
+	end for
+	Console.log(Messages.LogPluginsLoaded, {"AMOUNT": Var.loadedPlugins.len})
+end function

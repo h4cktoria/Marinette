@@ -1063,6 +1063,34 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
     end if
 end function
 
+command "pluger", [".", "plunger", "pm"], Const.host, Messages.HelpEntryPluger, function(arguments)
+	Conditions.host
+	Conditions.argumentsMoreThan(arguments, 0)
+	action = arguments.pull
+    if ["loaded"].indexOf(action) == 0 and arguments.len == 0 then
+		Console.log(Messages.LogPluginsLoaded, {"AMOUNT": Var.loadedPlugins.len})
+		for plugin in Var.loadedPlugins
+			name = plugin.value.Meta.name
+			internal = plugin.value.Meta.internal
+			author = plugin.value.Meta.author
+			general = replaceF(Messages.LogPluginsGeneralInfo, {"NAME": name, "INTERNAL": internal, "AUTHOR": author})
+			permissions = replaceF(Messages.LogPluginsGrantedPermissions, {"PERMISSIONS": plugin.value.Meta.permissions.join(", ")})
+			Console.log(general)
+			print(secondary(permissions))
+		end for
+
+    else if "load".indexOf(action) == 0 and arguments.len == 1 then
+		path = arguments.pull
+		Conditions.shell(["shell"])
+		loadPlugin(Intrinsics.shell, path)
+    else if "load-spec".indexOf(action) == 0 and arguments.len == 1 then
+		spec = arguments.pull
+		loadPluginFromSpec(spec)
+	else
+		Console.error(Messages.ErrorUnknownArguments)
+	end if
+
+end function
 
 command "netscan", ["nesca"], Const.host, Messages.HelpEntryNesca, function(arguments)
     Conditions.host
