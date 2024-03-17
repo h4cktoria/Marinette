@@ -54,7 +54,7 @@ main = function
     if Var.parameters.indexes.indexOf("--no-runtime-loading") == null then RuntimeHelpers.makeNeccessaryRuntimeAssigns
     if Var.parameters.indexes.indexOf("--no-system-checks") == null then RuntimeHelpers.checkIfEverythingIsAssigned
     if Var.parameters.indexes.indexOf("--skip-plugin-load") == null then initPlugins
-	Var.requirePermissionApproval = true
+    Var.requirePermissionApproval = true
 
     Console.cmdloop
 end function; main
