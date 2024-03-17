@@ -371,7 +371,6 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
         Intrinsics.shell = shell
         Intrinsics.computer = Intrinsics.shell.host_computer
         Intrinsics.file = Intrinsics.computer.File("/")
-<<<<<<< HEAD
 
         shared = get_custom_object
         shared.Var = deepCopy(Var)
@@ -380,11 +379,7 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
         shared.Sessions = deepCopy(Sessions)
 
         shell.launch(fd.path, "--no-ascii-art --password "+Var.password)
-        exit
-=======
-        
-        RuntimeHelpers.startMarinette(shell, fd.path)
->>>>>>> 0bcba6ba5e4b750f507f8ea12b5c4d2ae0e202f7
+        exit RuntimeHelpers.startMarinette(shell, fd.path)
     end if
 end function
 
