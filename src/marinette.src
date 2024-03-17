@@ -22,13 +22,13 @@ Config = {
     // See themeing.src to see all available themes
     "theme": "Violet",
     // List of plugins to be loaded at start
-	// Do not add plugins from untrusted sources
-	// since this skips permission approval
-	// Examples
-	// l;/root/plugin -- loads plugin from path on host shell
-	// s;/root/plugin;1.2.3.4;22;root;pass -- loads plugin from ssh server
-	// m;/root/plugin;1.2.3.4;22;0xFFEEA9;_string -- Uses exploit to load plugin
-	"pluginsOnStart": [],
+    // Do not add plugins from untrusted sources
+    // since this skips permission approval
+    // Examples
+    // l;/root/plugin -- loads plugin from path on host shell
+    // s;/root/plugin;1.2.3.4;22;root;pass -- loads plugin from ssh server
+    // m;/root/plugin;1.2.3.4;22;0xFFEEA9;_string -- Uses exploit to load plugin
+    "pluginsOnStart": [],
 }
 
 
