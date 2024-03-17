@@ -1,23 +1,83 @@
+// DO
+// NOT
+// USE
+// PLUGINS!!!
+
+
+
 plugins = get_custom_object
 
 permissions = [
-        "Console",        // access to Marinette Console (pretty printing)
-        "Libs",           // access to Libs
-        "Commands",       // registering commands and aliases, access to Conditions
-        "Var",            // access to Vars (Dangerous)
-	"Const",          // access to Const
-        "Sessions",		  // access to sessions
-        "CommandsDirect", // direct access to Commands && Aliases
-        "Config",         // accesss to Config (Dangerous)
-        "Locale",         // access to Translation ( && language name :D )
-        "Theme",          // access to theme name and data
-        "State",          // access to states
-        "Tools",          // access to tools, e.g. replaceF
-	"Plugins",        // Get info about loaded plugins
-	"PluginsDirect",  // Use internal APIs to manage plugins
-        "Root",           // acccess to many things (Extremely dangerous!)
+        "Console",         // access to Marinette Console (pretty printing)
+        "Libs",            // access to Libs
+        "Commands",        // registering commands and aliases, access to Conditions
+        "Var",             // access to Vars (Dangerous)
+		"Const",           // access to Const
+        "Sessions",		   // access to sessions
+        "CommandsDirect",  // direct access to Commands && Aliases
+        "Config",          // accesss to Config (Dangerous)
+        "Locale",          // access to Translation ( && language name :D )
+        "Theme",           // access to theme name and data
+        "State",           // access to states
+        "Tools",           // access to tools, e.g. replaceF
+		"Plugins",         // Get info about loaded plugins
+		"PluginsDirect",   // Use internal APIs to manage plugins
+        "Root",            // acccess to many things (Extremely dangerous!)
+		"Callbacks",       // access to callbacks
+		"CallbacksCustom", // Create custom callbacks
+		"CallbacksDirect", // access to Var.callbacks
 ]
 plugins.basicPermissions = ["Console", "Commands", "Locale", "Theme", "State"]
+
+triggerCallback = function(callback, event)
+	if Var.callbacks.indexes.indexOf(callback) == null then return
+	for f in Var.callbacks[callback]
+		if str(@f).matches("FUNCTION\(\w+\)") then f(event)
+	end for
+end function
+
+triggerCallbackPlugin = function(internal)
+	vars = Var
+	trigger = @triggerCallback
+	_triggerCallback = function(callback, event)
+		if vars.loadedPlugins[internal]["Callbacks"].indexOf(callback) == null then return
+		trigger(callback, event)
+	end function
+	return @_triggerCallback
+end function
+
+registerCallback = function(callback, f)
+	if Var.callbacks.indexes.indexOf(callback) == null then return
+	if typeof(Var.callbacks[callback]) != "list" then return
+	if str(@f).matches("FUNCTION\(\w+\)") then
+		Var.callbacks[callback].push(@f)
+	else
+		Console.error(Messages.ErrorPluginsCommandNotSupported, {"COMMAND": str(@f)})
+	end if
+end function
+
+availableCallbacks = function
+	return Var.callbacks.indexes
+end function
+
+createCallback = function(callback)
+	if Var.callbacks.indexes.indexOf(callback) != null then return false
+	Var.callbacks[callback] = []
+	return true
+end function
+
+createCallbackPlugin = function(internal)
+	vars = Var
+	create = @createCallback
+	_createCallback = function(callback)
+		if create(callback) then
+			vars.loadedPlugins[internal]["Callbacks"].push(callback)
+			return true
+		end if
+		false false
+	end function
+	return @_createCallback
+end function
 
 verifyMeta = function(meta)
         if typeof(@meta) != "map" then return false
@@ -62,6 +122,12 @@ getObjects = function(permission, internal)
 			return {"Messages": deepCopy(Messages), "language": Config.language}
 		else if permission == "Sessions" then
 			return {"sessions": Sessions, "Helpers": deepCopy(SessionHelpers)}
+		else if permission == "Callbacks" then
+			return {"register": @registerCallback, "available": @availableCallbacks}
+		else if permission == "CallbacksCustom" then
+			return {"create": @createCallbackPlugin(internal), "trigger": @triggerCallbackPlugin(internal)}
+		else if permission == "CallbacksDirect" then
+			return Var.callbacks
 		else
 			return null
         end if
@@ -166,6 +232,9 @@ plugins.registerPlugin = function(meta)
         pluginDef = {"Meta": meta, "Def": api}
         if meta.permissions.indexOf("State") != null then
                 pluginDef["State"] = {}
+        end if
+       if meta.permissions.indexOf("CallbacksCustom") != null then
+                pluginDef["Callbacks"] = []
         end if
 		if Var.requirePermissionApproval then
 			approved = permissionApproval(meta)
