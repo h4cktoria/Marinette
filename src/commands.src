@@ -379,7 +379,7 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
         shared.Sessions = deepCopy(Sessions)
 
         shell.launch(fd.path, "--no-ascii-art --password "+Var.password)
-        exit RuntimeHelpers.startMarinette(shell, fd.path)
+        RuntimeHelpers.startMarinette(shell, fd.path)
     end if
 end function
 
