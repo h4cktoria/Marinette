@@ -146,7 +146,7 @@ Console.boolInput = function(message=" ", default=true,  toReplaceFormat=null)
     accept = ["y", ""]
     refuse = ["escape", "n", "backspace"]
 
-    response = Console.input(message, false, toReplaceFormat, true).lower
+    response = Console.input(message, false, true, toReplaceFormat).lower
     for key in accept
 	if response == key then return true
     end for
