@@ -32,9 +32,14 @@ This repository is the only place where you can get Marinette without any risks.
 
 ## Description
 
-Marinette is a [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) without any fancy features like [Shell Expansions](https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html), [Shell Scripting](https://en.wikipedia.org/wiki/Shell_script), [Pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)) and so on. I've tried to make it as simple as I could, using few to no abstractions, allowing both the end users and myself to change it programmatically if needed. And I wouldn't say I've succeeded. =D
+Marinette is a [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) without any fancy features like [Shell Expansions](https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html), [Shell Scripting](https://en.wikipedia.org/wiki/Shell_script), [Pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)) and so on. I've tried to make it as simple as I could, using only structured programming, allowing the end users to change it programmatically if needed. And I wouldn't say I've succeeded. =D
 
-If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING TOOL! Hack by hand first, get a grip on the game mechanics, try to code something by yourself and have fun in general!
+Core(but not only!) features of Marinette:
+
+-   Simple and source-leak secure compile-time configuration
+-   [Defensive programmed](https://en.wikipedia.org/wiki/Defensive_programming) and won't crash if you misuse any command in any way
+
+Please read! If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING TOOL! Hack by hand first, get a grip on the game mechanics, try to code something by yourself and have fun in general!
 
 
 
@@ -42,21 +47,21 @@ If you're a newbie then PLEASE DON'T USE MARINETTE OR ANY OTHER PREMADE HACKING 
 ## How to install?
 
 1.  Clone the repository
-2.  From the root of the project, run **scripts/install_marinette.py**. It'll create **install_marinette.src**. Copy it to the Code Editor, compile it, run the binary
-3.  Go to **/home/guest/Sources/Marinette/src** and copy everything from [src](src) to here
-4.  Change the stuff in **marinette.src**
+2.  From the root of the project, run **scripts/install_marinette.py**. It'll create **install_marinette.src**. Copy it to the Code Editor, compile it and run the binary
+3.  Copy everything from [src](src) to **/home/guest/Sources/Marinette/src**
+4.  Change configuration in **marinette.src**
     1.  From the root of the project, run **scripts/config_password.py** with the desired password. Set the value in **Config.password**
     2.  From the root of the project, run **scripts/config_identificator.py**. Set the value in **Config.identificator**
     3.  (Optionally) From the root of the project, run **scripts/config_available_languages.py**. Set the desired language in **Config.language**
     4.  (Optionally) From the root of the project, run **scripts/config_available_themes.py**. Set the desired theme in **Config.theme**
-5.  Compile **marinette.src**. Launch Marinette with `--password YOUR_PASSWORD_HERE` parameters. Congratulations!
+5.  Compile **marinette.src**. Launch Marinette with `--password {YOUR_PASSWORD}` parameters. Congratulations!
 
 
 
 
 ## How to contribute?
 
-In the current state, I REALLY don't recommend you to contribute to Marinette because it's far from being complete. Anyway...
+In the current state, I REALLY don't recommend you to contribute to Marinette as it's far from being complete. Anyway...
 
 There are several ways you can contribute to Marinette
 
@@ -85,12 +90,23 @@ Open up an issue and wait for my response
 
 ### Code contribution
 
-PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE COMMITING! if you do, follow these ~simple~ coding conventions:
+PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE MAKING A PULL REQUEST! This includes, but not limits, to understanding of:
 
--   Zero OOP: Maps are structures or namespaces AND NOTHING MORE. No `self`, `super`, `.classID`, `new` and any other OOP mechanic
+-    Behaviour of `range()`
+-    How base class and it's instance behave
+-    Functions, list items and map items references
+-    How different default routine arguments behave
+
+If you understand these, you won't question most of the design choices
+
+Now that you're sure you know anything needed, have a look at these ~simple~ conventions:
+
+-   OOP is PROHIBITED! Maps are structures or namespaces AND NOTHING MORE! No `self`, `super`, `.classID`, `new` and any other OOP mechanic
 -   Compare built-in types with `isa`, Grey Hack objects with `typeof()`
 -   Name everything with camelCase; structures, namespaces and locale entries with PascalCase
--   After each locales or themes change, run [install_marinette.py](scripts/install_marinette.py)
+-   After each source change, run [install_marinette.py](scripts/install_marinette.py)
+-   Don't reinvent the wheel! If the algorithm you want to use is already defined in [portable.src](src/portable.src), you MUST use it!
+-   Before making a pull request, pull origin
 -   Define locales in [english.src](locales/english.src) first, then in your locale file
 -   Follow locale entries naming conventions described below
 
