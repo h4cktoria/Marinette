@@ -1,4 +1,4 @@
-// 
+//
 // Marinette's commands
 
 
@@ -26,7 +26,7 @@ command "help", ["h", "?"], Const.any, Messages.HelpEntryHelp, function(argument
                 continue
             end if
         end if
-        if Aliases.indexes.indexOf(command) != null then 
+        if Aliases.indexes.indexOf(command) != null then
             aliases = Aliases[command]
             commands = [command] + aliases
         else
@@ -41,7 +41,7 @@ command "help", ["h", "?"], Const.any, Messages.HelpEntryHelp, function(argument
             help = Helps[command]
             parts = help.split(" - ")
 
-            if parts.len == 1 then 
+            if parts.len == 1 then
                 description = parts[0]
             else if parts.len == 2 then
                 categories = parts[0]
@@ -52,7 +52,7 @@ command "help", ["h", "?"], Const.any, Messages.HelpEntryHelp, function(argument
                 description = parts[2]
             end if
         end if
-        
+
         help = {
             "commands": commands,
             "args": args,
@@ -70,7 +70,7 @@ command "help", ["h", "?"], Const.any, Messages.HelpEntryHelp, function(argument
         end for
     end function
 
-    if foundHelps.len > 0 then 
+    if foundHelps.len > 0 then
         categories = removeDuplicates(foundHelps.indexes)
         for category in categories
             foundHelps[category].sort("commands")
@@ -135,7 +135,7 @@ end function
 
 command "sessions", [], Const.any, Messages.HelpEntrySm, function(arguments)
     Conditions.argumentsMoreThan(arguments, 0)
-    
+
     command = arguments.pull
     if "add".indexOf(command) == 0  and arguments.len != 0 then return Conditions.arguments(arguments, 1)
     if "delete".indexOf(command) == 0 and arguments.len == 0 then return Conditions.argumentsMoreThan(arguments, 1)
@@ -160,14 +160,15 @@ command "sessions", [], Const.any, Messages.HelpEntrySm, function(arguments)
     else if "use".indexOf(command) == 0 then
         id = arguments[0]
         if id isa string or not SessionsHelpers.get(id) then return Console.error(Messages.ErrorIncorrectSessionId)
-        globals.Intrinsics = SessionsHelpers.get(id)
+        session = SessionsHelpers.get(id)
+        globals.Intrinsics = session.Intrinsics
         Console.log(Messages.LogSuccessfullSessionLoad)
     else if "look".indexOf(command) == 0 then
         output = Messages.SmHeader
         i = 1
         while SessionsHelpers.get(i) != null
-            intrinsics = SessionsHelpers.get(i)
-            output = output+char(10)+(i)+" "+SessionsHelpers.generateSessionName(intrinsics)
+            session = SessionsHelpers.get(i)
+            output = output+char(10)+(i)+" "+session.name
             i = i + 1
         end while
         print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
@@ -179,7 +180,7 @@ end function
 
 command "theme", [], Const.any, Messages.HelpEntryTheme, function(arguments)
     Conditions.arguments(arguments, 0)
-    
+
     asciiArt = [
         "  __  __          _          _   _       ",
         " |  \/  |__ _ _ _(_)_ _  ___| |_| |_ ___ ",
@@ -209,7 +210,7 @@ command "hashes", [], Const.any, Messages.HelpEntryHashcrack, function(arguments
     Conditions.crypto
 
     crypto = Libs.crypto
-    
+
     Console.log(Messages.LogHashCracking)
     for md5hash in fmap(@str, arguments)
         name = md5hash
@@ -219,8 +220,8 @@ command "hashes", [], Const.any, Messages.HelpEntryHashcrack, function(arguments
             name = parts[0]
             toCrack = parts[1]
         end if
-        
-        // 
+
+        //
         // This is a desync fix
         wait(0.01)
 
@@ -357,7 +358,7 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
 
     user = str(arguments[0])
     pass = str(arguments[1])
-    
+
     shell = get_shell(user, pass)
     if not shell then
         Console.error(Messages.ErrorIncorrectUsernameOrPassword)
@@ -370,7 +371,14 @@ command "su", [], Const.host, Messages.HelpEntryUserchange, function(arguments)
         Intrinsics.shell = shell
         Intrinsics.computer = Intrinsics.shell.host_computer
         Intrinsics.file = Intrinsics.computer.File("/")
-        
+
+        shared = get_custom_object
+        shared.Var = deepCopy(Var)
+        shared.Intrinsics = deepCopy(Intrinsics)
+        shared.Libs = deepCopy(Libs)
+        shared.Sessions = deepCopy(Sessions)
+
+        shell.launch(fd.path, "--no-ascii-art --password "+Var.password)
         RuntimeHelpers.startMarinette(shell, fd.path)
     end if
 end function
@@ -391,7 +399,7 @@ command "netcat", ["ncat", "nc"], Const.host, Messages.HelpEntrySvcon, function(
 
     router = getNetworkNode(addr)
     if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
-    
+
     addr = router.public_ip
     if isNodeLocallyAccessible(router) then addr = router.local_ip
 
@@ -403,7 +411,7 @@ command "netcat", ["ncat", "nc"], Const.host, Messages.HelpEntrySvcon, function(
     result = Intrinsics.shell.connect_service(addr, port, user, pass, svc)
     if not result then return Console.error(Messages.ErrorConnectionFailed)
     if ["shell", "ftpshell"].indexOf(typeof(result)) == null then Console.error(Messages.ErrorConnectionUnknownShell)
-    
+
     intrinsics = deepCopy(Intrinsics)
     intrinsics.shell = result
     intrinsics.computer = intrinsics.shell.host_computer
@@ -412,13 +420,13 @@ command "netcat", ["ncat", "nc"], Const.host, Messages.HelpEntrySvcon, function(
     intrinsics.localAddress = intrinsics.computer.local_ip
     intrinsics.port = port
     intrinsics.isConnectionRemote = true
-    
+
     SessionsHelpers.add(intrinsics)
     Console.log(Messages.LogSuccessfullSessionsUpdate)
 end function
 
 
-// 
+//
 // Thanks Ariavne for allowing me to use their nickname as a tool name :D
 command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arguments)
     Conditions.host
@@ -426,7 +434,7 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
 
     fd = Intrinsics.file
     metaxploit = Libs.metaxploit
-    
+
     while fd.parent
         fd = fd.parent
     end while
@@ -436,7 +444,7 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
     files = [] + fd.get_folders + fd.get_files
     while files.len > 0
         fd = files.pull
-        if fd.is_folder then 
+        if fd.is_folder then
             files = fd.get_folders + fd.get_files + files
             continue
         end if
@@ -453,7 +461,7 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
         end for
         if not isAlreadyFound then metalibs.push(metalib)
     end while
-    
+
     Console.log(Messages.LogScanningLocalLibraries, {"AMOUNT": metalibs.len})
     exploits = []
     for metalib in metalibs
@@ -465,7 +473,7 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
     end for
 
     if exploits.len == 0 then return Console.error(Messages.ErrorNoExploitsInScannedLibraries)
-    
+
     Console.log(Messages.LogExploitingVulnerabilities)
     results = []
     for exploit in exploits
@@ -474,9 +482,6 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
             if arguments.len > 0 then ofArgs = ofArgs + fmap(@str, arguments)
             ofArgs = removeDuplicates(ofArgs)
             for ofArg in ofArgs
-                // 
-                // This is a desync fix
-                wait(0.01)
                 if ofArg == null then
                     result = exploit.metalib.overflow(exploit.address, vulner.value)
                 else
@@ -567,7 +572,7 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
             priority = {
                 "shell": 0,
                 "computer": 1,
-                "file": 2, 
+                "file": 2,
                 "string": 3,
                 "number": 4,
             }
@@ -576,7 +581,7 @@ command "ariadne", ["aria"], Const.host, Messages.HelpEntryAriadne, function(arg
             return priority[iType] > priority[jType]
         end function
         mergeSort(lines, @typePredicate, 1)
-        
+
         output = lines.join(char(10))
         print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 
@@ -693,7 +698,7 @@ command "nemesis", ["ns"], Const.host, Messages.HelpEntryNemesis, function(argum
     end for
 
     if exploits.len == 0 then return Console.error(Messages.ErrorNoExploitsInScannedLibraries)
-    
+
     Console.log(Messages.LogExploitingVulnerabilities)
     results = []
     for exploit in exploits
@@ -702,12 +707,11 @@ command "nemesis", ["ns"], Const.host, Messages.HelpEntryNemesis, function(argum
             if arguments.len > 0 then ofArgs = ofArgs + arguments
             ofArgs = removeDuplicates(ofArgs)
             for ofArg in ofArgs
-                // 
-                // This is a desync fix
-                wait(0.01)
                 if ofArg == null then
+					wait(0.01)
                     result = exploit.metalib.overflow(exploit.address, vulner.value)
                 else
+					wait(0.01)
                     result = exploit.metalib.overflow(exploit.address, vulner.value, str(ofArg))
                 end if
                 if result == null then continue
@@ -799,7 +803,7 @@ command "nemesis", ["ns"], Const.host, Messages.HelpEntryNemesis, function(argum
             priority = {
                 "shell": 0,
                 "computer": 1,
-                "file": 2, 
+                "file": 2,
                 "string": 3,
                 "number": 4,
             }
@@ -808,7 +812,7 @@ command "nemesis", ["ns"], Const.host, Messages.HelpEntryNemesis, function(argum
             return priority[iType] > priority[jType]
         end function
         mergeSort(lines, @typePredicate, 1)
-        
+
         output = lines.join(char(10))
         print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
 
@@ -938,7 +942,7 @@ command "wificrack", [], Const.host, Messages.HelpEntryNetcrack, function(argume
     networks = Intrinsics.computer.wifi_networks(iface)
     if not networks then return Console.error(Messages.ErrorCouldNotGetNetworksList)
     if not id isa number or id > networks.len then return Console.error(Messages.ErrorIncorrectNetworkId)
-    
+
     Console.log(Messages.LookingForTheNetwork)
     powerPredicate = function(iItem, jItem)
         iPwr = iItem.split(" ")[1].replace("%", "").to_int
@@ -989,7 +993,7 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
     Conditions.host
     Conditions.network
     Conditions.apt
-    
+
     fd = Intrinsics.file
     apt = Libs.apt
     command = str(arguments.pull)
@@ -998,11 +1002,11 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
         for repo in fmap(@str, arguments)
             parts = repo.split(":")
             if parts.len > 2 then return Console.error(Messages.ErrorIncorrectRepositoryAddress)
-            
+
             address = parts[0]
             port = 1542
             if parts.len == 2 then port = parts[1].to_int
-            
+
             router = getNetworkNode(address)
             if not router then return Console.error(Messages.ErrorIncorrectNodeAddress)
             address = router.public_ip
@@ -1023,7 +1027,7 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
             address = router.public_ip
 
             result = apt.del_repo(address)
-            if result and result isa string then 
+            if result and result isa string then
                 Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "del_repo", "ERROR": result}))
             else
                 Console.log(replaceF(Messages.LogSuccessfullRepositoryDeletion, {"ADDRESS": address}))
@@ -1047,7 +1051,7 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
             address = router.public_ip
 
             result = apt.show(address)
-            if result.indexOf(" repository not found") then 
+            if result.indexOf(" repository not found") then
                 Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "show", "ERROR": result}))
             else
                 Console.log(replaceF(Messages.LogContentsOfRepository, {"ADDRESS": address}))
@@ -1063,6 +1067,34 @@ command "meow", ["mpm"], Const.host, Messages.HelpEntryMeow, function(arguments)
     end if
 end function
 
+command "pluger", [".", "plunger", "pm"], Const.host, Messages.HelpEntryPluger, function(arguments)
+	Conditions.host
+	Conditions.argumentsMoreThan(arguments, 0)
+	action = arguments.pull
+    if ["loaded"].indexOf(action) == 0 and arguments.len == 0 then
+		Console.log(Messages.LogPluginsLoaded, {"AMOUNT": Var.loadedPlugins.len})
+		for plugin in Var.loadedPlugins
+			name = plugin.value.Meta.name
+			internal = plugin.value.Meta.internal
+			author = plugin.value.Meta.author
+			general = replaceF(Messages.LogPluginsGeneralInfo, {"NAME": name, "INTERNAL": internal, "AUTHOR": author})
+			permissions = replaceF(Messages.LogPluginsGrantedPermissions, {"PERMISSIONS": plugin.value.Meta.permissions.join(", ")})
+			Console.log(general)
+			print(secondary(permissions))
+		end for
+
+    else if "load".indexOf(action) == 0 and arguments.len == 1 then
+		path = arguments.pull
+		Conditions.shell(["shell"])
+		loadPlugin(Intrinsics.shell, path)
+    else if "load-spec".indexOf(action) == 0 and arguments.len == 1 then
+		spec = arguments.pull
+		loadPluginFromSpec(spec)
+	else
+		Console.error(Messages.ErrorUnknownArguments)
+	end if
+
+end function
 
 command "netscan", ["nesca"], Const.host, Messages.HelpEntryNesca, function(arguments)
     Conditions.host
@@ -1077,7 +1109,7 @@ command "netscan", ["nesca"], Const.host, Messages.HelpEntryNesca, function(argu
 
         domain = getDomainName(address)
         Console.log(replaceF(Messages.LogNescaOn, {"DOMAIN": domain, "PUBADDR": router.public_ip, "LOCADDR": router.local_ip}))
-        
+
         output = Messages.NescaHeader
         if not isNodeLocallyAccessible(router) then output = output+char(10)+"0 "+Messages.PortStateOpened+" "+Messages.PortStateOpened+" "+Messages.ServiceNode+" "+router.kernel_version+" "+router.local_ip
         for publicPort in router.used_ports
@@ -1172,7 +1204,7 @@ command "netscan", ["nesca"], Const.host, Messages.HelpEntryNesca, function(argu
             return iAddr > jAddr
         end function
         mergeSort(lines, @addrPredicate, 1)
-        
+
         output = lines.join(char(10))
         print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
     end function
@@ -1217,7 +1249,7 @@ command "mails", [], Const.host, Messages.HelpEntryMaildump, function(arguments)
     result = crypto.smtp_user_list(target, port)
     if result isa string then
         return Console.error(replaceF(Messages.ErrorStringGeneral, {"FUNC": "smtp_user_list", "ERROR": result}))
-    else if not result then 
+    else if not result then
         return Console.error(replaceF(Messages.ErrorInvulnerableService, {"SERVICE": "smtp"}))
     end if
 
@@ -1253,7 +1285,7 @@ command "hostify", [], Const.shell, Messages.HelpEntryHostify, function(argument
         // Now that I think of it - this is potentially a security vulnerability. Should be cautious.
         fdMarinette = findMyself(get_shell, Config.identificator, "--identify-marinette --password "+Var.password)
         if not fdMarinette then return Console.error(Messages.ErrorCouldNotFindMyself)
-        
+
         Console.log(Messages.LogUploadingNeccessary)
         fdBin = get_shell.host_computer.File(fdMarinette.path)
         result = get_shell.scp(fdMarinette.path, fdPermissive.path, Intrinsics.shell)
@@ -1268,7 +1300,16 @@ command "hostify", [], Const.shell, Messages.HelpEntryHostify, function(argument
 
     Intrinsics.isConnectionRemote = false
 
-    RuntimeHelpers.startMarinette(Intrinsics.shell, marinettePath)
+    shared = get_custom_object
+    shared.Var = deepCopy(Var)
+    shared.Intrinsics = deepCopy(Intrinsics)
+    shared.Libs = deepCopy(Libs)
+    shared.Sessions = deepCopy(Sessions)
+
+    Console.log(Messages.LogSessionHostifiedSuccessfully)
+
+    Intrinsics.shell.launch(marinettePath, "--no-ascii-art --password "+Var.password)
+    exit RuntimeHelpers.startMarinette(Intrinsics.shell, marinettePath)
 end function
 
 
@@ -1345,7 +1386,7 @@ command "networks", [], Const.computer, Messages.HelpEntryNetlook, function(argu
 
     networks = Intrinsics.computer.wifi_networks(iface)
     if not networks then return Console.error(Messages.ErrorCouldNotGetNetworksList)
-    
+
     powerPredicate = function(iItem, jItem)
         iPwr = iItem.split(" ")[1].replace("%", "").to_int
         jPwr = jItem.split(" ")[1].replace("%", "").to_int
@@ -1386,7 +1427,7 @@ command "connect", [], Const.computer, Messages.HelpEntryNetcon, function(argume
     if not networks then return Console.error(Messages.ErrorCouldNotGetNetworksList)
     if not id isa number or id > networks.len then return Console.error(Messages.ErrorIncorrectNetworkId)
     id = id - 1
-    
+
     Console.log(Messages.LookingForTheNetwork)
     powerPredicate = function(iItem, jItem)
         iPwr = iItem.split(" ")[1].replace("%", "").to_int
@@ -1419,7 +1460,7 @@ command "tasklist", [], Const.computer, Messages.HelpEntryTasklist, function(arg
     lines = Intrinsics.computer.show_procs.split(char(10))
     tasks = lines[1:]
     if tasks.len == 0 then tasks = ["- - - - -"]
-    
+
     Console.log(Messages.LogAllRunningTasks)
     output = Messages.TasklistHeader+char(10)+tasks.join(char(10))
     print(formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary))
@@ -1538,9 +1579,9 @@ command "dir", ["ls", "look", "l"], Const.file, Messages.HelpEntryLook, function
         output = Messages.LookHeader
         contents = fd.get_folders + fd.get_files
         for f in contents
-            if f.is_folder then 
+            if f.is_folder then
                 type = Messages.Folder
-            else if f.is_binary then 
+            else if f.is_binary then
                 type = Messages.Binary
             else
                 type = Messages.Text
@@ -1549,7 +1590,7 @@ command "dir", ["ls", "look", "l"], Const.file, Messages.HelpEntryLook, function
             output = output+char(10)+[permissions[1:],f.owner,f.group,f.size,type,f.name].join(" ")
         end for
         if contents.len == 0 then output = output+char(10)+"- - - - - -"
-        
+
         lines = output.split(char(10))
         namePredicate = function(iItem, jItem)
             iName = iItem.split(" ")[5]
@@ -1573,7 +1614,7 @@ command "dir", ["ls", "look", "l"], Const.file, Messages.HelpEntryLook, function
         output = formatColumnsColored(output, Theme.miscPrimary, Theme.miscSecondary)
         print(output)
     end function
-    
+
     if arguments.len == 0 then
         lookOne(Intrinsics.file.path)
     else
@@ -1654,7 +1695,7 @@ end function
 
 command "copy", [], Const.file, Messages.HelpEntryCopy, function(arguments)
     Conditions.arguments(arguments, 2)
-    
+
     fd = Intrinsics.file
     path = str(arguments[0])
     dest = str(arguments[1])

@@ -1,22 +1,22 @@
-// 
+//
 // Marinette's library. All of the shell internals are here
 
 
 
 
-// 
+//
 // Defaulting to fallback and map appending the chosen theme if exists
 Theme = Themes["Violet"]
 if Themes.indexes.indexOf(Config.theme) != null then Theme = Theme + Themes[Config.theme]
 
 
-// 
+//
 // Compiling the locale with a specific language code for it to be usable
 // Missing entries will still be usable, but with an error message indicating that instead
 Messages = localesCompile(Config.language, Locales)
 
 
-// 
+//
 // Const is something persistent and used globally
 Const = {
     "any": Messages.SessionTypeAny,
@@ -24,25 +24,33 @@ Const = {
     "shell": Messages.SessionTypeShell,
     "computer": Messages.SessionTypeComputer,
     "file": Messages.SessionTypeFile,
+	"plugin": Messages.HelpCategoryPlugins,
 }
 
 
-// 
+//
 // Var is something that is set at runtime and used globally
 // Don't touch unless you know what you are doing
 Var = {
     "password": null,
     "hostSession": null,
     "parameters": parseParameters(params),
+	"importPlugin": false,
+	"requirePermissionApproval": false,
+	"loadedPlugins": {},
+	"pluginSharedState": {},
 }
 
 
-// 
-// Libraries are loaded incrementally at runtime
-Libs = {}
+Libs = {
+    "apt": null,
+    "crypto": null,
+    "metaxploit": null,
+    "blockchain": null,
+}
 
 
-// 
+//
 // Internal objects that are used in commands
 Intrinsics = {
     "shell": get_shell,
@@ -103,7 +111,7 @@ end function
 
 Console.asciiArt = function(art)
     i = 0; while i < art.len; i = i + 1
-        if i-1 < round(art.len * 3 / 4 - 1) then
+        if i < round(art.len * (3/4)) then
             print("<color="+Theme.ascii+">"+art[i-1])
         else
             print("<color="+Theme.asciiShadow+">"+art[i-1])
@@ -129,24 +137,25 @@ Console.error = function(message=" ", toReplaceFormat=null)
     Console._printWithColorAndTime(Theme.error, message, toReplaceFormat)
 end function
 
-Console.input = function(message=" ", isPassword=false, toReplaceFormat=null)
+Console.input = function(message=" ", isPassword=false, toReplaceFormat=null, anyKey=false)
     if toReplaceFormat then message = replaceF(message, toReplaceFormat)
-    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", isPassword)
+    input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", isPassword, anyKey)
     if isInputValid(input) then return input
     return ""
 end function
 
-Console.boolInput = function(message=" ", default=true, toReplaceFormat=null)
-    if toReplaceFormat then message = replaceF(message, toReplaceFormat)
-    input = ""
-    while not input
-        input = user_input("<color="+Theme.inputMessage+">"+message+"<color="+Theme.input+">", false, true).trim
-        if isInputValid(input) then
-            if not input then return default
-            if input.lower == "y" then return true
-            if input.lower == "n" or input.lower == "backspace" then return false
-        end if
-    end while
+Console.boolInput = function(message=" ", default=true,  toReplaceFormat=null)
+	accept = ["y", ""]
+	refuse = ["escape", "n", "backspace"]
+
+	response = Console.input(message, false, toReplaceFormat, true).lower
+	for key in accept
+		if response == key then return true
+	end for
+	for key in refuse
+		if response == key then return false
+	end for
+	return default;
 end function
 
 Console.prompt = function
@@ -170,7 +179,7 @@ Console.cmdloop = function
     while true
         input = Console.input(Console.prompt).trim
 
-        // 
+        //
         // Various handlers that get executed each loop
         IntrinsicsHelpers.tryToFixFdIfCorrupted
 
@@ -286,29 +295,30 @@ Sessions = []
 
 SessionsHelpers = {}
 
-// 
+//
 // Add session to the Sessions[]
 // Overwrites session if it already exists
 SessionsHelpers.add = function(intrinsics)
     intrinsics = deepCopy(intrinsics)
+    session = SessionsHelpers.createSession(intrinsics)
 
-    // 
+    //
     // No idea what this code does :P
-    if not intrinsics.isConnectionRemote then
+    if not session.Intrinsics.isConnectionRemote then
         if not Var.hostSession then
-            Var.hostSession = deepCopy(Intrinsics)
+            Var.hostSession = SessionsHelpers.createSession(Intrinsics)
             return
         end if
-        
+
         hostSession = deepCopy(Var.hostSession)
-        if SessionsHelpers.generateSessionName(hostSession).split(" ")[1:] == SessionsHelpers.generateSessionName(intrinsics).split(" ")[1:] then
-            Var.hostSession = deepCopy(intrinsics)
+        if hostSession.name.split(" ")[1:] == session.name.split(" ")[1:] then
+            Var.hostSession = deepCopy(session)
             return
         end if
-        
-        hostSession.isConnectionRemote = true
-        SessionsHelpers.add(hostSession)
-        Var.hostSession = deepCopy(intrinsics)
+
+        hostSession.Intrinsics.isConnectionRemote = true
+        SessionsHelpers.add(hostSession.Intrinsics)
+        Var.hostSession = deepCopy(session)
         return
     end if
 
@@ -316,14 +326,14 @@ SessionsHelpers.add = function(intrinsics)
     lookup = -1
     for oldSession in Sessions
         lookup = lookup + 1
-        if SessionsHelpers.generateSessionName(oldSession) != SessionsHelpers.generateSessionName(intrinsics) then continue
+        if oldSession.name != session.name then continue
         index = lookup
         break
     end for
     if index == null then
-        Sessions.push(intrinsics)
+        Sessions.push(session)
     else
-        Sessions[index] = intrinsics
+        Sessions[index] = session
     end if
 end function
 
@@ -340,7 +350,14 @@ SessionsHelpers.get = function(id)
     return deepCopy(sessions[id-1])
 end function
 
-SessionsHelpers.generateSessionName = function(intrinsics)
+//
+// Creates session object
+// Returns following:
+// session = [
+//     "name": string,
+//     "Intrinsics": map,
+// ]
+SessionsHelpers.createSession = function(intrinsics)
     intrinsics = deepCopy(intrinsics)
 
     object = IntrinsicsHelpers.getSessionType(intrinsics)
@@ -354,7 +371,20 @@ SessionsHelpers.generateSessionName = function(intrinsics)
     if port == null then port = "-"
     if not user then user = "-"
 
-    return [object,pubAddr,locAddr,port,user].join(" ")
+    session = {
+        "name": [object,pubAddr,locAddr,port,user].join(" "),
+        "Intrinsics": deepCopy(intrinsics),
+    }
+
+    return session
+end function
+
+SessionsHelpers.getSessionsNames = function
+    names = []
+    for session in deepCopy(Sessions)
+        names.push(session.name)
+    end for
+    return names
 end function
 
 
