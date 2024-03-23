@@ -93,10 +93,11 @@ Open up an issue and wait for my response
 
 PLEASE MAKE SURE YOU UNDERSTAND MOST OF THE MINISCRIPT IMPLICIT BEHAVIOUR BEFORE MAKING A PULL REQUEST! This includes, but not limits to, the understanding of:
 
--    Behaviour of `range()`
--    How base class and it's instances behave
--    Functions, list items and map items references
--    How different default routine arguments behave
+-   Behaviour of `range()`
+-   How base class and it's instances behave
+-   How different default routine arguments behave
+-   Functions, list items and map items references
+-   Scoping and data encapsulation
 
 If you understand these, you won't question most of the design choices
 
@@ -199,7 +200,7 @@ Special thanks and credits goes to:
 -   [Roupi](https://www.greyrepo.xyz/users/roupi) - for [Scan class module](https://www.greyrepo.xyz/posts/scan-class)
 -   [Finko42](https://github.com/Finko42) - for [Encryption and Hashing algorithms](https://github.com/Finko42/GreyHack)
 -   Ariavne - for allowing me to use their nickname as a command name(see `ariadne`)
--   [Guest](https://github.com/fmmaks666) - for Ukrainian translation and plugins implementation
+-   [Guest](https://github.com/fmmaks666) - for Ukrainian translation and plugins implementation(which didn't get into Marinette because of how hard it is to make it SECURE)
 -   [Simonize](https://github.com/Simoniko) - for color scheme(see `NoAuthV3Ocean` [theme](themes/nav3ocean.src)) and Polish translation
 -   [Olipro](https://github.com/Olipro) - for making Omni, from leaked version of which I've ~stealen~ borrowed a color scheme(see `Omni` [theme](themes/omni.src))
 -   [Volk](https://github.com/EntitySeaker) - for making Viper, from leaked version of which I've ~stealen~ borrowed a color scheme(see `Viper` [theme](themes/viper.src))

@@ -41,8 +41,9 @@ deepCopy = function(collection)
         return copied + {}
     end function
 
-    if collection isa list then return listCopy(collection)
-    if collection isa map then return mapCopy(collection)
+    if @collection isa list then return listCopy(collection)
+    if @collection isa map then return mapCopy(collection)
+    return @collection
 end function
 
 // 

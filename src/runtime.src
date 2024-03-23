@@ -105,6 +105,7 @@ RuntimeHelpers.makeNeccessaryRuntimeAssigns = function
 
 
     SessionsHelpers.add(Intrinsics)
+    RuntimeHelpers.assignMainframeIfConfigured
 end function
 
 // 
@@ -115,6 +116,17 @@ RuntimeHelpers.checkIfEverythingIsAssigned = function
     haveAllPassed = true
     if not (Intrinsics.publicAddress and Intrinsics.localAddress) then haveAllPassed = false
     if Libs.len < 4 then haveAllPassed = false
+    
+    if Config.mainframe then
+        for key in Mainframe.indexes
+            if Mainframe[key] == null then
+                haveAllPassed = false
+                break
+            end if
+        end for
+
+        if not MainframeHelpers.isReachable then haveAllPassed = false
+    end if
 
     if not haveAllPassed then
         Console.warning(Messages.WarningFailedSystemChecks)
@@ -143,4 +155,15 @@ RuntimeHelpers.startMarinette = function(shell, marinettePath)
     else
         exit
     end if
+end function
+
+RuntimeHelpers.assignMainframeIfConfigured = function
+    if not Config.mainframe then return
+    data = aes128("decrypt", passwordToAesKey(Var.password), Config.mainframe)
+    parts = data.split("@")
+    Mainframe.protocol = parts[0]
+    Mainframe.address = parts[1]
+    Mainframe.port = parts[2].to_int
+    Mainframe.user = parts[3]
+    Mainframe.password = parts[4]
 end function

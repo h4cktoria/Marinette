@@ -25,7 +25,6 @@ Const = {
     "computer": Messages.SessionTypeComputer,
     "file": Messages.SessionTypeFile,
     "plugin": Messages.HelpCategoryPlugins,
-
 }
 
 
@@ -33,14 +32,22 @@ Const = {
 // Var is something that is set at runtime and used globally
 // Don't touch unless you know what you are doing
 Var = {
+    "parameters": parseParameters(params),
     "password": null,
     "hostSession": null,
-    "parameters": parseParameters(params),
-    "importPlugin": false,
-    "requirePermissionApproval": false,
-    "loadedPlugins": {},
-    "pluginSharedState": {},
 }
+
+passwordToAesKey = function(password)
+    while password.len < 16
+        password = "0"+password
+    end while
+
+    while password.len > 16
+        password = password[1:]
+    end while
+
+    return password
+end function
 
 
 // 
@@ -180,6 +187,7 @@ Console.cmdloop = function
         // 
         // Various handlers that get executed each loop
         IntrinsicsHelpers.tryToFixFdIfCorrupted
+        MainframeHelpers.warnUserIfCouldNotConnectToMainframe
 
         if input.len == 0 then continue
 
@@ -373,4 +381,45 @@ command = function(name, aliases, category, help, func)
     Helps[name] = category+" - "+help
     Aliases[name] = aliases
     Commands[name] = @func
+end function
+
+
+Mainframe = {
+    "protocol": null,
+    "address": null,
+    "port": null,
+    "user": null,
+    "password": null,
+}
+
+
+MainframeHelpers = {}
+
+MainframeHelpers.isReachable = function
+    if not get_shell.host_computer.is_network_active then return false
+    router = getNetworkNode(Mainframe.address)
+    if not router or not router.ping_port(Mainframe.port) then return false
+    return true
+end function
+
+MainframeHelpers.connect = function
+    if not MainframeHelpers.isReachable then return
+
+    if Mainframe.protocol == "ssh" then
+        mainframeShell = Intrinsics.shell.connect_service(Mainframe.address, Mainframe.port, Mainframe.user, Mainframe.password, "ssh")
+    else if Mainframe.protocol == "overflow" then
+        if not Libs.metaxploit then return
+
+    end if
+
+    if typeof(mainframeShell) == "shell" then return mainframeShell
+end function
+
+MainframeHelpers.isAlive = function
+    return MainframeHelpers.connect != null
+end function
+
+MainframeHelpers.warnUserIfCouldNotConnectToMainframe = function
+    if not Config.mainframe or MainframeHelpers.isAlive then return
+    Console.warning("Could not connect to the mainframe! You've likely been compromised!")
 end function

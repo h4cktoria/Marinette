@@ -44,6 +44,8 @@ def create_project_structure_recursively(project_fd, installer_fd, game_path):
     dirs = list(project_fd.iterdir())
     dirs.sort()
     for path in dirs:
+        if path.is_dir() and path.name in blacklist:
+            continue
         new_path = str(PurePath(game_path) / path.name)
         if path.is_dir():
             installer_fd.write(create_folder(new_path))
@@ -73,6 +75,7 @@ import src_make_localization
 import src_make_themeing
 
 
+blacklist = ["etc", "locales", "scripts", "themes", "vols"]
 filename = Path(__file__).name.replace(".py", ".src")
 with open(f"scripts/{filename}", "w") as installer:
     installer.write(gh_init())

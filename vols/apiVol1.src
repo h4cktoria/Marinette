@@ -1,0 +1,13 @@
+// Why creating safe APIs is ridiculously hard in MS
+// By Hacktoria
+// Vol 1: Types hijacking
+
+print(number == funcRef) // 1
+
+f = function; end function
+for object in [1, "s", [], {}, @f, null]
+    print(object isa null) // 1 six times
+end for
+
+string = number
+print(1 isa string) // 1
